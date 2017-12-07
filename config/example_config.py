@@ -10,5 +10,8 @@ messagePlugins = [
     #  'price',
     #  'char'
 ]
+# On Tick Plugins
+tickPlugins = [
+]
 
 # Auth Setup
