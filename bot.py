@@ -1,4 +1,5 @@
 import discord
+import asyncio
 from config import config
 from plugins import onMessage
 from plugins import onTick
@@ -8,7 +9,7 @@ client = discord.Client()
 
 @client.event
 async def on_message(message):
-    onMessage.run(client, message)
+    await onMessage.run(client, message)
 
 
 @client.event
