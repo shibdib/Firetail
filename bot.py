@@ -24,13 +24,12 @@ logger.info('------')
 
 @client.event
 async def on_message(message):
-    if message.content.startswith(config.trigger):
+    if message.content.startswith(config.trigger) and message.content.split(' ', 1)[0][1:] in config.messagePlugins:
         await pluginManager.message_plugin(client, logger, config, message)
 
 
 @client.event
 async def on_ready():
-    logger.info('------')
     logger.info('Firetail - Created by Shibdib https://github.com/shibdib/Firetail')
     logger.info('Logged in as')
     logger.info(client.user.name)
