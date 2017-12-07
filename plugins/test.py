@@ -1,4 +1,4 @@
-async def plugin(client, message):
+async def run(client, message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return

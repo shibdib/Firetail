@@ -1,11 +1,15 @@
 
 # Put the bot token from https://discordapp.com/developers/applications here
 token = 'token'
+trigger = '!'
 
 # Set desired plugins to True (Capital T is important)
 # On Message Plugins
-# price = False # Price Check Plugin
-# char = False # Character Lookup
-# auth = False # Auth
+messageplugins = {
+    'test': True,
+    'auth': True,  # Auth
+    'price': False,  # Price Check
+    'char': False  # Character Lookup
+    }
 
 # Auth Setup

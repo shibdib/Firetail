@@ -16,17 +16,18 @@ client = discord.Client()
 
 @client.event
 async def on_message(message):
-    await onMessage.run(client, config, message)
+    if message.content.startswith(config.trigger):
+        await onMessage.run(client, config, message)
 
 
 @client.event
 async def on_ready():
-    print('------')
-    print('Firetail - Created by Shibdib https://github.com/shibdib/Firetail')
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
+    logger.info('------')
+    logger.info('Firetail - Created by Shibdib https://github.com/shibdib/Firetail')
+    logger.info('Logged in as')
+    logger.info(client.user.name)
+    logger.info(client.user.id)
+    logger.info('------')
 
 
 client.run(config.token)
