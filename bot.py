@@ -1,9 +1,7 @@
 import discord
-import asyncio
 import logging
 from config import config
-from plugins import onMessage
-from plugins import onTick
+import pluginManager
 
 logger = logging.getLogger('firetail')
 logger.setLevel(logging.DEBUG)
@@ -13,11 +11,21 @@ logger.addHandler(handler)
 
 client = discord.Client()
 
+logger.info('Loading Message Plugins: ')
+for plugin in config.messagePlugins:
+    logger.info(plugin)
+logger.info('------')
+
+logger.info('Loading Tick Plugins: ')
+for plugin in config.tickPlugins:
+    logger.info(plugin)
+logger.info('------')
+
 
 @client.event
 async def on_message(message):
     if message.content.startswith(config.trigger):
-        await onMessage.run(client, config, message)
+        await pluginManager.message_plugin(client, logger, config, message)
 
 
 @client.event

@@ -3,13 +3,12 @@
 token = 'token'
 trigger = '!'
 
-# Set desired plugins to True (Capital T is important)
+# Uncomment plugins to enable
 # On Message Plugins
-messageplugins = {
-    'test': True,
-    'auth': True,  # Auth
-    'price': False,  # Price Check
-    'char': False  # Character Lookup
-    }
+messagePlugins = [
+    'auth',
+    #  'price',
+    #  'char'
+]
 
 # Auth Setup
