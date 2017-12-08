@@ -1,0 +1,36 @@
+// config.json
+{
+  "BOT": {
+    "TOKEN": "1234",
+    "TRIGGER": "!"
+  },
+
+  "ENABLED_PLUGINS": {
+    "ON_MESSAGE": [
+      "AUTH",
+      "PRICE"
+    ],
+    "ON_TICK": [
+      "AUTHCHECK"
+    ]
+  },
+
+  "AUTH": {
+    "CLIENT_ID": "tests",
+    "REDIRECT_URI": 20,
+    "AUTHGROUPS": {
+      "AUTHGROUP1": {
+        "ID": 1234,
+        "ROLE": "Corp Bro"
+      },
+      "AUTHGROUP2": {
+        "ID": 1234,
+        "ROLE": "Alliance Bro"
+      },
+      "AUTHGROUP3": {
+        "ID": 1234,
+        "ROLE": "Corp Bro"
+      }
+    }
+  }
+}
