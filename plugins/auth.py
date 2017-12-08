@@ -7,5 +7,5 @@ async def run(client, logger, message):
         return
 
     authstring = message.content.split()[1]
-    reply = db.select_pending(authstring)
-    await client.send_message(message.channel, reply)
+    reply = await db.select_pending(authstring)
+    client.send_message(message.channel, reply)
