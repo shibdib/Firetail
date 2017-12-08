@@ -14,4 +14,8 @@ messagePlugins = [
 tickPlugins = [
 ]
 
+
 # Auth Setup
+class auth(object):
+    corpid = 1000066
+    corprole = 'Name'
