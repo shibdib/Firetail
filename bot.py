@@ -37,4 +37,4 @@ async def on_ready():
     logger.info('------')
 
 
-client.run(config["BOT"]["TOKEN"])
+client.run(config.token)
