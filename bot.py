@@ -1,10 +1,7 @@
 import discord
 import logging
-import json
 import pluginManager
-
-with open('config/config.json', 'r') as f:
-    config = json.load(f)
+from config import config
 
 logger = logging.getLogger('firetail')
 logger.setLevel(logging.DEBUG)
@@ -15,19 +12,19 @@ logger.addHandler(handler)
 client = discord.Client()
 
 logger.info('Loading Message Plugins: ')
-for plugin in config["ENABLED_PLUGINS"]["ON_MESSAGE"]:
+for plugin in config.messagePlugins:
     logger.info(plugin)
 logger.info('------')
 
 logger.info('Loading Tick Plugins: ')
-for plugin in config["ENABLED_PLUGINS"]["ON_TICK"]:
+for plugin in config.tickPlugins:
     logger.info(plugin)
 logger.info('------')
 
 
 @client.event
 async def on_message(message):
-    if message.content.startswith(config["BOT"]["TRIGGER"]) and message.content.split(' ', 1)[0][1:] in config["ENABLED_PLUGINS"]["ON_MESSAGE"]:
+    if message.content.startswith(config.tickPlugins) and message.content.split(' ', 1)[0][1:] in config["ENABLED_PLUGINS"]["ON_MESSAGE"]:
         await pluginManager.message_plugin(client, logger, config, message)
 
 
