@@ -24,7 +24,7 @@ logger.info('------')
 
 @client.event
 async def on_message(message):
-    if message.content.startswith(config.tickPlugins) and message.content.split(' ', 1)[0][1:] in config["ENABLED_PLUGINS"]["ON_MESSAGE"]:
+    if message.content.startswith(config.trigger):
         await pluginManager.message_plugin(client, logger, config, message)
 
 

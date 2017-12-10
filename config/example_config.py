@@ -5,7 +5,6 @@ trigger = '!'
 # Uncomment plugins to enable
 # On Message Plugins
 messagePlugins = [
-    'auth',
     #  'price',
     #  'char'
 ]
