@@ -41,5 +41,11 @@ killmail = {  # add or remove groups as needed, groups must have unique names.
 # Jabber Relayings
 jabber = {  # add or remove groups as needed, groups must have unique names.
     'username': 'bot@test.com',
-    'password': 'password'
+    'password': 'password',
+    'triggers': {
+        'trigger1': {
+            'string': 'To All Online',
+            'Channel': '389865784656134155'
+        }
+    }
 }
