@@ -8,7 +8,7 @@ async def run(client, logger, config):
     #  Get latest kill data
     data = redis(client)
     #  Foreach thru all provided groups
-    for group in config.pluginSettings.killmail:
+    for group in config.PluginSettings.killmail:
         killmail_group_id = group['id']
         channel_id = group['channelId']
         loss = group['lossMails']
@@ -17,11 +17,11 @@ async def run(client, logger, config):
         for parties in data['killmail']:
             if loss:
                 for groups in parties['victim']:
-                    group_ids.append(groups['corporation_id'])
-                    group_ids.append(groups['alliance_id'])
+                    group_ids.append(int(groups['corporation_id']))
+                    group_ids.append(int(groups['alliance_id']))
             for groups in parties['attackers']:
-                group_ids.append(groups['corporation_id'])
-                group_ids.append(groups['alliance_id'])
+                group_ids.append(int(groups['corporation_id']))
+                group_ids.append(int(groups['alliance_id']))
         if killmail_group_id in group_ids:
             kill_id = data['killID']
             value_raw = data['zkb']['totalValue']

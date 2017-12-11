@@ -22,21 +22,11 @@ autoResponse = {
 }
 
 
-class pluginSettings:
+class PluginSettings:
     killmail = {  # add or remove groups as needed, groups must have unique names.
         'group1': {
             'id': 1234,  # Corp/Alliance ID
             'channelId': 1234,  # Channel ID
             'lossMails': True  # Show Loss Mails
-        },
-        'group2': {
-            'id': 0,  # Corp/Alliance ID
-            'channelId': 1234,  # Channel ID
-            'lossMails': True  # Show Loss Mails
-        },
-        'group3': {
-            'id': 0,  # Corp/Alliance ID
-            'channelId': 1234,  # Channel ID
-            'lossMails': True  # Show Loss Mails
-        },
+        }
     }
