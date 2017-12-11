@@ -1,6 +1,7 @@
 import discord
 import logging
 import pluginManager
+import asyncio
 from config import config
 
 logger = logging.getLogger('firetail')
@@ -22,6 +23,14 @@ for plugin in config.tickPlugins:
 logger.info('------')
 
 
+# Tick Loop
+async def tick_loop():
+    await client.wait_until_ready()
+    while not client.is_closed:
+        await pluginManager.tick_plugin(client, logger, config)
+        await asyncio.sleep(3)  # task runs every 60 seconds
+
+
 @client.event
 async def on_message(message):
     if message.content.startswith(config.trigger):
@@ -37,4 +46,5 @@ async def on_ready():
     logger.info('------')
 
 
+client.loop.create_task(tick_loop())
 client.run(config.token)

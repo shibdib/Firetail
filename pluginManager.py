@@ -17,6 +17,9 @@ async def message_plugin(client, logger, config, message):
         await client.send_message(message.channel, msg)
 
 
-async def tick_plugin(client, logger, config, message):
+async def tick_plugin(client, logger, config):
     for plugin in config.tickPlugins:
-        await plugin.run(client, logger, config, message)
+        spec = importlib.util.spec_from_file_location(plugin, "plugins/" + plugin + ".py")
+        plugin = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(plugin)
+        await plugin.run(client, logger, config)

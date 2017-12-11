@@ -11,11 +11,32 @@ messagePlugins = (
     #  'char'
 )
 # On Tick Plugins
-tickPlugins = [
-]
+tickPlugins = (
+    #  'killmails',
+)
 
 # Auto Responses
 autoResponse = {
     'auth': 'To get roles on this server visit: ' + authUrl,
     'help': 'To get assistance with a plugin type !plugin help, currently active plugins are ' + str(messagePlugins)
 }
+
+
+class pluginSettings:
+    killmail = {  # add or remove groups as needed, groups must have unique names.
+        'group1': {
+            'id': 1234,  # Corp/Alliance ID
+            'channelId': 1234,  # Channel ID
+            'lossMails': True  # Show Loss Mails
+        },
+        'group2': {
+            'id': 0,  # Corp/Alliance ID
+            'channelId': 1234,  # Channel ID
+            'lossMails': True  # Show Loss Mails
+        },
+        'group3': {
+            'id': 0,  # Corp/Alliance ID
+            'channelId': 1234,  # Channel ID
+            'lossMails': True  # Show Loss Mails
+        },
+    }
