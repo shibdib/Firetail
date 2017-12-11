@@ -8,7 +8,7 @@ async def message_plugin(client, logger, config, message):
         plugin = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(plugin)
         if message.content.split()[1] == 'help':
-            await plugin.helpText(client, logger, config, message)
+            await plugin.helptext(client, logger, config, message)
         else:
             await plugin.run(client, logger, config, message)
 
