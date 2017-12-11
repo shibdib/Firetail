@@ -1,14 +1,24 @@
 import discord
 import logging
+from logging.handlers import RotatingFileHandler
+import sys
 import pluginManager
 import asyncio
 from config import config
 
 logger = logging.getLogger('firetail')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='logs/firetail.log', encoding='utf-8')
+logger.setLevel(logging.INFO)
+handler = RotatingFileHandler(filename='logs/firetail.log', encoding='utf-8', maxBytes=2000, backupCount=10)
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
+
+
+async def my_handler(type, value, tb):
+    logger.exception("Uncaught exception: {0}".format(str(value)))
+
+
+sys.excepthook = my_handler
+
 
 client = discord.Client()
 logger.info(' -------INITIATING STARTUP------- ')
