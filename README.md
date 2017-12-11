@@ -6,7 +6,7 @@ This is still in the early planning stages. Aiming for a Christmas release of so
 
 
 
-https://discord.gg/wD7n6pr To discuss.
+https://discord.gg/ZWmzTP3 To discuss.
 
 
 # Ideas
