@@ -17,7 +17,7 @@ async def run(client, logger, config, message):
         sellmin = '{:,}'.format(float(data['sell']['min']))
         sellavg = '{:,}'.format(float(data['sell']['weightedAverage']))
         em = discord.Embed(title=item.title(), description="Price information from Jita 4-4", url="https://market.fuzzwork.co.uk/type/" + str(typeid) + "/", colour=0xDEADBF)
-        em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot")
+        em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + Fuzzwork Market")
         em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(typeid) + "_64.png")
         em.add_field(name="Buy", value="Low: " + buymin + " \nAvg: " + buyavg + " \nHigh: " + buymax + " \n ", inline=True)
         em.add_field(name="Sell", value="Low: " + sellmin + " \nAvg: " + sellavg + " \nHigh: " + sellmax + " \n ", inline=True)
