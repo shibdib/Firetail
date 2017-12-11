@@ -12,8 +12,7 @@ messagePlugins = (
 )
 # On Tick Plugins
 tickPlugins = (
-    #  'killmails',
-    #  'jabber'
+    #  'killmails'
 )
 
 # Auto Responses
