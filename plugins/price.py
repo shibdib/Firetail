@@ -5,9 +5,9 @@ import discord
 async def run(client, logger, config, message):
     item = message.content.split(' ', 1)[1]
     data = await esi.market_data(item)
-    logger.info('Price - ' + message.author + ' requested price information for a ' + item)
+    logger.info('Price - ' + str(message.author) + ' requested price information for a ' + str(item))
     if data == 0:
-        logger.info('Price - ' + item + ' could not be found')
+        logger.info('Price - ' + str(item) + ' could not be found')
         msg = item + " was not found, are you sure it's an item?".format(message)
         await client.send_message(message.channel, msg)
     else:

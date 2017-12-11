@@ -11,6 +11,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 client = discord.Client()
+logger.info(' -------INITIATING STARTUP------- ')
 
 logger.info('Loading Message Plugins: ')
 for plugin in config.messagePlugins:
