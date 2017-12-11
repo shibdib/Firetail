@@ -19,12 +19,12 @@ async def run(client, logger, config):
         group_ids = []
         if loss:
             group_ids.append(kill_data['killmail']['victim']['corporation_id'])
-            if hasattr(kill_data['killmail']['victim'], 'alliance_id'):
+            if 'alliance_id' in kill_data['killmail']['victim']:
                 group_ids.append(kill_data['killmail']['victim']['alliance_id'])
         for attacker in kill_data['killmail']['attackers']:
-            if hasattr(attacker, 'corporation_id'):
+            if 'corporation_id' in attacker:
                 group_ids.append(attacker['corporation_id'])
-            if hasattr(attacker, 'alliance_id'):
+            if 'alliance_id' in attacker:
                 group_ids.append(attacker['alliance_id'])
         if killmail_group_id in group_ids:
             kill_id = kill_data['killID']
@@ -38,7 +38,7 @@ async def run(client, logger, config):
             victim_corp_id = kill_data['killmail']['victim']['corporation_id']
             victim_corp_raw = await esi.corporation_info(victim_corp_id)
             victim_corp = victim_corp_raw['corporation_name']
-            if hasattr(kill_data['killmail']['victim'], 'alliance_id'):
+            if 'alliance_id' in kill_data['killmail']['victim']:
                 victim_alliance_id = kill_data['killmail']['victim']['alliance_id']
                 victim_alliance_raw = await esi.alliance_info(victim_alliance_id)
                 victim_alliance = victim_alliance_raw['alliance_name']
@@ -50,7 +50,7 @@ async def run(client, logger, config):
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
-            if hasattr(kill_data['killmail']['victim'], 'alliance_id'):
+            if 'alliance_id' in kill_data['killmail']['victim']:
                 em.add_field(name="Victim",
                              value="Name: " + str(victim_name) + " \nCorp: " + str(victim_corp) + " \nAlliance: " + str(
                                  victim_alliance) + " \n ")
@@ -73,7 +73,7 @@ async def run(client, logger, config):
             victim_corp_id = kill_data['killmail']['victim']['corporation_id']
             victim_corp_raw = await esi.corporation_info(victim_corp_id)
             victim_corp = victim_corp_raw['corporation_name']
-            if hasattr(kill_data['killmail']['victim'], 'alliance_id'):
+            if 'alliance_id' in kill_data['killmail']['victim']:
                 victim_alliance_id = kill_data['killmail']['victim']['alliance_id']
                 victim_alliance_raw = await esi.alliance_info(victim_alliance_id)
                 victim_alliance = victim_alliance_raw['alliance_name']
@@ -85,7 +85,7 @@ async def run(client, logger, config):
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
-            if hasattr(kill_data['killmail']['victim'], 'alliance_id'):
+            if 'alliance_id' in kill_data['killmail']['victim']:
                 em.add_field(name="Victim",
                              value="Name: " + str(victim_name) + " \nCorp: " + str(victim_corp) + " \nAlliance: " + str(
                                  victim_alliance) + " \n ")
