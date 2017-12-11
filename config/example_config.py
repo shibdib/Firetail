@@ -13,6 +13,7 @@ messagePlugins = (
 # On Tick Plugins
 tickPlugins = (
     #  'killmails',
+    #  'jabber'
 )
 
 # Auto Responses
@@ -34,4 +35,11 @@ killmail = {  # add or remove groups as needed, groups must have unique names.
             'lossMails': True  # Show Loss Mails
         }
     }
+}
+
+
+# Jabber Relayings
+jabber = {  # add or remove groups as needed, groups must have unique names.
+    'username': 'bot@test.com',
+    'password': 'password'
 }
