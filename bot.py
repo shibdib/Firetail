@@ -40,9 +40,7 @@ async def on_message(message):
 @client.event
 async def on_ready():
     logger.info('Firetail - Created by Shibdib https://github.com/shibdib/Firetail')
-    logger.info('Logged in as')
-    logger.info(client.user.name)
-    logger.info(client.user.id)
+    logger.info('Logged in as: ' + client.user.name)
     logger.info('------')
 
 

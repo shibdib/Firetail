@@ -19,7 +19,6 @@ async def system_info(system_id):
         return json.loads(url.read().decode())
 
 
-
 # Character Stuff
 async def character_info(character_id):
     with urllib.request.urlopen('https://esi.tech.ccp.is/latest/characters/' + str(character_id) + '/') as url:

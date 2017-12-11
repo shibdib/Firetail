@@ -59,6 +59,7 @@ async def run(client, logger, config):
                 em.add_field(name="Victim",
                              value="Name: " + str(victim_name) + " \nCorp: " + str(victim_corp))
             channel = client.get_channel(str(channel_id))
+            logger.info('Killmail - Kill # ' + kill_id + ' has been posted to ' + channel.name)
             await client.send_message(channel, embed=em)
         elif kill_data['zkb']['totalValue'] >= config.killmail['bigKillsValue'] and config.killmail['bigKills']:
             channel_id = config.killmail['bigKillsChannel']
@@ -93,6 +94,7 @@ async def run(client, logger, config):
                 em.add_field(name="Victim",
                              value="Name: " + str(victim_name) + " \nCorp: " + str(victim_corp))
             channel = client.get_channel(str(channel_id))
+            logger.info('Killmail - Big Kill # ' + kill_id + ' has been posted to ' + channel.name)
             await client.send_message(channel, embed=em)
         else:
             continue
