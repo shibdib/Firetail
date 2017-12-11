@@ -49,6 +49,12 @@ async def on_message(message):
 
 
 @client.event
+async def on_member_join(member):
+    if config.welcomeMessageEnabled:
+        await client.send_message(member, config.welcomeMessage)
+
+
+@client.event
 async def on_ready():
     logger.info('Firetail - Created by Shibdib https://github.com/shibdib/Firetail')
     logger.info('Logged in as: ' + client.user.name)

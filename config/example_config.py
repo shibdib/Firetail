@@ -3,6 +3,10 @@ token = 'Mzg4MzEwNDczODAxNDY1ODU3.DQzRyg.YkMZxzWStqiPiO8qm8HswuzBqjg'
 trigger = '!'
 authUrl = 'http://keepstar.shibdib.info'
 
+# Welcome Message
+welcomeMessageEnabled = False  # Set to true if you'd like the message below to be sent to new users
+welcomeMessage = '**Welcome to the server!**\n \nTo get roles type !auth to get a link to the authing system.\nIf you ' \
+                 'want more information regarding other plugins type !help'
 # Uncomment plugins to enable
 # On Message Plugins
 messagePlugins = (
