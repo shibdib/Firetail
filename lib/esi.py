@@ -6,7 +6,7 @@ import json
 
 async def esi_search(item, category):
     with urllib.request.urlopen('https://esi.tech.ccp.is/latest/search/?categories=' + category + '&datasource=tranquility&language=en-us&search=' + item + '&strict=false') as url:
-        return json.loads(url.read().decode())[0]
+        return json.loads(url.read().decode())
 
 
 # Character Stuff
@@ -37,9 +37,10 @@ async def item_id(itemname):
         return data['typeID']
 
 
-async def market_data(itemname, systemname):
-    itemid = item_id(itemname)
-    systemid = esi_search(systemname, 'solarsystem')
-    with urllib.request.urlopen('http://api.eve-central.com/api/marketstat?typeid=' + itemid + '&usesystem=' + systemid) as url:
+async def market_data(itemname):
+    urlsafe = urllib.parse.quote_plus(itemname)
+    itemid = await item_id(urlsafe)
+    url = 'https://market.fuzzwork.co.uk/aggregates/?station=60003760&types=' + str(itemid)
+    with urllib.request.urlopen(url) as url:
         data = json.loads(url.read().decode())
-        return data['typeID']
+        return data[str(itemid)]

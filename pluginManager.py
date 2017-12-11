@@ -7,7 +7,14 @@ async def message_plugin(client, logger, config, message):
         spec = importlib.util.spec_from_file_location(command, "plugins/" + command + ".py")
         plugin = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(plugin)
-        await plugin.run(client, logger, config, message)
+        if message.content.split()[1] == 'help':
+            await plugin.helpText(client, logger, config, message)
+        else:
+            await plugin.run(client, logger, config, message)
+
+    if command in config.autoResponse:
+        msg = config.autoResponse[command].format(message)
+        await client.send_message(message.channel, msg)
 
 
 async def tick_plugin(client, logger, config, message):
