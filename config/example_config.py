@@ -21,7 +21,6 @@ autoResponse = {
     'help': 'To get assistance with a plugin type !plugin help, currently active plugins are ' + str(messagePlugins)
 }
 
-
 # Killmail Plugin Settings
 killmail = {  # add or remove groups as needed, groups must have unique names.
     'bigKills': True,
@@ -32,19 +31,6 @@ killmail = {  # add or remove groups as needed, groups must have unique names.
             'id': '498125261',  # Corp/Alliance ID
             'channelId': '244061582496104448',  # Channel ID
             'lossMails': True  # Show Loss Mails
-        }
-    }
-}
-
-
-# Jabber Relayings
-jabber = {  # add or remove groups as needed, groups must have unique names.
-    'username': 'bot@test.com',
-    'password': 'password',
-    'triggers': {
-        'trigger1': {
-            'string': 'To All Online',
-            'Channel': '389865784656134155'
         }
     }
 }

@@ -9,7 +9,7 @@ async def run(client, logger, config):
     kill_data = await redis(client)
     #  Foreach thru all provided groups
     for group in config.killmail['killmailGroups']:
-        killmail_group_id = config.killmail['killmailGroups'][group]['id']
+        killmail_group_id = int(config.killmail['killmailGroups'][group]['id'])
         channel_id = config.killmail['killmailGroups'][group]['channelId']
         loss = config.killmail['killmailGroups'][group]['lossMails']
         #  Skip npc
@@ -18,14 +18,14 @@ async def run(client, logger, config):
         #  Get all group id's from the mail
         group_ids = []
         if loss:
-            group_ids.append(kill_data['killmail']['victim']['corporation_id'])
+            group_ids.append(int(kill_data['killmail']['victim']['corporation_id']))
             if 'alliance_id' in kill_data['killmail']['victim']:
-                group_ids.append(kill_data['killmail']['victim']['alliance_id'])
+                group_ids.append(int(kill_data['killmail']['victim']['alliance_id']))
         for attacker in kill_data['killmail']['attackers']:
             if 'corporation_id' in attacker:
-                group_ids.append(attacker['corporation_id'])
+                group_ids.append(int(attacker['corporation_id']))
             if 'alliance_id' in attacker:
-                group_ids.append(attacker['alliance_id'])
+                group_ids.append(int(attacker['alliance_id']))
         if killmail_group_id in group_ids:
             kill_id = kill_data['killID']
             value_raw = kill_data['zkb']['totalValue']
