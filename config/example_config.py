@@ -1,5 +1,5 @@
 # Put the bot token from https://discordapp.com/developers/applications here
-token = 'Mzg4MzEwNDczODAxNDY1ODU3.DQzRyg.YkMZxzWStqiPiO8qm8HswuzBqjg'
+token = 'lol'
 trigger = '!'
 authUrl = 'http://keepstar.shibdib.info'
 
