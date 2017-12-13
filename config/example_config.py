@@ -11,7 +11,7 @@ welcomeMessage = '**Welcome to the server!**\n \nTo get roles type !auth to get 
 # Uncomment plugins to enable
 # On Message Plugins
 messagePlugins = (
-    'test',  # Test plugin please ignore
+    'time',  # Test plugin please ignore
     'price',  # Price check plugin
     #  'char'
 )
