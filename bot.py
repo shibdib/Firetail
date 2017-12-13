@@ -73,7 +73,7 @@ async def on_ready():
     logger.info('------')
     # Set playing
     await client.change_presence(game=discord.Game(name=config.game))
-    await client.change_nickname(client, config.nickname)
+    #  await client.change_nickname(client.user, config.nickname)
 
 
 client.loop.create_task(tick_loop())
