@@ -28,7 +28,12 @@ async def run(client, logger, config, message):
         em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(typeid) + "_64.png")
         em.add_field(name="Buy", value="Low: " + buymin + " \nAvg: " + buyavg + " \nHigh: " + buymax + " \n ", inline=True)
         em.add_field(name="Sell", value="Low: " + sellmin + " \nAvg: " + sellavg + " \nHigh: " + sellmax + " \n ", inline=True)
-        await client.send_message(message.channel, embed=em)
+        if config.forcePrivateMessage:
+            await client.send_message(message.author, embed=em)
+        else:
+            await client.send_message(message.channel, embed=em)
+        if config.deleteRequest:
+            await client.delete_message(message)
 
 
 async def helptext(client, logger, config, message):

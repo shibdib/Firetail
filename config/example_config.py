@@ -13,6 +13,8 @@ messagePlugins = (
     'eveTime',  # Get the time in eve and around the world
     'price'  # Price check plugin
 )
+forcePrivateMessage = False  # If true, all bot responses will be done via PM
+deleteRequest = False  # If true, on bot response the message request is deleted (Works well with the above option)
 # On Tick Plugins
 tickPlugins = (
     #  'killmails'  #Killmail posting plugin
@@ -21,7 +23,7 @@ tickPlugins = (
 # Auto Responses - Add more with the format 'trigger': 'Auto response'
 autoResponse = {
     'auth': 'To get roles on this server visit: ',
-    'help': 'To get assistance with a plugin type !plugin help, currently active plugins are ' + str(messagePlugins)  
+    'help': 'To get assistance with a plugin type !plugin help, currently active plugins are ' + str(messagePlugins)
 }
 
 # Killmail Plugin Settings
