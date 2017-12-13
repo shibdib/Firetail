@@ -106,7 +106,7 @@ async def run(client, logger, config):
             solar_system_name = solar_system_info['name']
             if '-' in solar_system_name:
                 solar_system_name = solar_system_name.upper()
-            title = "**BIG KILL REPORTED:** " + ship_lost + " Destroyed in "
+            title = "BIG KILL REPORTED: " + ship_lost + " Destroyed in "
             em = discord.Embed(title=title.title() + str(solar_system_name),
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
