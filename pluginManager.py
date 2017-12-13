@@ -14,6 +14,7 @@ async def message_plugin(client, logger, config, message):
 
     if command in config.autoResponse:
         msg = config.autoResponse[command].format(message)
+        logger.info('Auto Response - ' + str(message.author) + ' triggered the auto response for - ' + command)
         await client.send_message(message.channel, msg)
 
 

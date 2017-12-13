@@ -31,5 +31,5 @@ async def run(client, logger, config, message):
 
 async def helptext(client, logger, config, message):
     msg = "To use this plugin simply do **!time**".format(message)
-    logger.info('Time - ' + str(message.author) + ' requested help info')
+    logger.info('Time - ' + str(message.author) + ' requested help for this plugin')
     await client.send_message(message.channel, msg)
