@@ -57,8 +57,8 @@ async def run(client, logger, config):
             solar_system_name = solar_system_info['name']
             if '-' in solar_system_name:
                 solar_system_name = solar_system_name.upper()
-            title = ship_lost + " Destroyed in " + str(solar_system_name)
-            em = discord.Embed(title=title.title(),
+            title = ship_lost + " Destroyed in "
+            em = discord.Embed(title=title.title() + str(solar_system_name),
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
@@ -106,8 +106,8 @@ async def run(client, logger, config):
             solar_system_name = solar_system_info['name']
             if '-' in solar_system_name:
                 solar_system_name = solar_system_name.upper()
-            title = "**BIG KILL REPORTED:** " + ship_lost + " Destroyed in " + str(solar_system_name)
-            em = discord.Embed(title=title.title(),
+            title = "**BIG KILL REPORTED:** " + ship_lost + " Destroyed in "
+            em = discord.Embed(title=title.title() + str(solar_system_name),
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
