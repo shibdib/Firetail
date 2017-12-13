@@ -1,7 +1,6 @@
-# Put the bot token from https://discordapp.com/developers/applications here
-token = 'lol'
-trigger = '!'
-authUrl = 'http://keepstar.shibdib.info'
+token = 'lol'  # Put the bot token from https://discordapp.com/developers/applications here
+trigger = '!'  # the trigger for commands
+game = '!help for more info'  # What game the bot is playing
 
 # Welcome Message
 welcomeMessageEnabled = False  # Set to true if you'd like the message below to be sent to new users
