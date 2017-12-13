@@ -3,14 +3,14 @@ import importlib.util
 
 async def message_plugin(client, logger, config, message):
     command = message.content.split()[0][len(config.trigger):].lower()
+    # rename time to avoid issues
+    if command == 'time':
+        command = 'eveTime'
     if command in config.messagePlugins:
         spec = importlib.util.spec_from_file_location(command, "plugins/" + command + ".py")
         plugin = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(plugin)
-        if message.content.split()[1] == 'help':
-            await plugin.helptext(client, logger, config, message)
-        else:
-            await plugin.run(client, logger, config, message)
+        await plugin.run(client, logger, config, message)
 
     if command in config.autoResponse:
         msg = config.autoResponse[command].format(message)
