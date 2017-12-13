@@ -10,7 +10,7 @@ welcomeMessage = '**Welcome to the server!**\n \nTo get roles type !auth to get 
 # Uncomment plugins to enable
 # On Message Plugins
 messagePlugins = (
-    'time',  # Get the time in eve and around the world
+    'eveTime',  # Get the time in eve and around the world
     'price'  # Price check plugin
 )
 # On Tick Plugins
@@ -20,8 +20,8 @@ tickPlugins = (
 
 # Auto Responses - Add more with the format 'trigger': 'Auto response'
 autoResponse = {
-    'auth': 'To get roles on this server visit: ' + authUrl,
-    'help': 'To get assistance with a plugin type !plugin help, currently active plugins are ' + str(messagePlugins)
+    'auth': 'To get roles on this server visit: ',
+    'help': 'To get assistance with a plugin type !plugin help, currently active plugins are ' + str(messagePlugins)  
 }
 
 # Killmail Plugin Settings
