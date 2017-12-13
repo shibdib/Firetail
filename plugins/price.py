@@ -4,6 +4,11 @@ import discord
 
 async def run(client, logger, config, message):
     item = message.content.split(' ', 1)[1]
+    # handle help request
+    if len(message.content.split()) > 1:
+        if message.content.split(' ', 1)[1].lower() == 'help':
+            await helptext(client, logger, config, message)
+            return
     data = await esi.market_data(item)
     logger.info('Price - ' + str(message.author) + ' requested price information for a ' + str(item))
     if data == 0:
@@ -28,4 +33,5 @@ async def run(client, logger, config, message):
 
 async def helptext(client, logger, config, message):
     msg = "To use this plugin simply do !price itemName. Example **!price rifter**.".format(message)
+    logger.info('Price - ' + str(message.author) + ' requested help for this plugin')
     await client.send_message(message.channel, msg)

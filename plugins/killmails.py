@@ -7,6 +7,11 @@ import discord
 async def run(client, logger, config):
     #  Get latest kill data
     kill_data = await redis(client)
+    #  no new kills are found
+    try:
+        check = kill_data['killID']
+    except:
+        return
     #  Foreach thru all provided groups
     for group in config.killmail['killmailGroups']:
         killmail_group_id = int(config.killmail['killmailGroups'][group]['id'])
@@ -30,33 +35,47 @@ async def run(client, logger, config):
             kill_id = kill_data['killID']
             value_raw = kill_data['zkb']['totalValue']
             value = '{:,}'.format(float(value_raw))
-            victim_id = kill_data['killmail']['victim']['character_id']
-            victim_name = await esi.character_name(victim_id)
+            try:
+                victim_id = kill_data['killmail']['victim']['character_id']
+                victim_name = await esi.character_name(victim_id)
+            except:
+                victim_name = None
             ship_lost_id = kill_data['killmail']['victim']['ship_type_id']
             ship_lost_raw = await esi.type_info_search(ship_lost_id)
             ship_lost = ship_lost_raw['name']
             victim_corp_id = kill_data['killmail']['victim']['corporation_id']
             victim_corp_raw = await esi.corporation_info(victim_corp_id)
             victim_corp = victim_corp_raw['corporation_name']
-            if 'alliance_id' in kill_data['killmail']['victim']:
+            try:
                 victim_alliance_id = kill_data['killmail']['victim']['alliance_id']
                 victim_alliance_raw = await esi.alliance_info(victim_alliance_id)
                 victim_alliance = victim_alliance_raw['alliance_name']
+            except:
+                victim_alliance = None
             solar_system_id = kill_data['killmail']['solar_system_id']
             solar_system_info = await esi.system_info(solar_system_id)
             solar_system_name = solar_system_info['name']
-            title = victim_name + " Lost a " + ship_lost + " Valued At " + value + " ISK "
-            em = discord.Embed(title=title.title(), description="Fight Occurred In: " + str(solar_system_name),
+            if '-' in solar_system_name:
+                solar_system_name = solar_system_name.upper()
+            title = ship_lost + " Destroyed in " + str(solar_system_name)
+            em = discord.Embed(title=title.title(),
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
-            if 'alliance_id' in kill_data['killmail']['victim']:
+            if victim_name is not None and victim_alliance is not None:
                 em.add_field(name="Victim",
-                             value="Name: " + str(victim_name) + " \nCorp: " + str(victim_corp) + " \nAlliance: " + str(
+                             value="Name: " + str(victim_name) + "\nShip Value: " + value + " \nCorp: " + str(victim_corp) + " \nAlliance: " + str(
                                  victim_alliance) + " \n ")
-            else:
+            elif victim_name is not None and victim_alliance is None:
                 em.add_field(name="Victim",
-                             value="Name: " + str(victim_name) + " \nCorp: " + str(victim_corp))
+                             value="Name: " + str(victim_name) + "\nShip Value: " + value + " \nCorp: " + str(victim_corp))
+            elif victim_name is None and victim_alliance is not None:
+                em.add_field(name="Structure Info",
+                             value="Structure Value: " + value + "\nCorp: " + str(victim_corp) + " \nAlliance: " + str(
+                                 victim_alliance) + " \n ")
+            elif victim_name is None and victim_alliance is None:
+                em.add_field(name="Structure Info",
+                             value="Structure Value: " + value + "\nCorp: " + str(victim_corp))
             channel = client.get_channel(str(channel_id))
             logger.info('Killmail - Kill # ' + str(kill_id) + ' has been posted to ' + str(channel.name))
             await client.send_message(channel, embed=em)
@@ -65,33 +84,47 @@ async def run(client, logger, config):
             kill_id = kill_data['killID']
             value_raw = kill_data['zkb']['totalValue']
             value = '{:,}'.format(float(value_raw))
-            victim_id = kill_data['killmail']['victim']['character_id']
-            victim_name = await esi.character_name(victim_id)
+            try:
+                victim_id = kill_data['killmail']['victim']['character_id']
+                victim_name = await esi.character_name(victim_id)
+            except:
+                victim_name = None
             ship_lost_id = kill_data['killmail']['victim']['ship_type_id']
             ship_lost_raw = await esi.type_info_search(ship_lost_id)
             ship_lost = ship_lost_raw['name']
             victim_corp_id = kill_data['killmail']['victim']['corporation_id']
             victim_corp_raw = await esi.corporation_info(victim_corp_id)
             victim_corp = victim_corp_raw['corporation_name']
-            if 'alliance_id' in kill_data['killmail']['victim']:
+            try:
                 victim_alliance_id = kill_data['killmail']['victim']['alliance_id']
                 victim_alliance_raw = await esi.alliance_info(victim_alliance_id)
                 victim_alliance = victim_alliance_raw['alliance_name']
+            except:
+                victim_alliance = None
             solar_system_id = kill_data['killmail']['solar_system_id']
             solar_system_info = await esi.system_info(solar_system_id)
             solar_system_name = solar_system_info['name']
-            title = "**BIG KILL REPORTED:** " + victim_name + " Lost a " + ship_lost + " Valued At " + value + " ISK "
-            em = discord.Embed(title=title.title(), description="Fight Occurred In: " + str(solar_system_name),
+            if '-' in solar_system_name:
+                solar_system_name = solar_system_name.upper()
+            title = "**BIG KILL REPORTED:** " + ship_lost + " Destroyed in " + str(solar_system_name)
+            em = discord.Embed(title=title.title(),
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
-            if 'alliance_id' in kill_data['killmail']['victim']:
+            if victim_name is not None and victim_alliance is not None:
                 em.add_field(name="Victim",
-                             value="Name: " + str(victim_name) + " \nCorp: " + str(victim_corp) + " \nAlliance: " + str(
+                             value="Name: " + str(victim_name) + "\nShip Value: " + value + " \nCorp: " + str(victim_corp) + " \nAlliance: " + str(
                                  victim_alliance) + " \n ")
-            else:
+            elif victim_name is not None and victim_alliance is None:
                 em.add_field(name="Victim",
-                             value="Name: " + str(victim_name) + " \nCorp: " + str(victim_corp))
+                             value="Name: " + str(victim_name) + "\nShip Value: " + value + " \nCorp: " + str(victim_corp))
+            elif victim_name is None and victim_alliance is not None:
+                em.add_field(name="Structure Info",
+                             value="Structure Value: " + value + "\nCorp: " + str(victim_corp) + " \nAlliance: " + str(
+                                 victim_alliance) + " \n ")
+            elif victim_name is None and victim_alliance is None:
+                em.add_field(name="Structure Info",
+                             value="Structure Value: " + value + "\nCorp: " + str(victim_corp))
             channel = client.get_channel(str(channel_id))
             logger.info('Killmail - Big Kill # ' + str(kill_id) + ' has been posted to ' + str(channel.name))
             await client.send_message(channel, embed=em)
