@@ -1,28 +1,44 @@
-import urllib.request
+import aiohttp
 import json
 
 
 # Misc
 
 async def esi_search(item, category):
-    with urllib.request.urlopen('https://esi.tech.ccp.is/latest/search/?categories=' + str(category) + '&datasource=tranquility&language=en-us&search=' + str(item) + '&strict=false') as url:
-        return json.loads(url.read().decode())
+    async with aiohttp.ClientSession() as session:
+        url = 'https://esi.tech.ccp.is/latest/search/?categories=' + str(category) + '&datasource=tranquility&language=en-us&search=' + str(item) + '&strict=false'
+        async with session.get(url) as resp:
+            data = await resp.text()
+            data = json.loads(data)
+            return data
 
 
 async def type_info_search(type_id):
-    with urllib.request.urlopen('https://esi.tech.ccp.is/latest/universe/types/' + str(type_id) + '/') as url:
-        return json.loads(url.read().decode())
+    async with aiohttp.ClientSession() as session:
+        url = 'https://esi.tech.ccp.is/latest/universe/types/' + str(type_id) + '/'
+        async with session.get(url) as resp:
+            data = await resp.text()
+            data = json.loads(data)
+            return data
 
 
 async def system_info(system_id):
-    with urllib.request.urlopen('https://esi.tech.ccp.is/latest/universe/systems/' + str(system_id) + '/') as url:
-        return json.loads(url.read().decode())
+    async with aiohttp.ClientSession() as session:
+        url = 'https://esi.tech.ccp.is/latest/universe/systems/' + str(system_id) + '/'
+        async with session.get(url) as resp:
+            data = await resp.text()
+            data = json.loads(data)
+            return data
 
 
 # Character Stuff
 async def character_info(character_id):
-    with urllib.request.urlopen('https://esi.tech.ccp.is/latest/characters/' + str(character_id) + '/') as url:
-        return json.loads(url.read().decode())
+    async with aiohttp.ClientSession() as session:
+        url = 'https://esi.tech.ccp.is/latest/characters/' + str(character_id) + '/'
+        async with session.get(url) as resp:
+            data = await resp.text()
+            data = json.loads(data)
+            return data
 
 
 async def character_corp_id(character_id):
@@ -31,8 +47,12 @@ async def character_corp_id(character_id):
 
 
 async def corporation_info(corporation_id):
-    with urllib.request.urlopen('https://esi.tech.ccp.is/latest/corporations/' + str(corporation_id) + '/') as url:
-        return json.loads(url.read().decode())
+    async with aiohttp.ClientSession() as session:
+        url = 'https://esi.tech.ccp.is/latest/corporations/' + str(corporation_id) + '/'
+        async with session.get(url) as resp:
+            data = await resp.text()
+            data = json.loads(data)
+            return data
 
 
 async def character_alliance_id(character_id):
@@ -41,8 +61,12 @@ async def character_alliance_id(character_id):
 
 
 async def alliance_info(alliance_id):
-    with urllib.request.urlopen('https://esi.tech.ccp.is/latest/alliances/' + str(alliance_id) + '/') as url:
-        return json.loads(url.read().decode())
+    async with aiohttp.ClientSession() as session:
+        url = 'https://esi.tech.ccp.is/latest/alliances/' + str(alliance_id) + '/'
+        async with session.get(url) as resp:
+            data = await resp.text()
+            data = json.loads(data)
+            return data
 
 
 async def character_name(character_id):
@@ -52,18 +76,22 @@ async def character_name(character_id):
 
 # Item Stuff
 async def item_id(item_name):
-    with urllib.request.urlopen('https://www.fuzzwork.co.uk/api/typeid.php?typename=' + str(item_name)) as url:
-        data = json.loads(url.read().decode())
-        return data['typeID']
+    async with aiohttp.ClientSession() as session:
+        url = 'https://www.fuzzwork.co.uk/api/typeid.php?typename=' + str(item_name)
+        async with session.get(url) as resp:
+            data = await resp.text()
+            data = json.loads(data)
+            return data['typeID']
 
 
 async def market_data(item_name, station):
-    urlsafe = urllib.parse.quote_plus(item_name)
-    itemid = await item_id(urlsafe)
+    itemid = await item_id(item_name)
     if itemid == 0:
         return itemid
     else:
-        url = 'https://market.fuzzwork.co.uk/aggregates/?station=' + str(station) + '&types=' + str(itemid)
-        with urllib.request.urlopen(url) as url:
-            data = json.loads(url.read().decode())
-            return data[str(itemid)]
+        async with aiohttp.ClientSession() as session:
+            url = 'https://market.fuzzwork.co.uk/aggregates/?station=' + str(station) + '&types=' + str(itemid)
+            async with session.get(url) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data[str(itemid)]

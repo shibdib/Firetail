@@ -1,5 +1,5 @@
 from lib import esi
-import urllib.request
+import aiohttp
 import json
 import discord
 
@@ -133,6 +133,9 @@ async def run(client, logger, config):
 
 
 async def redis(client):
-    zkill = "https://redisq.zkillboard.com/listen.php?queueID=" + client.user.id
-    with urllib.request.urlopen(zkill) as url:
-        return json.loads(url.read().decode())['package']
+    async with aiohttp.ClientSession() as session:
+        url = "https://redisq.zkillboard.com/listen.php?queueID=" + client.user.id
+        async with session.get(url) as resp:
+            data = await resp.text()
+            data = json.loads(data)
+            return data['package']
