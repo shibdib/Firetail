@@ -5,9 +5,10 @@ import discord
 async def run(client, logger, config, message):
     item = message.content.split(' ', 1)[1]
     # handle help request
-    if item.lower() == 'help':
-        await helptext(client, logger, config, message)
-        return
+    if len(message.content.split()) > 1:
+        if message.content.split(' ', 1)[1].lower() == 'help':
+            await helptext(client, logger, config, message)
+            return
     data = await esi.market_data(item)
     logger.info('Price - ' + str(message.author) + ' requested price information for a ' + str(item))
     if data == 0:
