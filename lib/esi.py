@@ -63,7 +63,7 @@ async def market_data(item_name, station):
     if itemid == 0:
         return itemid
     else:
-        url = 'https://market.fuzzwork.co.uk/aggregates/?station=' + station + '&types=' + str(itemid)
+        url = 'https://market.fuzzwork.co.uk/aggregates/?station=' + str(station) + '&types=' + str(itemid)
         with urllib.request.urlopen(url) as url:
             data = json.loads(url.read().decode())
             return data[str(itemid)]

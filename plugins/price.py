@@ -11,7 +11,7 @@ async def run(client, logger, config, message):
             'dodixie': 60011866,
             'rens': 60004588,
             'hek': 60005686}
-    if message.content.split()[0][len(config.trigger):].lower() is not 'price':
+    if message.content.split()[0][len(config.trigger):].lower() != 'price':
         lookup = message.content.split()[0][len(config.trigger):].lower()
         system = hubId[lookup]
     # handle help request
