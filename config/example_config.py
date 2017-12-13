@@ -11,7 +11,7 @@ welcomeMessage = '**Welcome to the server!**\n \nTo get roles type !auth to get 
 # Uncomment plugins to enable
 # On Message Plugins
 messagePlugins = (
-    'time',  # Test plugin please ignore
+    'time',  # Get the time in eve and around the world
     'price'  # Price check plugin
 )
 # On Tick Plugins

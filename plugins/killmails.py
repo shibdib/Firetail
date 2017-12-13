@@ -54,7 +54,9 @@ async def run(client, logger, config):
                 victim_alliance = None
             solar_system_id = kill_data['killmail']['solar_system_id']
             solar_system_info = await esi.system_info(solar_system_id)
-            solar_system_name = solar_system_info['name'].upper()
+            solar_system_name = solar_system_info['name']
+            if '-' in solar_system_name:
+                solar_system_name = solar_system_name.upper()
             title = ship_lost + " Destroyed in " + str(solar_system_name)
             em = discord.Embed(title=title.title(),
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
@@ -101,7 +103,9 @@ async def run(client, logger, config):
                 victim_alliance = None
             solar_system_id = kill_data['killmail']['solar_system_id']
             solar_system_info = await esi.system_info(solar_system_id)
-            solar_system_name = solar_system_info['name'].upper()
+            solar_system_name = solar_system_info['name']
+            if '-' in solar_system_name:
+                solar_system_name = solar_system_name.upper()
             title = "**BIG KILL REPORTED:** " + ship_lost + " Destroyed in " + str(solar_system_name)
             em = discord.Embed(title=title.title(),
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
