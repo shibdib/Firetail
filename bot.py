@@ -71,6 +71,8 @@ async def on_ready():
     logger.info('Firetail - Created by Shibdib https://github.com/shibdib/Firetail')
     logger.info('Logged in as: ' + client.user.name)
     logger.info('------')
+    # Set playing
+    await client.change_presence(game=discord.Game(name=config.game))
 
 
 client.loop.create_task(tick_loop())
