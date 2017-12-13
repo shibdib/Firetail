@@ -22,7 +22,12 @@ async def run(client, logger, config, message):
     em.add_field(name="Time",
                  value=eve_time + " \n" + pst + " \n" + est + " \n" + cet + " \n" + msk + " \n" + aest, inline=True)
     logger.info('Time - ' + str(message.author) + ' requested time info')
-    await client.send_message(message.channel, embed=em)
+    if config.forcePrivateMessage:
+        await client.send_message(message.author, embed=em)
+    else:
+        await client.send_message(message.channel, embed=em)
+    if config.deleteRequest:
+        await client.delete_message(message)
 
 
 async def helptext(client, logger, config, message):

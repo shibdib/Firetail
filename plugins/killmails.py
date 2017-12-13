@@ -1,5 +1,5 @@
 from lib import esi
-import urllib.request
+import aiohttp
 import json
 import discord
 
@@ -34,7 +34,7 @@ async def run(client, logger, config):
         if killmail_group_id in group_ids:
             kill_id = kill_data['killID']
             value_raw = kill_data['zkb']['totalValue']
-            value = '{:,}'.format(float(value_raw))
+            value = '{0:,.2f}'.format(float(value_raw))
             try:
                 victim_id = kill_data['killmail']['victim']['character_id']
                 victim_name = await esi.character_name(victim_id)
@@ -57,8 +57,8 @@ async def run(client, logger, config):
             solar_system_name = solar_system_info['name']
             if '-' in solar_system_name:
                 solar_system_name = solar_system_name.upper()
-            title = ship_lost + " Destroyed in " + str(solar_system_name)
-            em = discord.Embed(title=title.title(),
+            title = ship_lost + " Destroyed in "
+            em = discord.Embed(title=title.title() + str(solar_system_name),
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
@@ -83,7 +83,7 @@ async def run(client, logger, config):
             channel_id = config.killmail['bigKillsChannel']
             kill_id = kill_data['killID']
             value_raw = kill_data['zkb']['totalValue']
-            value = '{:,}'.format(float(value_raw))
+            value = '{0:,.2f}'.format(float(value_raw))
             try:
                 victim_id = kill_data['killmail']['victim']['character_id']
                 victim_name = await esi.character_name(victim_id)
@@ -106,8 +106,8 @@ async def run(client, logger, config):
             solar_system_name = solar_system_info['name']
             if '-' in solar_system_name:
                 solar_system_name = solar_system_name.upper()
-            title = "**BIG KILL REPORTED:** " + ship_lost + " Destroyed in " + str(solar_system_name)
-            em = discord.Embed(title=title.title(),
+            title = "BIG KILL REPORTED: " + ship_lost + " Destroyed in "
+            em = discord.Embed(title=title.title() + str(solar_system_name),
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
@@ -133,6 +133,9 @@ async def run(client, logger, config):
 
 
 async def redis(client):
-    zkill = "https://redisq.zkillboard.com/listen.php?queueID=" + client.user.id
-    with urllib.request.urlopen(zkill) as url:
-        return json.loads(url.read().decode())['package']
+    async with aiohttp.ClientSession() as session:
+        url = "https://redisq.zkillboard.com/listen.php?queueID=" + client.user.id
+        async with session.get(url) as resp:
+            data = await resp.text()
+            data = json.loads(data)
+            return data['package']

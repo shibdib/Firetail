@@ -1,5 +1,6 @@
 token = 'lol'  # Put the bot token from https://discordapp.com/developers/applications here
 trigger = '!'  # the trigger for commands
+nickname = 'Firetail'  # Name your bot
 game = '!help for more info'  # What game the bot is playing
 
 # Welcome Message
@@ -10,9 +11,11 @@ welcomeMessage = '**Welcome to the server!**\n \nTo get roles type !auth to get 
 # Uncomment plugins to enable
 # On Message Plugins
 messagePlugins = (
-    'time',  # Get the time in eve and around the world
+    'eveTime',  # Get the time in eve and around the world
     'price'  # Price check plugin
 )
+forcePrivateMessage = False  # If true, all bot responses will be done via PM
+deleteRequest = False  # If true, on bot response the message request is deleted (Works well with the above option)
 # On Tick Plugins
 tickPlugins = (
     #  'killmails'  #Killmail posting plugin
@@ -20,7 +23,7 @@ tickPlugins = (
 
 # Auto Responses - Add more with the format 'trigger': 'Auto response'
 autoResponse = {
-    'auth': 'To get roles on this server visit: ' + authUrl,
+    'auth': 'To get roles on this server visit: ',
     'help': 'To get assistance with a plugin type !plugin help, currently active plugins are ' + str(messagePlugins)
 }
 
