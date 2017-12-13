@@ -7,6 +7,9 @@ import discord
 async def run(client, logger, config):
     #  Get latest kill data
     kill_data = await redis(client)
+    #  no new kills are found
+    if 'killID' not in kill_data:
+        return
     #  Foreach thru all provided groups
     for group in config.killmail['killmailGroups']:
         killmail_group_id = int(config.killmail['killmailGroups'][group]['id'])
