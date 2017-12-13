@@ -8,7 +8,7 @@ from config import config
 
 logger = logging.getLogger('firetail')
 logger.setLevel(logging.INFO)
-handler = RotatingFileHandler(filename='logs/firetail.log', encoding='utf-8', maxBytes=2000, backupCount=10)
+handler = RotatingFileHandler(filename='logs/firetail.log', encoding='utf-8', maxBytes=5*1024*1024, backupCount=10)
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
