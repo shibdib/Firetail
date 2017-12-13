@@ -1,4 +1,6 @@
 # Firetail
+[![BCH compliance](https://bettercodehub.com/edge/badge/shibdib/Firetail?branch=master)](https://bettercodehub.com/)
+
 An EVE Online Discord Bot (Continuation of Dramiel)
 
 
