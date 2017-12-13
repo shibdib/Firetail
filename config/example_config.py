@@ -1,5 +1,6 @@
 token = 'lol'  # Put the bot token from https://discordapp.com/developers/applications here
 trigger = '!'  # the trigger for commands
+nickname = 'Firetail'  # Name your bot
 game = '!help for more info'  # What game the bot is playing
 
 # Welcome Message
