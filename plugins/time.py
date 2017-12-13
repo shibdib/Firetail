@@ -14,12 +14,13 @@ async def run(client, logger, config, message):
     pst = datetime.now(pytz.timezone("America/Los_Angeles")).strftime('%H:%M')
     cet = datetime.now(pytz.timezone("Europe/Copenhagen")).strftime('%H:%M')
     msk = datetime.now(pytz.timezone("Europe/Moscow")).strftime('%H:%M')
+    aest = datetime.now(pytz.timezone("Australia/Sydney")).strftime('%H:%M')
     em = discord.Embed()
     em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot")
     em.add_field(name="Time Zones",
-                 value="**EVE Time ** \n**PST/California ** \n**EST/New York ** \n**CET/Copenhagen ** \n**MSK/Moscow **", inline=True)
+                 value="**EVE Time ** \n**PST/California ** \n**EST/New York ** \n**CET/Copenhagen ** \n**MSK/Moscow ** \n**AEST/Sydney **", inline=True)
     em.add_field(name="Time",
-                 value=eve_time + " \n" + pst + " \n" + est + " \n" + cet + " \n" + msk, inline=True)
+                 value=eve_time + " \n" + pst + " \n" + est + " \n" + cet + " \n" + msk + " \n" + aest, inline=True)
     logger.info('Time - ' + str(message.author) + ' requested time info')
     await client.send_message(message.channel, embed=em)
 
