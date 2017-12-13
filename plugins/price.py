@@ -50,7 +50,7 @@ async def run(client, logger, config, message):
 
 
 async def helptext(client, logger, config, message):
-    msg = "To use this plugin simply do !price itemName. Example **!price rifter** or use a trade hub such as !jita " \
-          "!amarr !dodixie !rens or !hek in place of price.".format(message)
+    msg = "To use this plugin simply do !price itemName. Example **!price rifter** or use a trade hub such as **!jita " \
+          "!amarr !dodixie !rens** or **!hek** in place of price.".format(message)
     logger.info('Price - ' + str(message.author) + ' requested help for this plugin')
     await client.send_message(message.channel, msg)
