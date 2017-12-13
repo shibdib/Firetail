@@ -6,6 +6,9 @@ async def message_plugin(client, logger, config, message):
     # rename time to avoid issues
     if command == 'time':
         command = 'eveTime'
+    # handle price triggers
+    if command == 'jita' or command == 'amarr' or command == 'dodixie' or command == 'rens':
+        command = 'price'
     if command in config.messagePlugins:
         spec = importlib.util.spec_from_file_location(command, "plugins/" + command + ".py")
         plugin = importlib.util.module_from_spec(spec)
