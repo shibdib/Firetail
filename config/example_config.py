@@ -12,8 +12,7 @@ welcomeMessage = '**Welcome to the server!**\n \nTo get roles type !auth to get 
 # On Message Plugins
 messagePlugins = (
     'time',  # Test plugin please ignore
-    'price',  # Price check plugin
-    #  'char'
+    'price'  # Price check plugin
 )
 # On Tick Plugins
 tickPlugins = (
