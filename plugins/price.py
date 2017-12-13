@@ -27,12 +27,12 @@ async def run(client, logger, config, message):
         await client.send_message(message.channel, msg)
     else:
         typeid = await esi.item_id(item)
-        buymax = '{:,}'.format(float(data['buy']['max']))
-        buymin = '{:,}'.format(float(data['buy']['min']))
-        buyavg = '{:,}'.format(float(data['buy']['weightedAverage']))
-        sellmax = '{:,}'.format(float(data['sell']['max']))
-        sellmin = '{:,}'.format(float(data['sell']['min']))
-        sellavg = '{:,}'.format(float(data['sell']['weightedAverage']))
+        buymax = '{0:,.2f}'.format(float(data['buy']['max']))
+        buymin = '{0:,.2f}'.format(float(data['buy']['min']))
+        buyavg = '{0:,.2f}'.format(float(data['buy']['weightedAverage']))
+        sellmax = '{0:,.2f}'.format(float(data['sell']['max']))
+        sellmin = '{0:,.2f}'.format(float(data['sell']['min']))
+        sellavg = '{0:,.2f}'.format(float(data['sell']['weightedAverage']))
         em = discord.Embed(title=item.title(), description="Price information from " + lookup.title(),
                            url="https://market.fuzzwork.co.uk/type/" + str(typeid) + "/", colour=0xDEADBF)
         em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + Fuzzwork Market")

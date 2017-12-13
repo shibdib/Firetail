@@ -34,7 +34,7 @@ async def run(client, logger, config):
         if killmail_group_id in group_ids:
             kill_id = kill_data['killID']
             value_raw = kill_data['zkb']['totalValue']
-            value = '{:,}'.format(float(value_raw))
+            value = '{0:,.2f}'.format(float(value_raw))
             try:
                 victim_id = kill_data['killmail']['victim']['character_id']
                 victim_name = await esi.character_name(victim_id)
@@ -83,7 +83,7 @@ async def run(client, logger, config):
             channel_id = config.killmail['bigKillsChannel']
             kill_id = kill_data['killID']
             value_raw = kill_data['zkb']['totalValue']
-            value = '{:,}'.format(float(value_raw))
+            value = '{0:,.2f}'.format(float(value_raw))
             try:
                 victim_id = kill_data['killmail']['victim']['character_id']
                 victim_name = await esi.character_name(victim_id)
