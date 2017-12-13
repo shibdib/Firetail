@@ -25,9 +25,11 @@ async def run(client, logger, config, message):
     em.add_field(name="Buy", value="Low: " + buymin + " \nAvg: " + buyavg + " \nHigh: " + buymax + " \n ", inline=True)
     em.add_field(name="Sell", value="Low: " + sellmin + " \nAvg: " + sellavg + " \nHigh: " + sellmax + " \n ",
                  inline=True)
+    logger.info('Time - ' + str(message.author) + ' requested time info')
     await client.send_message(message.channel, embed=em)
 
 
 async def helptext(client, logger, config, message):
     msg = "To use this plugin simply do **!time**".format(message)
+    logger.info('Time - ' + str(message.author) + ' requested help info')
     await client.send_message(message.channel, msg)
