@@ -1,5 +1,6 @@
 import discord
 import logging
+from lib import db
 from logging.handlers import RotatingFileHandler
 import sys
 import pluginManager
@@ -56,14 +57,12 @@ async def on_member_join(member):
 
 @client.event
 async def on_server_join(server):
-    if config.welcomeMessageEnabled:
-        logger.info('Connected to Server: ' + server.id)
+    logger.info('Connected to Server: ' + server.id)
 
 
 @client.event
 async def on_server_remove(server):
-    if config.welcomeMessageEnabled:
-        logger.info('Left Server: ' + server.id)
+    logger.info('Left Server: ' + server.id)
 
 
 @client.event
@@ -74,6 +73,7 @@ async def on_ready():
     # Set playing
     await client.change_presence(game=discord.Game(name=config.game))
     #  await client.change_nickname(client.user, config.nickname)
+    await db.database_management(logger)
 
 
 client.loop.create_task(tick_loop())

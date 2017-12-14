@@ -12,7 +12,7 @@ welcomeMessage = '**Welcome to the server!**\n \nTo get roles type !auth to get 
 # On Message Plugins
 messagePlugins = (
     'eveTime',  # Get the time in eve and around the world
-    'price'  # Price check plugin
+    'price',  # Price check plugin
 )
 forcePrivateMessage = False  # If true, all bot responses will be done via PM
 deleteRequest = False  # If true, on bot response the message request is deleted (Works well with the above option)
