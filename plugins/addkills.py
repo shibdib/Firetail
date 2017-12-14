@@ -32,6 +32,7 @@ async def run(client, logger, config, message):
         await db.execute_sql(logger, sql, values)
     except:
         return await client.send_message(message.channel, '**ERROR** - Failed to add the server. Contact the bot owner for assistance.')
+    logger.info('addkills - ' + str(message.author) + ' added killmail tracking to their server.')
     return await client.send_message(message.channel, '**Success** - This channel will begin receiving killmails as they occur.')
 
 
@@ -39,7 +40,7 @@ async def helptext(client, logger, config, message):
     msg = "This plugin allows you to designate a channel to receive killmails. While in the channel you'd like to use, " \
           "type **!addkills corp/allianceID** so for example to add TEST Alliance killmails it would be **!addkills " \
           "498125261**".format(message)
-    logger.info('Price - ' + str(message.author) + ' requested help for this plugin')
+    logger.info('addkills - ' + str(message.author) + ' requested help for this plugin')
     await client.send_message(message.channel, msg)
 
 
@@ -50,4 +51,5 @@ async def removeServer(client, message, logger, server):
         await db.execute_sql(logger, sql, values)
     except:
         return await client.send_message(message.channel, '**ERROR** - Failed to remove the server. Contact the bot owner for assistance.')
+    logger.info('addkills - ' + str(message.author) + ' removed killmail tracking from their server.')
     return await client.send_message(message.channel, '**Success** - This bot will no longer report any killmails on this server.')
