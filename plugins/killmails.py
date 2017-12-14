@@ -38,8 +38,8 @@ async def run(client, logger, config):
             sql = "SELECT * FROM zkill"
             other_channels = await db.select(sql, logger)
             for zkill in other_channels:
-                if zkill[2] in group_ids:
-                    process_kill(client, zkill[0], kill_data, logger)
+                if zkill[3] in group_ids:
+                    await process_kill(client, zkill[1], kill_data, logger)
         elif kill_data['zkb']['totalValue'] >= config.killmail['bigKillsValue'] and config.killmail['bigKills']:
             channel_id = config.killmail['bigKillsChannel']
             await process_kill(client, channel_id, kill_data, logger, True)

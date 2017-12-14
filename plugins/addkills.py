@@ -44,8 +44,8 @@ async def helptext(client, logger, config, message):
 
 
 async def removeServer(client, message, logger, server):
-    sql = ''' DELETE FROM zkill WHERE (serverid) = (?) '''
-    values = server
+    sql = ''' DELETE FROM zkill WHERE `serverid` = (?) '''
+    values = (server,)
     try:
         await db.execute_sql(logger, sql, values)
     except:
