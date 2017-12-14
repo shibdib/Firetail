@@ -34,11 +34,6 @@ for plugin in config.tickPlugins:
     logger.info(plugin)
 logger.info('------')
 
-logger.info('Preparing Database: ')
-db.create_database('database/firetail.sqlite', logger)
-db.create_tables('database/firetail.sqlite', logger)
-logger.info('------')
-
 
 # Tick Loop
 async def tick_loop():
@@ -78,6 +73,7 @@ async def on_ready():
     # Set playing
     await client.change_presence(game=discord.Game(name=config.game))
     #  await client.change_nickname(client.user, config.nickname)
+    await db.database_management(logger)
 
 
 client.loop.create_task(tick_loop())

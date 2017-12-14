@@ -1,6 +1,13 @@
 import sqlite3
 
 
+async def database_management(logger):
+    logger.info('Preparing Databases..... ')
+    await create_database('database/firetail.sqlite', logger)
+    await create_tables('database/firetail.sqlite', logger)
+    logger.info('------')
+
+
 async def create_connection(db_file, logger):
     """ create a database connection to the SQLite database
         specified by db_file
@@ -41,12 +48,12 @@ async def select_pending(string):
 
 async def create_database(db_file, logger):
     """ create a database connection to a SQLite database """
-    conn = create_connection(db_file, logger)
+    conn = await create_connection(db_file, logger)
     conn.close()
 
 
 async def create_tables(db_file, logger):
-    conn = create_connection(db_file, logger)
+    conn = await create_connection(db_file, logger)
     if conn is not None:
         # create zkill table
         zkill_table = """ CREATE TABLE IF NOT EXISTS zkill (
@@ -54,9 +61,9 @@ async def create_tables(db_file, logger):
                                         channelid INTEGER NOT NULL,
                                         serverid INTEGER NOT NULL UNIQUE,
                                         groupid	INTEGER NOT NULL,
-                                        ownerid INTEGER NOT NULL,
+                                        ownerid INTEGER NOT NULL
                                     ); """
-        create_table(conn, zkill_table, logger)
+        await create_table(conn, zkill_table, logger)
     else:
         logger.error('Database: Unable to connect to the database at ' + db_file)
 
