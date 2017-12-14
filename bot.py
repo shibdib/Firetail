@@ -1,5 +1,6 @@
 import discord
 import logging
+from lib import db
 from logging.handlers import RotatingFileHandler
 import sys
 import pluginManager
@@ -31,6 +32,11 @@ logger.info('------')
 logger.info('Loading Tick Plugins: ')
 for plugin in config.tickPlugins:
     logger.info(plugin)
+logger.info('------')
+
+logger.info('Preparing Database: ')
+db.create_database('database/firetail.sqlite', logger)
+db.create_tables('database/firetail.sqlite', logger)
 logger.info('------')
 
 
