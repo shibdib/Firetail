@@ -40,15 +40,14 @@ async def run(client, logger, config):
             for zkill in other_channels:
                 if zkill[3] in group_ids:
                     await process_kill(client, zkill[1], kill_data, logger)
-        elif kill_data['zkb']['totalValue'] >= config.killmail['bigKillsValue'] and config.killmail['bigKills']:
+        if kill_data['zkb']['totalValue'] >= config.killmail['bigKillsValue'] and config.killmail['bigKills']:
             channel_id = config.killmail['bigKillsChannel']
             await process_kill(client, channel_id, kill_data, logger, True)
-        else:
-            continue
 
 
 async def process_kill(client, channel_id, kill_data, logger, big=False):
             kill_id = kill_data['killID']
+            time = kill_data['killmail']['killmail_time'].split('T', 1)[1][:-4]
             value_raw = kill_data['zkb']['totalValue']
             value = '{0:,.2f}'.format(float(value_raw))
             try:
@@ -76,7 +75,7 @@ async def process_kill(client, channel_id, kill_data, logger, big=False):
             title = ship_lost + " Destroyed in "
             if big:
                 title = "BIG KILL REPORTED: " + ship_lost + " Destroyed in "
-            em = discord.Embed(title=title.title() + str(solar_system_name),
+            em = discord.Embed(title=title.title() + str(solar_system_name), description='Killed At: ' + time + 'EVE',
                                url="https://zkillboard.com/kill/" + str(kill_id) + "/", colour=0xDEADBF)
             em.set_footer(icon_url=client.user.default_avatar_url, text="Provided Via Firetail Bot + ZKill")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
