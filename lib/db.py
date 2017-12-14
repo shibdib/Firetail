@@ -38,14 +38,6 @@ async def create_table(conn, create_table_sql, logger):
         logger.error('Database: Unable to create a table for the database')
 
 
-async def select_pending(string):
-    db = sqlite3.connect('database/auth.sqlite')
-    cursor = db.cursor()
-    cursor.execute('''SELECT characterID FROM pendingUsers WHERE authString=?''', (string,))
-    data = cursor.fetchone()
-    return data[0]
-
-
 async def create_database(db_file, logger):
     """ create a database connection to a SQLite database """
     conn = await create_connection(db_file, logger)
@@ -66,4 +58,18 @@ async def create_tables(db_file, logger):
         await create_table(conn, zkill_table, logger)
     else:
         logger.error('Database: Unable to connect to the database at ' + db_file)
+
+
+async def select_row(table, needle, stack):
+    db = sqlite3.connect('database/firetail.sqlite')
+    cursor = db.cursor()
+    cursor.execute('''SELECT * FROM ''' + table + ''' WHERE  ''' + stack + ''' =?''', (needle,))
+    data = cursor.fetchone()
+    return data
+
+
+async def insert(sql, var):
+    db = sqlite3.connect('database/firetail.sqlite')
+    cursor = db.cursor()
+    cursor.execute(sql, var)
 
