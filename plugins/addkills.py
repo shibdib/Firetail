@@ -49,5 +49,5 @@ async def removeServer(client, message, logger, server):
     try:
         await db.execute_sql(logger, sql, values)
     except:
-        return await client.send_message(message.channel, '**ERROR** - Failed to add the server. Contact the bot owner for assistance.')
-    return await client.send_message(message.channel, '**Success** - This channel will begin receiving killmails as they occur.')
+        return await client.send_message(message.channel, '**ERROR** - Failed to remove the server. Contact the bot owner for assistance.')
+    return await client.send_message(message.channel, '**Success** - This bot will no longer report any killmails on this server.')
