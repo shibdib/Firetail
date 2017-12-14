@@ -10,7 +10,7 @@ async def run(client, logger, config, message):
     group = message.content.split(' ', 1)[1]
     channel = message.channel.id
     author = message.author.id
-    server_owner = message.server.owner
+    server_owner = message.server.owner.id
     server = message.server.id
     group_corp = esi.corporation_info(group)
     group_alliance = esi.alliance_info(group)
@@ -20,13 +20,15 @@ async def run(client, logger, config, message):
     # Verify group exists
     if 'error' in group_corp and 'error' in group_alliance:
         return await client.send_message(message.channel, 'Not a valid group ID. Please use **!addKills help** for more info.')
-    sql = ''' INSERT INTO zkill(channelid,serverid,groupid,ownerid)
+    sql = ''' UPDATE INTO zkill(channelid,serverid,groupid,ownerid)
               VALUES(?,?,?,?) '''
     values = (channel, server, group, author)
     try:
-        await db.insert_row(sql, values)
+        await db.insert_row(sql, values, logger)
     except:
+        logger.error('addkills: ' + message.author.name + ' tried and failed to add ' + group)
         return await client.send_message(message.channel, '**ERROR** - Failed to add the server. Contact the bot owner for assistance.')
+    logger.info('addkills: ' + message.author.name + ' has added a zkill channel for ' + group)
     return await client.send_message(message.channel, '**Success** - This channel will begin receiving killmails as they occur.')
 
 
