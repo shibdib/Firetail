@@ -56,14 +56,12 @@ async def on_member_join(member):
 
 @client.event
 async def on_server_join(server):
-    if config.welcomeMessageEnabled:
-        logger.info('Connected to Server: ' + server.id)
+    logger.info('Connected to Server: ' + server.id)
 
 
 @client.event
 async def on_server_remove(server):
-    if config.welcomeMessageEnabled:
-        logger.info('Left Server: ' + server.id)
+    logger.info('Left Server: ' + server.id)
 
 
 @client.event
