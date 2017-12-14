@@ -65,10 +65,11 @@ async def select(sql, logger):
     cursor = db.cursor()
     cursor.execute(sql)
     data = cursor.fetchall()
+    db.close()
     return data
 
 
-async def insert_row(sql, var, logger):
+async def execute_sql(logger, sql, var=None):
     db = await create_connection('database/firetail.sqlite', logger)
     cursor = db.cursor()
     cursor.execute(sql, var)
