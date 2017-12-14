@@ -24,7 +24,7 @@ async def run(client, logger, config, message):
               VALUES(?,?,?,?) '''
     values = (channel, server, group, author)
     try:
-        await db.insert(sql, values)
+        await db.insert_row(sql, values)
     except:
         return await client.send_message(message.channel, '**ERROR** - Failed to add the server. Contact the bot owner for assistance.')
     return await client.send_message(message.channel, '**Success** - This channel will begin receiving killmails as they occur.')
@@ -32,7 +32,7 @@ async def run(client, logger, config, message):
 
 async def helptext(client, logger, config, message):
     msg = "This plugin allows you to designate a channel to receive killmails. While in the channel you'd like to use, " \
-          "type **!addKills corp/allianceID** so for example to add TEST Alliance killmails it would be **!addKills " \
+          "type **!addkills corp/allianceID** so for example to add TEST Alliance killmails it would be **!addkills " \
           "498125261**".format(message)
     logger.info('Price - ' + str(message.author) + ' requested help for this plugin')
     await client.send_message(message.channel, msg)

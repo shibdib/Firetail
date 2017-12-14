@@ -60,16 +60,17 @@ async def create_tables(db_file, logger):
         logger.error('Database: Unable to connect to the database at ' + db_file)
 
 
-async def select_row(table, needle, stack):
-    db = sqlite3.connect('database/firetail.sqlite')
+async def select(sql, logger):
+    db = await create_connection('database/firetail.sqlite', logger)
     cursor = db.cursor()
-    cursor.execute('''SELECT * FROM ''' + table + ''' WHERE  ''' + stack + ''' =?''', (needle,))
-    data = cursor.fetchone()
+    cursor.execute(sql)
+    data = cursor.fetchall()
     return data
 
 
-async def insert(sql, var):
-    db = sqlite3.connect('database/firetail.sqlite')
+async def insert_row(sql, var, logger):
+    db = await create_connection('database/firetail.sqlite', logger)
     cursor = db.cursor()
     cursor.execute(sql, var)
-
+    db.commit()
+    db.close()
