@@ -34,12 +34,12 @@ async def run(client, logger, config):
                 group_ids.append(int(attacker['alliance_id']))
         if killmail_group_id in group_ids:
             await process_kill(client, channel_id, kill_data, logger)
-        if 'addkills' in config.tickPlugins:
+        if 'addkills' in config.messagePlugins:
             sql = "SELECT * FROM zkill"
-            other_channels = db.select(sql, logger)
+            other_channels = await db.select(sql, logger)
             for zkill in other_channels:
-                if zkill['groupid'] in group_ids:
-                    process_kill(client, zkill['channelid'], kill_data, logger)
+                if zkill[2] in group_ids:
+                    process_kill(client, zkill[0], kill_data, logger)
         elif kill_data['zkb']['totalValue'] >= config.killmail['bigKillsValue'] and config.killmail['bigKills']:
             channel_id = config.killmail['bigKillsChannel']
             await process_kill(client, channel_id, kill_data, logger, True)
