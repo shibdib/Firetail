@@ -18,11 +18,11 @@ if discord.version_info.major < 1:
 
 
 def run_firetail(debug=None, launcher=None):
-    firetail = bot.Firetail
+    firetail = bot.Firetail()
     events.init_events(firetail, launcher=launcher)
     firetail.logger = logger.init_logger(debug_flag=debug)
     firetail.load_extension('firetail.core.commands')
-    firetail.load_extension('firetail.core.ext_manager')
+    firetail.load_extension('firetail.core.extension_manager')
     for ext in firetail.preload_ext:
         ext_name = ("firetail.extensions." + ext)
         firetail.load_extension(ext_name)

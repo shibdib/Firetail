@@ -75,7 +75,7 @@ class Core:
                                  title='Game set.')
         await ctx.send(embed=embed)
 
-    @_set.command()
+    @_set.command(name="status")
     @checks.is_co_owner()
     @commands.guild_only()
     async def status(self, ctx, *, status: str):
@@ -257,7 +257,7 @@ class Core:
         if ctx.invoked_subcommand is None:
             await ctx.bot.send_cmd_help(ctx)
 
-    @_get.command()
+    @_get.command(name="guildperms")
     @checks.is_co_owner()
     async def guildperms(self, ctx):
         """Gets bot permissions for the current guild."""
@@ -296,7 +296,7 @@ class Core:
                 content=msg)
             await ctx.author.send(embed=embed)
 
-    @_get.command()
+    @_get.command(name="channelperms")
     @checks.is_co_owner()
     async def channelperms(self, ctx):
         """Gets bot permissions for the current channel."""
@@ -306,8 +306,8 @@ class Core:
         core_dir = ctx.bot.core_dir
         data_dir = os.path.join(core_dir, '..', 'data')
         data_file = 'permissions.json'
-        msg = f"Channel Permissions: {chan_perms.value}\n"
-        msg += f"Met Minimum Permissions: {str(perms_compare)}\n\n"
+        msg = "Channel Permissions: {}\n".format(chan_perms.value)
+        msg += "Met Minimum Permissions: {}\n\n".format(str(perms_compare))
 
         with open(os.path.join(data_dir, data_file), "r") as perm_json:
             perm_dict = json.load(perm_json)
@@ -315,9 +315,9 @@ class Core:
         for perm, bitshift in perm_dict.items():
             if bool((req_perms.value >> bitshift) & 1):
                 if bool((chan_perms.value >> bitshift) & 1):
-                    msg += f":white_small_square:  {perm}\n"
+                    msg += ":white_small_square:  {perm}\n".format(perm)
                 else:
-                    msg += f":black_small_square:  {perm}\n"
+                    msg += ":black_small_square:  {perm}\n".format(perm)
         try:
             if chan_perms.embed_links:
                 embed = utils.make_embed(
@@ -340,7 +340,7 @@ class Core:
         r_c = ctx.bot.resumed_count
         embed = utils.make_embed(
             msg_type='info',
-            title=f"Connections Resumed: {r_c}")
+            title="Connections Resumed: {}".format(r_c))
         await ctx.send(embed=embed)
 
     @commands.command(name="ping")
@@ -349,10 +349,10 @@ class Core:
         msg = ("{0:.2f} ms").format(ctx.bot.ws.latency * 1000)
         embed = utils.make_embed(
             msg_type='info',
-            title=f'Bot Latency: {msg}')
+            title='Bot Latency: {}'.format(msg))
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(name="purge")
     @checks.is_co_owner()
     async def purge(self, ctx, msg_number: int = 10):
         """Delete a number of messages from the channel.
@@ -372,7 +372,7 @@ class Core:
         await asyncio.sleep(3)
         await result_msg.delete()
 
-    @commands.command()
+    @commands.command(name="reload_em")
     @checks.is_co_owner()
     async def reload_em(self, ctx):
         """Reload Extension Manager."""
@@ -403,7 +403,7 @@ class Core:
                 if new_prefix.lower() == 'reset':
                     new_prefix = bot.default_prefix
                 embed = utils.make_embed(
-                    msg_type='success', title=f"Prefix set to {new_prefix}")
+                    msg_type='success', title="Prefix set to {}".format(new_prefix))
                 await ctx.send(embed=embed)
             else:
                 guild_prefix = await bot.data.guild(ctx.guild).prefix()
@@ -413,7 +413,7 @@ class Core:
                 else:
                     prefix = prefix[0]
                 embed = utils.make_embed(
-                    msg_type='info', title=f"Prefix is {prefix}")
+                    msg_type='info', title="Prefix is {}".format(prefix))
                 await ctx.send(embed=embed)
         else:
             if len(default_prefix) > 1:
@@ -421,7 +421,7 @@ class Core:
             else:
                 prefix = default_prefix[0]
             embed = utils.make_embed(
-                msg_type='info', title=f"Prefix is {prefix}")
+                msg_type='info', title="Prefix is {}".format(prefix))
             await ctx.send(embed=embed)
 
 

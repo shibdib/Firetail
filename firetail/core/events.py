@@ -12,6 +12,7 @@ INTRO = ("====================================\n"
 
 log = logging.getLogger("firetail")
 
+
 def init_events(bot, launcher=None):
 
     @bot.event
@@ -28,14 +29,14 @@ def init_events(bot, launcher=None):
         print("We're on!\n")
         guilds = len(bot.guilds)
         users = len(list(bot.get_all_members()))
-        print(f"Version: {firetail.__version__}\n")
+        print("Version: {}\n".format(firetail.__version__))
         if guilds:
-            print(f"Servers: {guilds}")
-            print(f"Members: {users}")
+            print("Servers: {}".format(guilds))
+            print("Members: {}".format(users))
         else:
             print("I'm not in any server yet, so be sure to invite me!")
         if bot.invite_url:
-            print(f"\nInvite URL: {bot.invite_url}\n")
+            print("\nInvite URL: {}\n".format(bot.invite_url))
 
     @bot.event
     async def on_command_error(ctx, error):
