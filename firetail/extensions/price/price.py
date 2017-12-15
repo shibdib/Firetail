@@ -1,4 +1,3 @@
-from firetail.lib import ESI
 from discord.ext import commands
 from firetail.utils import make_embed
 
@@ -31,19 +30,19 @@ class Price:
             if ctx.message.content.split(' ', 1)[1].lower() == 'help':
                 #  await helptext(client, logger, config, message)
                 return
-        data = await ESI.market_data(item, system)
+        data = await ctx.bot.esi_data.market_data(item, system)
         self.logger.info('Price - ' + str(ctx.author) + ' requested price information for a ' + str(item))
         if data == 0:
             self.logger.info('Price - ' + str(item) + ' could not be found')
             msg = item + " was not found, are you sure it's an item?"
-            if config.forcePrivateMessage:
+            if config.dm_only:
                 await ctx.author.send(msg)
             else:
                 await ctx.channel.send(msg)
-            if config.deleteRequest:
+            if config.delete_commands:
                 await ctx.message.delete()
         else:
-            typeid = await ESI.item_id(item)
+            typeid = await ctx.bot.esi_data.item_id(item)
             buymax = '{0:,.2f}'.format(float(data['buy']['max']))
             buymin = '{0:,.2f}'.format(float(data['buy']['min']))
             buyavg = '{0:,.2f}'.format(float(data['buy']['weightedAverage']))
@@ -60,9 +59,9 @@ class Price:
                          inline=True)
             em.add_field(name="Sell", value="Low: " + sellmin + " \nAvg: " + sellavg + " \nHigh: " + sellmax + " \n ",
                          inline=True)
-            if config.forcePrivateMessage:
+            if config.dm_only:
                 await ctx.author.send(embed=em)
             else:
                 await ctx.channel.send(embed=em)
-            if config.deleteRequest:
+            if config.delete_commands:
                 await ctx.message.delete()
