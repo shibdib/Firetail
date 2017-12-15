@@ -94,7 +94,7 @@ async def process_kill(client, channel_id, kill_data, logger, big=False):
                 em.add_field(name="Structure Info",
                              value="Structure Value: " + value + "\nCorp: " + str(victim_corp))
             channel = client.get_channel(str(channel_id))
-            logger.info('Killmail - Kill # ' + str(kill_id) + ' has been posted to ' + str(channel.name))
+            logger.info('Killmail - Kill # ' + str(kill_id) + ' has been posted to ' + str(channel.id))
             await client.send_message(channel, embed=em)
 
 
