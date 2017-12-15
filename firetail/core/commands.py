@@ -378,8 +378,8 @@ class Core:
         """Reload Extension Manager."""
         bot = ctx.bot
         try:
-            bot.unload_extension('firetail.core.ext_manager')
-            bot.load_extension('firetail.core.ext_manager')
+            bot.unload_extension('firetail.core.extension_manager')
+            bot.load_extension('firetail.core.extension_manager')
             embed = utils.make_embed(msg_type='success',
                                      title='Extension Manager reloaded.')
             await ctx.send(embed=embed)
