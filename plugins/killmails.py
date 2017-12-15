@@ -94,8 +94,11 @@ async def process_kill(client, channel_id, kill_data, logger, big=False):
                 em.add_field(name="Structure Info",
                              value="Structure Value: " + value + "\nCorp: " + str(victim_corp))
             channel = client.get_channel(str(channel_id))
-            logger.info('Killmail - Kill # ' + str(kill_id) + ' has been posted to ' + str(channel.name))
-            await client.send_message(channel, embed=em)
+            logger.info('Killmail - Kill # ' + str(kill_id) + ' has been posted to ' + str(channel_id))
+            try:
+                await client.send_message(channel, embed=em)
+            except:
+                logger.error('Killmail - ERROR Kill # ' + str(kill_id) + ' could not be posted to ' + str(channel_id))
 
 
 async def redis(client):
