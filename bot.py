@@ -14,13 +14,6 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 
-async def my_handler(type, value, tb):
-    logger.exception("Uncaught exception: {0}".format(str(value)))
-
-
-sys.excepthook = my_handler
-
-
 client = discord.Client()
 logger.info(' -------INITIATING STARTUP------- ')
 
