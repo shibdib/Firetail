@@ -23,8 +23,8 @@ class Price:
         item = ctx.message.content.split(' ', 1)[1]
         system = 60003760
         lookup = 'Jita'
-        if ctx.message.content.split()[0][len(config.trigger):].lower() != 'price':
-            lookup = ctx.message.content.split()[0][len(config.trigger):].lower()
+        if ctx.message.content.split()[0][len(config.bot_prefix):].lower() != 'price':
+            lookup = ctx.message.content.split()[0][len(config.bot_prefix):].lower()
             system = self.hub_id[lookup]
         # handle help request
         if len(ctx.message.content.split()) > 1:
