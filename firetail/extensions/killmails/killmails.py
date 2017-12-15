@@ -1,4 +1,3 @@
-from firetail.lib import ESI
 from firetail.lib import db
 from firetail.utils import make_embed
 import asyncio
@@ -64,23 +63,23 @@ class Killmails:
         value = '{0:,.2f}'.format(float(value_raw))
         try:
             victim_id = kill_data['killmail']['victim']['character_id']
-            victim_name = await ESI.character_name(victim_id)
+            victim_name = await self.bot.esi_data.character_name(victim_id)
         except:
             victim_name = None
         ship_lost_id = kill_data['killmail']['victim']['ship_type_id']
-        ship_lost_raw = await ESI.type_info_search(ship_lost_id)
+        ship_lost_raw = await self.bot.esi_data.type_info_search(ship_lost_id)
         ship_lost = ship_lost_raw['name']
         victim_corp_id = kill_data['killmail']['victim']['corporation_id']
-        victim_corp_raw = await ESI.corporation_info(victim_corp_id)
+        victim_corp_raw = await self.bot.esi_data.corporation_info(victim_corp_id)
         victim_corp = victim_corp_raw['corporation_name']
         try:
             victim_alliance_id = kill_data['killmail']['victim']['alliance_id']
-            victim_alliance_raw = await ESI.alliance_info(victim_alliance_id)
+            victim_alliance_raw = await self.bot.esi_data.alliance_info(victim_alliance_id)
             victim_alliance = victim_alliance_raw['alliance_name']
         except:
             victim_alliance = None
         solar_system_id = kill_data['killmail']['solar_system_id']
-        solar_system_info = await ESI.system_info(solar_system_id)
+        solar_system_info = await self.bot.esi_data.system_info(solar_system_id)
         solar_system_name = solar_system_info['name']
         if '-' in solar_system_name:
             solar_system_name = solar_system_name.upper()
