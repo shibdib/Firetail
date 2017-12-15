@@ -1,6 +1,7 @@
 import logging
 import logging.handlers
 import sys
+import os
 
 
 def init_logger(debug_flag=False):
@@ -25,7 +26,7 @@ def init_logger(debug_flag=False):
     stdout_handler.setFormatter(firetail_format)
     logger.setLevel(log_level)
 
-    logfile_path = '/logs/firetail.log'
+    logfile_path = os.getcwd() + '/logs/firetail.log'
     fhandler = logging.handlers.RotatingFileHandler(
         filename=str(logfile_path), encoding='utf-8', mode='a',
         maxBytes=400000, backupCount=20)
