@@ -1,8 +1,6 @@
 import discord
 import logging
-from lib import db
 from logging.handlers import RotatingFileHandler
-import sys
 import pluginManager
 import asyncio
 from config import config
@@ -66,7 +64,6 @@ async def on_ready():
     # Set playing
     await client.change_presence(game=discord.Game(name=config.game))
     #  await client.change_nickname(client.user, config.nickname)
-    await db.database_management(logger)
 
 
 client.loop.create_task(tick_loop())
