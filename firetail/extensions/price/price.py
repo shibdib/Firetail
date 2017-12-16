@@ -53,7 +53,7 @@ class Price:
             em = make_embed(msg_type='info', title=item.title(),
                             title_url="https://market.fuzzwork.co.uk/type/" + str(typeid) + "/",
                             content="Price information from " + lookup.title())
-            em.set_footer(icon_url=ctx.guild.me.avatar_url,
+            em.set_footer(icon_url=ctx.bot.user.avatar_url,
                           text="Provided Via firetail Bot + Fuzzwork Market")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(typeid) + "_64.png")
             em.add_field(name="Buy", value="Low: " + buymin + " \nAvg: " + buyavg + " \nHigh: " + buymax + " \n ",
