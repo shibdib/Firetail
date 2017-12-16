@@ -29,9 +29,7 @@ setup(
         'discord.py',
         'python-dateutil>=2.6',
         'asyncpg>=0.13',
-        'websockets',
-        'pytz',
-        'aiohttp'
+        'pytz'
     ],
 
     dependency_links=[
