@@ -18,6 +18,7 @@ class Price:
 
     @commands.command(name='price', aliases=["jita", "Jita", "amarr", "Amarr", "dodixie", "Dodixie", "rens", "Rens", "hek", "Hek",])
     async def _price(self, ctx):
+        """Gets you price information from the top trade hubs. Use **!price item** or **!amarr item** (Works for Jita, Amarr, Dodixie, Rens, Hek)"""
         config = self.config
         item = ctx.message.content.split(' ', 1)[1]
         system = 60003760
@@ -52,7 +53,7 @@ class Price:
             em = make_embed(msg_type='info', title=item.title(),
                             title_url="https://market.fuzzwork.co.uk/type/" + str(typeid) + "/",
                             content="Price information from " + lookup.title())
-            em.set_footer(icon_url=ctx.guild.me.avatar_url,
+            em.set_footer(icon_url=ctx.bot.user.avatar_url,
                           text="Provided Via firetail Bot + Fuzzwork Market")
             em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(typeid) + "_64.png")
             em.add_field(name="Buy", value="Low: " + buymin + " \nAvg: " + buyavg + " \nHigh: " + buymax + " \n ",

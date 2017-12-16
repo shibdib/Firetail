@@ -27,7 +27,7 @@ class EveTime:
             time_field.append(datetime.now(pytz.timezone(zone)).strftime('%H:%M'))
 
         embed = make_embed(guild=ctx.guild)
-        embed.set_footer(icon_url=ctx.guild.me.avatar_url,
+        embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via Firetail Bot")
         embed.add_field(name="Time Zones", value='\n'.join(tz_field), inline=True)
         embed.add_field(name="Time", value='\n'.join(time_field), inline=True)
