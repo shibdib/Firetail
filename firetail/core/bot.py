@@ -1,17 +1,14 @@
 import discord
 from discord.ext import commands
 
-import sys
 import os
 import aiohttp
-import asyncio
 from collections import Counter
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from firetail import config
 from firetail.lib import ESI
-from firetail.utils import logger
 from firetail.utils import ExitCodes
 
 
