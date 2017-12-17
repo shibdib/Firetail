@@ -1,5 +1,5 @@
-from lib import esi
-from lib import db
+from firetail.lib import ESI
+from firetail.lib import db
 
 
 async def run(client, logger, config, message):
@@ -14,8 +14,8 @@ async def run(client, logger, config, message):
     author = message.author.id
     server_owner = message.server.owner.id
     server = message.server.id
-    group_corp = await esi.corporation_info(group)
-    group_alliance = await esi.alliance_info(group)
+    group_corp = await ESI.corporation_info(group)
+    group_alliance = await ESI.alliance_info(group)
     # Verify user requesting is the server owner
     if server_owner != author:
         return await client.send_message(message.channel, 'Only the server owner can perform this action.')
