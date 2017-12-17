@@ -48,12 +48,14 @@ class Killmails:
                     group_ids.append(int(attacker['alliance_id']))
             if killmail_group_id in group_ids:
                 await self.process_kill(channel_id, kill_data)
-            if 'addkills' in self.bot.extensions:
-                sql = "SELECT * FROM zkill"
-                other_channels = await db.select(sql, self.logger)
-                for zkill in other_channels:
-                    if zkill[3] in group_ids:
-                        await self.process_kill(zkill[1], kill_data)
+            for ext in self.bot.extensions:
+                if 'add_kills' in ext:
+                    print('2345')
+                    sql = "SELECT * FROM zkill"
+                    other_channels = await db.select(sql)
+                    for zkill in other_channels:
+                        if zkill[3] in group_ids:
+                            await self.process_kill(zkill[1], kill_data)
             if kill_data['zkb']['totalValue'] >= big_kills_value and big_kills:
                 channel_id = config.killmail['bigKillsChannel']
                 await self.process_kill(channel_id, kill_data, True)

@@ -20,8 +20,8 @@ class AddKills:
         group = ctx.message.content.split(' ', 1)[1]
         channel = ctx.message.channel.id
         author = ctx.message.author.id
-        server_owner = ctx.server.owner.id
-        server = ctx.message.server.id
+        server_owner = ctx.message.guild.owner.id
+        server = ctx.message.guild.id
         group_corp = await self.bot.esi_data.corporation_info(group)
         group_alliance = await self.bot.esi_data.alliance_info(group)
         # Verify user requesting is the server owner
@@ -37,18 +37,14 @@ class AddKills:
         sql = ''' REPLACE INTO zkill(channelid,serverid,groupid,ownerid)
                   VALUES(?,?,?,?) '''
         values = (channel, server, group, author)
-        try:
-            await db.execute_sql(sql, values)
-        except:
-            return await ctx.channel.send('**ERROR** - Failed to add the server. Contact the bot '
-                                          'owner for assistance.')
+        await db.execute_sql(sql, values)
         self.logger.info('addkills - ' + str(ctx.message.author) + ' added killmail tracking to their server.')
         return await ctx.channel.send('**Success** - This channel will begin receiving killmails '
                                       'as they occur.')
 
     async def removeServer(self, ctx):
         sql = ''' DELETE FROM zkill WHERE `serverid` = (?) '''
-        values = (ctx.server.id,)
+        values = (ctx.message.guild.id,)
         try:
             await db.execute_sql(sql, values)
         except:
