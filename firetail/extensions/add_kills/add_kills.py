@@ -11,8 +11,7 @@ class AddKills:
 
     @commands.command(name='addkills')
     async def _add_kills(self, ctx):
-        """Do '!addkills corp/allianceID' to start receiving killmails in the channel. Do '!addkills remove' to stop
-        receiving killmails."""
+        """Do '!addkills corp/allianceID' to start receiving killmails in the channel. Do '!addkills remove' to stop receiving killmails."""
         # handle help request
         if len(ctx.message.content.split()) == 1:
             return await ctx.channel.send('Not a valid group ID. Please use **!help addkills** '
