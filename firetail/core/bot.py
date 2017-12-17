@@ -1,16 +1,14 @@
 import discord
 from discord.ext import commands
 
-import sys
 import os
 import aiohttp
-import asyncio
 from collections import Counter
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from firetail import config
-from firetail.lib import ESI, db
+from firetail.lib import ESI
 from firetail.utils import ExitCodes
 
 
@@ -33,7 +31,6 @@ class Firetail(commands.Bot):
         super().__init__(**kwargs)
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.esi_data = ESI(self.session)
-        db.database_management()
 
     async def send_cmd_help(self, ctx):
         if ctx.invoked_subcommand:

@@ -3,8 +3,8 @@ import sqlite3
 
 async def database_management():
     print('Preparing Databases..... ')
-    await create_database('database/firetail.sqlite')
-    await create_tables('database/firetail.sqlite')
+    await create_database('/firetail/database/firetail.sqlite')
+    await create_tables('/firetail/database/firetail.sqlite')
     print('------')
 
 
@@ -61,6 +61,7 @@ async def create_tables(db_file):
 
 
 async def select(sql):
+    await database_management()
     db = await create_connection('database/firetail.sqlite')
     cursor = db.cursor()
     cursor.execute(sql)
@@ -70,6 +71,7 @@ async def select(sql):
 
 
 async def execute_sql(sql, var=None):
+    await database_management()
     db = await create_connection('database/firetail.sqlite')
     cursor = db.cursor()
     cursor.execute(sql, var)
