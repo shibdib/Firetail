@@ -242,7 +242,7 @@ class Core:
         embed.add_field(name="Messages Read", value=bot.message_count)
         embed.add_field(name="Invite Link", value=invite_str)
         footer_txt = ("For support, contact us on our Discord server. "
-                      "Invite Code: hhVjAN8")
+                      "Invite Code: ZWmzTP3")
         embed.set_footer(text=footer_txt)
 
         try:
