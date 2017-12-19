@@ -31,10 +31,10 @@ class CharLookup:
                            title=character_data['name'], content='Character Info:')
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via Firetail Bot")
-        embed.set_thumbnail(url="https://imageserver.eveonline.com/Character/" + str(character_id['character'][0]) + "_64.png")
+        embed.set_thumbnail(url="https://imageserver.eveonline.com/Character/" + str(character_id['character'][0]) + "_64.jpg")
         if victim_alliance:
             embed.add_field(name="Info", value='Alliance:\nCorporation:\nLast Seen Location:\nLast Seen Ship:', inline=True)
-            embed.add_field(name="Test", value='{}\n{}\n{}\n{}'.format(victim_alliance, victim_corp, solar_system_name,
+            embed.add_field(name="-", value='{}\n{}\n{}\n{}'.format(victim_alliance, victim_corp, solar_system_name,
                                                                        ship_lost), inline=True)
         else:
             embed.add_field(name="Info", value='Corporation:\nLast Seen System:\nLast Seen Ship:', inline=True)
