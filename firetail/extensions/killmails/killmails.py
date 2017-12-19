@@ -93,7 +93,7 @@ class Killmails:
         em = make_embed(msg_type='info', title=title.title() + str(solar_system_name),
                         title_url="https://zkillboard.com/kill/" + str(kill_id) + "/",
                         content='Killed At: ' + kill_time + ' EVE')
-        em.set_footer(icon_url=bot.user.default_avatar_url,
+        em.set_footer(icon_url=self.bot.user.avatar_url,
                       text="Provided Via firetail Bot + ZKill")
         em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
         if victim_name is not None and victim_alliance is not None:
