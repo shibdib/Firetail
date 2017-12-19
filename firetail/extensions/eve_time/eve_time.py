@@ -19,7 +19,7 @@ class EveTime:
 
     @commands.command(name='time')
     async def _time(self, ctx):
-        """Shows the time in a range of timezones, including EVE Time."""
+        """Shows the time in a range of timezones."""
         tz_field = []
         time_field = []
         for display, zone in self.TIMEZONES.items():
