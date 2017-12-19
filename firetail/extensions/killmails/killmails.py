@@ -120,4 +120,8 @@ class Killmails:
         zkill = "{}/listen.php?queueID={}".format(base_url, self.bot.user.id)
         async with self.bot.session.get(zkill) as resp:
             data = (await resp.json())['package']
-        return data if data.get('killID') else None
+        try:
+            if data.get('killID'):
+                return data
+        except:
+            return None
