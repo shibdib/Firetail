@@ -5,7 +5,6 @@ from discord.ext import commands
 class AddKills:
     def __init__(self, bot):
         self.bot = bot
-        self.session = bot.session
         self.config = bot.config
         self.logger = bot.logger
 
