@@ -24,8 +24,7 @@ class GroupLookup:
             raw_corp_description = group_data['corporation_description']
             new_lines = re.sub('<br\s*?>', '\n', raw_corp_description)
             tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
-            no_tags = tag_re.sub('', new_lines)
-            corp_description = html.escape(no_tags)
+            corp_description = tag_re.sub('', new_lines)
             zkill_link = 'https://zkillboard.com/corporation/{}/'.format(group_id)
             eve_who = 'https://evewho.com/corp/{}'.format(urllib.parse.quote(group_name))
             dotlan = 'http://evemaps.dotlan.net/corporation/{}'.format(urllib.parse.quote(group_name))
