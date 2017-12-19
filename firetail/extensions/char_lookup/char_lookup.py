@@ -46,11 +46,15 @@ class CharLookup:
 
     async def zkill_info(self, character_id):
         async with aiohttp.ClientSession() as session:
-            url = 'https://zkillboard.com/api/no-items/kills/limit/1/characterID/{}/'.format(character_id)
+            url = 'https://zkillboard.com/api/no-items/limit/1/characterID/{}/'.format(character_id)
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
-                if data[0]['victim']['character_id'] == character_id: # TODO fix for structure kills
+                try:
+                    victim_id = data[0]['victim']['character_id']
+                except:
+                    victim_id = 0
+                if victim_id == character_id:
                     return data[0]['victim'], data[0]['solar_system_id']
                 else:
                     for attacker in data[0]['attackers']:
