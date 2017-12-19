@@ -18,7 +18,8 @@ class Price:
 
     @commands.command(name='price', aliases=["jita", "Jita", "amarr", "Amarr", "dodixie", "Dodixie", "rens", "Rens", "hek", "Hek",])
     async def _price(self, ctx):
-        """Gets you price information from the top trade hubs. Use **!price item** or **!amarr item** (Works for Jita, Amarr, Dodixie, Rens, Hek)"""
+        """Gets you price information from the top trade hubs.
+        Use **!price item** or **!amarr item** (Works for Jita, Amarr, Dodixie, Rens, Hek)"""
         config = self.config
         item = ctx.message.content.split(' ', 1)[1]
         system = 60003760
