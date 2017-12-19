@@ -13,7 +13,7 @@ class ESI:
     async def esi_search(self, item, category):
         async with aiohttp.ClientSession() as session:
             url = ('{}/search/?categories={}&datasource=tranquility'
-                   '&language=en-us&search={}&strict=false'
+                   '&language=en-us&search={}&strict=true'
                    '').format(ESI_URL, category, item)
             async with session.get(url) as resp:
                 data = await resp.text()
