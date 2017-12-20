@@ -1,8 +1,6 @@
 from firetail.lib import db
 from firetail.utils import make_embed
 import asyncio
-import sched
-import time
 
 
 class Killmails:
@@ -75,11 +73,11 @@ class Killmails:
         ship_lost = ship_lost_raw['name']
         victim_corp_id = kill_data['killmail']['victim']['corporation_id']
         victim_corp_raw = await self.bot.esi_data.corporation_info(victim_corp_id)
-        victim_corp = victim_corp_raw['corporation_name']
+        victim_corp = victim_corp_raw['name']
         try:
             victim_alliance_id = kill_data['killmail']['victim']['alliance_id']
             victim_alliance_raw = await self.bot.esi_data.alliance_info(victim_alliance_id)
-            victim_alliance = victim_alliance_raw['alliance_name']
+            victim_alliance = victim_alliance_raw['name']
         except:
             victim_alliance = None
         solar_system_id = kill_data['killmail']['solar_system_id']
