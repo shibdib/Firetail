@@ -3,7 +3,6 @@ import aiohttp
 import json
 import urllib
 import re
-import html
 
 from firetail.utils import make_embed
 
@@ -22,14 +21,14 @@ class GroupLookup:
             if len(group_id['corporation']) > 1:
                 for id in group_id['corporation']:
                     group_data = await ctx.bot.esi_data.corporation_info(id)
-                    if group_data['corporation_name'].lower() == group_name.lower():
+                    if group_data['name'].lower() == group_name.lower():
                         group_id = id
                         group_data = await ctx.bot.esi_data.corporation_info(group_id)
             else:
                 group_id = group_id['corporation'][0]
                 group_data = await ctx.bot.esi_data.corporation_info(group_id)
             zkill_stats = await self.zkill_stats(group_id, 'corporationID')
-            raw_corp_description = group_data['corporation_description']
+            raw_corp_description = group_data['description']
             new_lines = re.sub('<br\s*?>', '\n', raw_corp_description)
             tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
             corp_description = tag_re.sub('', new_lines)
@@ -40,7 +39,7 @@ class GroupLookup:
             try:
                 alliance_id = group_data['alliance_id']
                 alliance_info = await ctx.bot.esi_data.alliance_info(alliance_id)
-                alliance_name = alliance_info['alliance_name']
+                alliance_name = alliance_info['name']
                 alliance = True
             except:
                 alliance = False
@@ -51,7 +50,7 @@ class GroupLookup:
                 if len(group_id['alliance']) > 1:
                     for id in group_id['alliance']:
                         group_data = await ctx.bot.esi_data.alliance_info(id)
-                        if group_data['alliance_name'].lower() == group_name.lower():
+                        if group_data['name'].lower() == group_name.lower():
                             group_id = id
                             group_data = await ctx.bot.esi_data.alliance_info(group_id)
                 else:
