@@ -25,7 +25,7 @@ class CharLookup:
         solar_system_info = await ctx.bot.esi_data.system_info(latest_system_id)
         solar_system_name = solar_system_info['name']
         victim_corp_raw = await ctx.bot.esi_data.corporation_info(character_data['corporation_id'])
-        victim_corp = victim_corp_raw['corporation_name']
+        victim_corp = victim_corp_raw['name']
         zkill_stats = await self.zkill_stats(character_id['character'][0])
         zkill_link = 'https://zkillboard.com/character/{}/'.format(character_id['character'][0])
         eve_prism = 'http://eve-prism.com/?view=character&name={}'.format(urllib.parse.quote(character_name))
@@ -42,7 +42,7 @@ class CharLookup:
             solo_kills = 'N/A'
         try:
             victim_alliance_raw = await ctx.bot.esi_data.alliance_info(character_data['alliance_id'])
-            victim_alliance = victim_alliance_raw['alliance_name']
+            victim_alliance = victim_alliance_raw['name']
         except:
             victim_alliance = None
 

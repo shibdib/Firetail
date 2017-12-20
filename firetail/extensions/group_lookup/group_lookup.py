@@ -104,7 +104,7 @@ class GroupLookup:
             embed.add_field(name="General Info", value='Name:\nTicker:\nMember Count:\nAlliance:',
                             inline=True)
             embed.add_field(name="-",
-                            value='{}\n{}\n{}\n{}'.format(group_data['corporation_name'], group_data['ticker'], group_data['member_count'], alliance_name),
+                            value='{}\n{}\n{}\n{}'.format(group_data['name'], group_data['ticker'], group_data['member_count'], alliance_name),
                             inline=True)
             embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:\nKnown Super Count:\nKnown Titan Count:\nMost Active System:',
                             inline=True)
@@ -116,7 +116,7 @@ class GroupLookup:
             embed.add_field(name="General Info", value='Name:\nTicker:\nMember Count:',
                             inline=True)
             embed.add_field(name="-",
-                            value='{}\n{}\n{}'.format(group_data['corporation_name'], group_data['ticker'], group_data['member_count']),
+                            value='{}\n{}\n{}'.format(group_data['name'], group_data['ticker'], group_data['member_count']),
                             inline=True)
             embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:\nKnown Super Count:\nKnown Titan Count:\nMost Active System:',
                             inline=True)
@@ -128,7 +128,7 @@ class GroupLookup:
             embed.add_field(name="General Info", value='Name:\nTicker:',
                             inline=True)
             embed.add_field(name="-",
-                            value='{}\n{}'.format(group_data['alliance_name'], group_data['ticker']),
+                            value='{}\n{}'.format(group_data['name'], group_data['ticker']),
                             inline=True)
             embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:\nKnown Super Count:\nKnown Titan Count:\nMost Active System:',
                             inline=True)
