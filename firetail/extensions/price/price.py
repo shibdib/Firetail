@@ -16,7 +16,7 @@ class Price:
             'rens': 60004588,
             'hek': 60005686}
 
-    @commands.command(name='price', aliases=["jita", "Jita", "amarr", "Amarr", "dodixie", "Dodixie", "rens", "Rens", "hek", "Hek",])
+    @commands.command(name='price', aliases=["jita", "amarr", "dodixie", "rens", "hek",])
     async def _price(self, ctx):
         """Gets you price information from the top trade hubs.
         Use **!price item** or **!amarr item** (Works for Jita, Amarr, Dodixie, Rens, Hek)"""
