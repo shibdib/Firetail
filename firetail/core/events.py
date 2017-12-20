@@ -96,3 +96,15 @@ def init_events(bot, launcher=None):
     @bot.event
     async def on_command(command):
         bot.counter["processed_commands"] += 1
+
+    @bot.event
+    async def on_guild_join(guild):
+        log.info("Connected to a new guild. Guild ID/Name: {}/{}".format(str(guild.id), guild.name))
+
+    @bot.event
+    async def on_guild_remove(guild):
+        log.info("Leaving guild. Guild ID/Name: {}/{}".format(str(guild.id), guild.name))
+
+    @bot.event
+    async def on_member_ban(guild, user):
+        log.info("New Ban Reported. Guild ID/Name: {}/{} -- Member ID/Name: {}/{}".format(str(guild.id), guild.name, str(user.id), user.name))
