@@ -11,7 +11,8 @@ class CharLookup:
 
     @commands.command(name='char')
     async def _char(self, ctx):
-        """Shows character information. Do '!char name'"""
+        """Shows character information.
+        Do '!char name'"""
         character_name = ctx.message.content.split(' ', 1)[1]
         character_id = await ctx.bot.esi_data.esi_search(character_name, 'character')
         try:

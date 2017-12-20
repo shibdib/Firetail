@@ -13,7 +13,8 @@ class GroupLookup:
 
     @commands.command(name='group', aliases=["corp", "alliance"])
     async def _group(self, ctx):
-        """Shows corp and alliance information. Do '!group name'"""
+        """Shows corp and alliance information.
+        Do '!group name'"""
         group_name = ctx.message.content.split(' ', 1)[1]
         try:
             group = 'corporation'
