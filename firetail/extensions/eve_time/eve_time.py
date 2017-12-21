@@ -25,6 +25,9 @@ class EveTime:
     @commands.command(name='time')
     async def _time(self, ctx):
         """Shows the time in a range of timezones."""
+        if len(ctx.message.content.split()) == 1:
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            return await dest.send('**ERROR:** Use **!help time** for more info.')
 
         self.logger.info('EveTime - {} requested time info.'.format(str(ctx.message.author)))
         tz_field = []

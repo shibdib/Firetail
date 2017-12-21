@@ -12,6 +12,9 @@ class AddKills:
     async def _add_kills(self, ctx):
         """Do '!addkills groupID' to get killmails in the channel.
         Do '!addkills remove' to stop receiving killmails."""
+        if len(ctx.message.content.split()) == 1:
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            return await dest.send('**ERROR:** Use **!help addkills** for more info.')
         # handle help request
         if len(ctx.message.content.split()) == 1:
             return await ctx.channel.send('Not a valid group ID. Please use **!help addkills** '
