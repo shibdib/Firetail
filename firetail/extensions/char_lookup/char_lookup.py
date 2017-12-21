@@ -18,6 +18,9 @@ class CharLookup:
     async def _char(self, ctx):
         """Shows character information.
         Do '!char name'"""
+        if len(ctx.message.content.split()) == 1:
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            return await dest.send('**ERROR:** Use **!help char** for more info.')
         character_name = ctx.message.content.split(' ', 1)[1]
         self.logger.info('CharLookup - {} requested character info for the user {}'.format(str(ctx.message.author), character_name))
         character_id = await ctx.bot.esi_data.esi_search(character_name, 'character')

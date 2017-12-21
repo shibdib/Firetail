@@ -20,6 +20,9 @@ class Price:
     async def _price(self, ctx):
         """Gets you price information from the top trade hubs.
         Use **!price item** or **!amarr item** (Works for Jita, Amarr, Dodixie, Rens, Hek)"""
+        if len(ctx.message.content.split()) == 1:
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            return await dest.send('**ERROR:** Use **!help price** for more info.')
         config = self.config
         item = ctx.message.content.split(' ', 1)[1]
         system = 60003760
