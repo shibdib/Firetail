@@ -8,6 +8,11 @@ from firetail.utils import make_embed
 class EveTime:
     """This extension handles the time commands."""
 
+    def __init__(self, bot):
+        self.bot = bot
+        self.config = bot.config
+        self.logger = bot.logger
+
     TIMEZONES = {
         'EVE Time': 'UTC',
         'PST/California': 'America/Los_Angeles',
@@ -20,6 +25,8 @@ class EveTime:
     @commands.command(name='time')
     async def _time(self, ctx):
         """Shows the time in a range of timezones."""
+
+        self.logger.info('EveTime - {} requested time info.'.format(str(ctx.message.author)))
         tz_field = []
         time_field = []
         for display, zone in self.TIMEZONES.items():

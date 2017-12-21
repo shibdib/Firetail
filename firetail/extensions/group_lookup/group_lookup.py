@@ -10,11 +10,17 @@ from firetail.utils import make_embed
 class GroupLookup:
     """This extension handles looking up corps and alliance."""
 
+    def __init__(self, bot):
+        self.bot = bot
+        self.config = bot.config
+        self.logger = bot.logger
+
     @commands.command(name='group', aliases=["corp", "alliance"])
     async def _group(self, ctx):
         """Shows corp and alliance information.
         Do '!group name'"""
         group_name = ctx.message.content.split(' ', 1)[1]
+        self.logger.info('GroupLookup - {} requested group info for the group {}'.format(str(ctx.message.author), group_name))
         try:
             group = 'corporation'
             group_id = await ctx.bot.esi_data.esi_search(group_name, group)
@@ -63,6 +69,7 @@ class GroupLookup:
                 logo = 'https://imageserver.eveonline.com/Alliance/{}_64.png'.format(group_id)
             except:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
+                self.logger.info('GroupLookup ERROR - {} could not be found'.format(group_name))
                 return await dest.send('**ERROR:** No Group Found With The Name {}'.format(group_name))
         if zkill_stats:
             total_kills = '{0:}'.format(zkill_stats['allTimeSum'])
