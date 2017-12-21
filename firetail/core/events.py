@@ -46,6 +46,16 @@ def init_events(bot, launcher=None):
             await bot.send_cmd_help(ctx)
         elif isinstance(error, commands.DisabledCommand):
             await ctx.send("That command is disabled.")
+        elif isinstance(error, commands.CheckFailure):
+            pass
+        elif isinstance(error, commands.CommandNotFound):
+            pass
+        elif isinstance(error, commands.NoPrivateMessage):
+            await ctx.send("That command is not available in DMs.")
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send("This command is on cooldown. "
+                           "Try again in {:.2f}s"
+                           "".format(error.retry_after))
         elif isinstance(error, commands.CommandInvokeError):
             # Need to test if the following still works
             """
@@ -69,18 +79,11 @@ def init_events(bot, launcher=None):
             exception_log += "".join(traceback.format_exception(
                 type(error), error, error.__traceback__))
             bot._last_exception = exception_log
-            await ctx.send(message)
+            if "Missing Permissions" in exception_log:
+                await ctx.author.send("**ERROR:** The Bot Does Not Have All Required Permissions In That Channel.")
+            else:
+                await ctx.send(message)
 
-        elif isinstance(error, commands.CommandNotFound):
-            pass
-        elif isinstance(error, commands.CheckFailure):
-            pass
-        elif isinstance(error, commands.NoPrivateMessage):
-            await ctx.send("That command is not available in DMs.")
-        elif isinstance(error, commands.CommandOnCooldown):
-            await ctx.send("This command is on cooldown. "
-                           "Try again in {:.2f}s"
-                           "".format(error.retry_after))
         else:
             log.exception(type(error).__name__, exc_info=error)
 
