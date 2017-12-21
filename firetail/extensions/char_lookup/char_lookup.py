@@ -31,17 +31,22 @@ class CharLookup:
             self.logger.info('CharLookup ERROR - {} could not be found'.format(character_name))
             return await dest.send('**ERROR:** No User Found With The Name {}'.format(character_name))
         latest_killmail, latest_system_id = await self.zkill_last_mail(character_id['character'][0])
-        ship_lost_raw = await ctx.bot.esi_data.type_info_search(latest_killmail['ship_type_id'])
-        ship_lost = ship_lost_raw['name']
-        solar_system_info = await ctx.bot.esi_data.system_info(latest_system_id)
-        solar_system_name = solar_system_info['name']
-        victim_corp_raw = await ctx.bot.esi_data.corporation_info(character_data['corporation_id'])
-        victim_corp = victim_corp_raw['name']
+        try:
+            ship_lost_raw = await ctx.bot.esi_data.type_info_search(latest_killmail['ship_type_id'])
+            ship_lost = ship_lost_raw['name']
+            solar_system_info = await ctx.bot.esi_data.system_info(latest_system_id)
+            solar_system_name = solar_system_info['name']
+            victim_corp_raw = await ctx.bot.esi_data.corporation_info(character_data['corporation_id'])
+            victim_corp = victim_corp_raw['name']
+        except:
+            ship_lost = 'N/A'
+            solar_system_name = 'N/A'
+            victim_corp = 'N/A'
         zkill_stats = await self.zkill_stats(character_id['character'][0])
         zkill_link = 'https://zkillboard.com/character/{}/'.format(character_id['character'][0])
         eve_prism = 'http://eve-prism.com/?view=character&name={}'.format(urllib.parse.quote(character_name))
         eve_who = 'https://evewho.com/pilot/{}'.format(urllib.parse.quote(character_name))
-        if zkill_stats:
+        if zkill_stats['allTimeSum']:
             total_kills = '{0:}'.format(zkill_stats['allTimeSum'])
             danger_ratio = zkill_stats['dangerRatio']
             gang_ratio = zkill_stats['gangRatio']
