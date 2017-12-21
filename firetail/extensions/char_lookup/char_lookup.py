@@ -9,16 +9,23 @@ from firetail.utils import make_embed
 class CharLookup:
     """This extension handles looking up characters."""
 
+    def __init__(self, bot):
+        self.bot = bot
+        self.config = bot.config
+        self.logger = bot.logger
+
     @commands.command(name='char')
     async def _char(self, ctx):
         """Shows character information.
         Do '!char name'"""
         character_name = ctx.message.content.split(' ', 1)[1]
+        self.logger.info('CharLookup - {} requested character info for the user {}'.format(str(ctx.message.author), character_name))
         character_id = await ctx.bot.esi_data.esi_search(character_name, 'character')
         try:
             character_data = await ctx.bot.esi_data.character_info(character_id['character'][0])
         except:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
+            self.logger.info('CharLookup ERROR - {} could not be found'.format(character_name))
             return await dest.send('**ERROR:** No User Found With The Name {}'.format(character_name))
         latest_killmail, latest_system_id = await self.zkill_last_mail(character_id['character'][0])
         ship_lost_raw = await ctx.bot.esi_data.type_info_search(latest_killmail['ship_type_id'])
