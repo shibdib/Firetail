@@ -15,10 +15,13 @@ class Killmails:
     async def tick_loop(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
-            data = await self.request_data()
-            if data['killID']:
-                await self.process_data(data)
-            await asyncio.sleep(5)
+            try:
+                data = await self.request_data()
+                if data['killID']:
+                    await self.process_data(data)
+                await asyncio.sleep(5)
+            except:
+                await asyncio.sleep(5)
 
     async def process_data(self, kill_data):
         config = self.config
