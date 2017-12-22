@@ -15,10 +15,13 @@ class Killmails:
     async def tick_loop(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
-            data = await self.request_data()
-            if data:
-                await self.process_data(data)
-            await asyncio.sleep(5)
+            try:
+                data = await self.request_data()
+                if data['killID']:
+                    await self.process_data(data)
+                await asyncio.sleep(5)
+            except:
+                await asyncio.sleep(5)
 
     async def process_data(self, kill_data):
         config = self.config
@@ -51,6 +54,8 @@ class Killmails:
                     sql = "SELECT * FROM zkill"
                     other_channels = await db.select(sql)
                     for zkill in other_channels:
+                        print(zkill[3])
+                        print(group_ids)
                         if zkill[3] in group_ids:
                             await self.process_kill(zkill[1], kill_data)
             if kill_data['zkb']['totalValue'] >= big_kills_value and big_kills:
@@ -108,7 +113,10 @@ class Killmails:
         elif victim_name is None and victim_alliance is None:
             em.add_field(name="Structure Info",
                          value="Structure Value: " + value + "\nCorp: " + str(victim_corp))
-        channel = bot.get_channel(int(channel_id))
+        try:
+            channel = bot.get_channel(int(channel_id))
+        except:
+            return self.logger.info('Killmail - Bad Channel Attempted {}'.format(channel_id))
         self.logger.info(('Killmail - Kill # {} has been posted to {}'
                           '').format(kill_id, channel.name))
         await channel.send(embed=em)
