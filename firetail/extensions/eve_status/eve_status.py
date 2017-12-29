@@ -15,7 +15,7 @@ class EveStatus:
     async def _time(self, ctx):
         """Shows the current status of TQ."""
         self.logger.info('EveStatus - {} requested server info.'.format(str(ctx.message.author)))
-        data = self.bot.esi_data.server_info()
+        data = await ctx.bot.esi_data.server_info()
         try:
             if data.get('start_time'):
                 status = 'Online'
@@ -27,7 +27,8 @@ class EveStatus:
         embed = make_embed(guild=ctx.guild)
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via Firetail Bot")
-        embed.add_field(name="-", value="Server State:\nPlayer Count:",
+        embed.set_thumbnail(url="https://image.eveonline.com/Alliance/434243723_64.png")
+        embed.add_field(name="Status", value="Server State:\nPlayer Count:",
                      inline=True)
         embed.add_field(name="-", value="{}\n{}".format(status, player_count),
                      inline=True)
