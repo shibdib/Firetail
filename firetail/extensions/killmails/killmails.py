@@ -19,7 +19,9 @@ class Killmails:
                 data = await self.request_data()
                 if data['killID']:
                     await self.process_data(data)
-                await asyncio.sleep(5)
+                else:
+                    await asyncio.sleep(15)
+                await asyncio.sleep(1)
             except:
                 await asyncio.sleep(5)
 
