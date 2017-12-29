@@ -10,6 +10,14 @@ class ESI:
     def __init__(self, session):
         self.session = session
 
+    async def server_info(self):
+        async with aiohttp.ClientSession() as session:
+            url = '{}/status/'.format(ESI_URL)
+            async with session.get(url) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data
+
     async def esi_search(self, item, category):
         async with aiohttp.ClientSession() as session:
             url = ('{}/search/?categories={}&datasource=tranquility'

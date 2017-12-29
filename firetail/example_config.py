@@ -12,7 +12,11 @@ bot_coowners = [114428861990699012]
 # 'killmails' - Killmail posting extension
 # 'eveTime' - Get the time in eve and around the world
 # 'price' - Price check extension
-preload_extensions = ['eve_time', 'price']
+# 'eve_status' - Get TQ Status
+# 'group_lookup' - Get corp/alliance info
+# 'char_lookup' - Get character info
+
+preload_extensions = ['eve_time', 'price', 'eve_status', 'group_lookup', 'char_lookup']
 
 game = '!help for more info'
 dm_only = False  # bot responses always sent via direct message
