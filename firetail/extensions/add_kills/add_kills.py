@@ -16,7 +16,11 @@ class AddKills:
         if len(ctx.message.content.split()) == 1:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Use **!help addkills** for more info.')
-        # handle help request
+        # Check if server is at cap
+        sql = "SELECT COUNT (*) FROM add_kills WHERE serverid = {}".format(ctx.message.guild.id)
+        current_requests = await db.select(sql)
+        if current_requests > 5:
+            return await ctx.channel.send("You've reached the limit for adding killmail channels to your server")
         if len(ctx.message.content.split()) == 1:
             return await ctx.channel.send('Not a valid group ID. Please use **!help addkills** '
                                           'for more info.')
