@@ -30,9 +30,10 @@ class GroupLookup:
             if len(group_id['corporation']) > 1:
                 for id in group_id['corporation']:
                     group_data = await ctx.bot.esi_data.corporation_info(id)
-                    if group_data['name'].lower() == group_name.lower():
+                    if group_data['name'].lower().strip() == group_name.lower().strip():
                         group_id = id
                         group_data = await ctx.bot.esi_data.corporation_info(group_id)
+                        break
             else:
                 group_id = group_id['corporation'][0]
                 group_data = await ctx.bot.esi_data.corporation_info(group_id)
@@ -59,9 +60,10 @@ class GroupLookup:
                 if len(group_id['alliance']) > 1:
                     for id in group_id['alliance']:
                         group_data = await ctx.bot.esi_data.alliance_info(id)
-                        if group_data['name'].lower() == group_name.lower():
+                        if group_data['name'].lower().strip() == group_name.lower().strip():
                             group_id = id
                             group_data = await ctx.bot.esi_data.alliance_info(group_id)
+                            break
                 else:
                     group_id = group_id['alliance'][0]
                     group_data = await ctx.bot.esi_data.alliance_info(group_id)
