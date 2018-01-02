@@ -43,7 +43,7 @@ class AddKills:
         if 'error' in group_corp and 'error' in group_alliance and group != 9:
             return await ctx.channel.send('Not a valid group ID. Please use **!help addkills** '
                                           'for more info.')
-        sql = ''' REPLACE INTO zkill(channelid,serverid,groupid,ownerid)
+        sql = ''' REPLACE INTO add_kills(channelid,serverid,groupid,ownerid)
                   VALUES(?,?,?,?) '''
         values = (channel, server, group, author)
         await db.execute_sql(sql, values)
@@ -52,7 +52,7 @@ class AddKills:
                                       'as they occur.')
 
     async def removeServer(self, ctx):
-        sql = ''' DELETE FROM zkill WHERE `serverid` = (?) '''
+        sql = ''' DELETE FROM add_kills WHERE `serverid` = (?) '''
         values = (ctx.message.guild.id,)
         try:
             await db.execute_sql(sql, values)
