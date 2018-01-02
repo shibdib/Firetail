@@ -53,7 +53,7 @@ class Killmails:
                 await self.process_kill(channel_id, kill_data)
             for ext in self.bot.extensions:
                 if 'add_kills' in ext:
-                    sql = "SELECT * FROM zkill"
+                    sql = "SELECT * FROM add_kills"
                     other_channels = await db.select(sql)
                     for zkill in other_channels:
                         if zkill[3] in group_ids:
