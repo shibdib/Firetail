@@ -55,11 +55,11 @@ class Killmails:
                 if 'add_kills' in ext:
                     sql = "SELECT * FROM add_kills"
                     other_channels = await db.select(sql)
-                    for zkill in other_channels:
-                        if zkill[3] in group_ids:
-                            await self.process_kill(zkill[1], kill_data)
-                        if zkill[3] == 9 and kill_data['zkb']['totalValue'] >= big_kills_value:
-                            await self.process_kill(zkill[1], kill_data, True)
+                    for add_kills in other_channels:
+                        if add_kills[3] in group_ids:
+                            await self.process_kill(add_kills[1], kill_data)
+                        if add_kills[3] == 9 and kill_data['zkb']['totalValue'] >= big_kills_value:
+                            await self.process_kill(add_kills[1], kill_data, True)
             if kill_data['zkb']['totalValue'] >= big_kills_value and big_kills:
                 channel_id = config.killmail['bigKillsChannel']
                 await self.process_kill(channel_id, kill_data, True)
