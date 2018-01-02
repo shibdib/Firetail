@@ -35,10 +35,10 @@ async def create_table(conn, create_table_sql):
 async def create_tables(db):
     if db is not None:
         # create zkill table
-        zkill_table = """ CREATE TABLE IF NOT EXISTS zkill (
+        zkill_table = """ CREATE TABLE IF NOT EXISTS add_kills (
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                                         channelid INTEGER NOT NULL,
-                                        serverid INTEGER NOT NULL UNIQUE,
+                                        serverid INTEGER NOT NULL,
                                         groupid	INTEGER NOT NULL,
                                         ownerid INTEGER NOT NULL
                                     ); """
