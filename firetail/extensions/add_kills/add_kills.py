@@ -11,6 +11,7 @@ class AddKills:
     @commands.command(name='addkills')
     async def _add_kills(self, ctx):
         """Do '!addkills groupID' to get killmails in the channel.
+        Do '!addkills big' to get EVE Wide big kills reported in the channel.
         Do '!addkills remove' to stop receiving killmails."""
         if len(ctx.message.content.split()) == 1:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
@@ -20,6 +21,8 @@ class AddKills:
             return await ctx.channel.send('Not a valid group ID. Please use **!help addkills** '
                                           'for more info.')
         group = ctx.message.content.split(' ', 1)[1]
+        if group.lower().strip() == 'big':
+            group = 9
         channel = ctx.message.channel.id
         author = ctx.message.author.id
         server_owner = ctx.message.guild.owner.id
@@ -33,7 +36,7 @@ class AddKills:
         if ctx.message.content.split(' ', 1)[1].lower() == 'remove':
             return await self.removeServer(ctx)
         # Verify group exists
-        if 'error' in group_corp and 'error' in group_alliance:
+        if 'error' in group_corp and 'error' in group_alliance and group != 9:
             return await ctx.channel.send('Not a valid group ID. Please use **!help addkills** '
                                           'for more info.')
         sql = ''' REPLACE INTO zkill(channelid,serverid,groupid,ownerid)
