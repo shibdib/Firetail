@@ -64,8 +64,7 @@ class Core:
             await ctx.bot.send_cmd_help(ctx)
 
     @_set.command(name="game")
-    @checks.is_co_owner()
-    @commands.guild_only()
+    @checks.is_admin()
     async def _game(self, ctx, *, game: str):
         """Sets bot game status"""
         status = ctx.me.status
@@ -76,8 +75,7 @@ class Core:
         await ctx.send(embed=embed)
 
     @_set.command(name="status")
-    @checks.is_co_owner()
-    @commands.guild_only()
+    @checks.is_admin()
     async def status(self, ctx, *, status: str):
         """Sets bot status
         Available statuses:
@@ -108,7 +106,7 @@ class Core:
             await ctx.send(embed=embed)
 
     @_set.command(name="username", aliases=["name"])
-    @checks.is_co_owner()
+    @checks.is_admin()
     async def _username(self, ctx, *, username: str):
         """Sets bot username"""
         try:
@@ -128,7 +126,7 @@ class Core:
             await ctx.send(embed=embed)
 
     @_set.command(name="avatar")
-    @checks.is_co_owner()
+    @checks.is_admin()
     async def _avatar(self, ctx, *, avatar_url: str):
         """Sets bot avatar"""
         session = aiohttp.ClientSession()
@@ -152,8 +150,7 @@ class Core:
             await ctx.send(embed=embed)
 
     @_set.command(name="nickname")
-    @checks.admin()
-    @commands.guild_only()
+    @checks.is_admin()
     async def _nickname(self, ctx, *, nickname: str):
         """Sets bot nickname"""
         try:
@@ -258,7 +255,7 @@ class Core:
             await ctx.bot.send_cmd_help(ctx)
 
     @_get.command(name="guildperms")
-    @checks.is_co_owner()
+    @checks.is_admin()
     async def guildperms(self, ctx):
         """Gets bot permissions for the current guild."""
         guild_perms = ctx.guild.me.guild_permissions
@@ -297,7 +294,7 @@ class Core:
             await ctx.author.send(embed=embed)
 
     @_get.command(name="channelperms")
-    @checks.is_co_owner()
+    @checks.is_admin()
     async def channelperms(self, ctx):
         """Gets bot permissions for the current channel."""
         chan_perms = ctx.channel.permissions_for(ctx.guild.me)
@@ -353,7 +350,7 @@ class Core:
         await ctx.send(embed=embed)
 
     @commands.command(name="purge")
-    @checks.is_co_owner()
+    @checks.is_mod()
     async def purge(self, ctx, msg_number: int = 10):
         """Delete a number of messages from the channel.
         Default is 10. Max 100."""

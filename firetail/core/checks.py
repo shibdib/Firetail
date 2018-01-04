@@ -12,12 +12,28 @@ async def check_is_co_owner(ctx):
     return owner or co_owner
 
 
+async def check_is_admin(ctx):
+    return ctx.author.guild_permissions.administrator
+
+
+async def check_is_mod(ctx):
+    return ctx.channel.permissions_for(ctx.author).manage_messages
+
+
 def is_owner():
     return commands.check(check_is_owner)
 
 
 def is_co_owner():
     return commands.check(check_is_co_owner)
+
+
+def is_admin():
+    return commands.check(check_is_admin)
+
+
+def is_mod():
+    return commands.check(check_is_mod)
 
 
 async def check_permissions(ctx, perms):
