@@ -178,31 +178,27 @@ class CharLookup:
 
     async def firetail_intel(self, character_id, character_name, zkill_stats):
         try:
-            try:
-                solo = 100 - zkill_stats['gangRatio']
-                threat = zkill_stats['dangerRatio']
-                character_type, special = await self.character_type(character_id, solo, threat)
-                top_lists = zkill_stats['topLists']
-                for top_type in top_lists:
-                    if top_type['type'] == 'solarSystem':
-                        try:
-                            top_system = top_type['values'][0]['solarSystemName']
-                        except:
-                            top_system = 'Unknown'
-                intel = '{}\n{} is most likely a {}. The past month they have been most active in {}. You have a {}%' \
-                        ' chance of encountering this player solo.'.format(special, character_name, character_type, top_system, solo)
-                return intel
-            except:
-                loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
-                    character_id)
-                kill_url = 'https://zkillboard.com/api/kills/characterID/{}/kills/limit/1/no-items/'.format(character_id)
-                solo = 0
-                threat = 0
-                character_type, special = await self.character_type(loss_url, kill_url, solo, threat)
-                intel = '{}\n{} is most likely a {}. No further intel available at this time.'.format(special, character_name, character_type)
-                return intel
+            solo = 100 - zkill_stats['gangRatio']
+            threat = zkill_stats['dangerRatio']
+            character_type, special = await self.character_type(character_id, solo, threat)
+            top_lists = zkill_stats['topLists']
+            for top_type in top_lists:
+                if top_type['type'] == 'solarSystem':
+                    try:
+                        top_system = top_type['values'][0]['solarSystemName']
+                    except:
+                        top_system = 'Unknown'
+            intel = '{}\n{} is most likely a {}. The past month they have been most active in {}. You have a {}%' \
+                    ' chance of encountering this player solo.'.format(special, character_name, character_type, top_system, solo)
+            return intel
         except:
-            intel = '{} is most likely a carebear as we can\'t find any PVP history for them.'.format(character_name)
+            loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
+                character_id)
+            kill_url = 'https://zkillboard.com/api/kills/characterID/{}/kills/limit/1/no-items/'.format(character_id)
+            solo = 0
+            threat = 0
+            character_type, special = await self.character_type(character_id, solo, threat)
+            intel = '{}\n{} is most likely a {}. No further intel available at this time.'.format(special, character_name, character_type)
             return intel
 
     async def character_type(self, character_id, solo, threat):
