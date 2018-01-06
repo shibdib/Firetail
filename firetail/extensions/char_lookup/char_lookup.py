@@ -27,6 +27,7 @@ class CharLookup:
         character_id = await ctx.bot.esi_data.esi_search(character_name, 'character')
         try:
             character_data = await ctx.bot.esi_data.character_info(character_id['character'][0])
+            character_name = character_data['name']
         except:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             self.logger.info('CharLookup ERROR - {} could not be found'.format(character_name))
@@ -157,8 +158,11 @@ class CharLookup:
                     return data[0]['victim'], data[0]['solar_system_id']
                 else:
                     for attacker in data[0]['attackers']:
-                        if attacker['character_id'] == character_id:
-                            return attacker, data[0]['solar_system_id']
+                        try:
+                            if attacker['character_id'] == character_id:
+                                return attacker, data[0]['solar_system_id']
+                        except:
+                            return None, None
 
     async def zkill_stats(self, character_id):
         async with aiohttp.ClientSession() as session:
@@ -174,12 +178,10 @@ class CharLookup:
 
     async def firetail_intel(self, character_id, character_name, zkill_stats):
         try:
-            loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
-                character_id)
             try:
                 solo = 100 - zkill_stats['gangRatio']
                 threat = zkill_stats['dangerRatio']
-                character_type = await self.character_type(loss_url, solo, threat)
+                character_type, special = await self.character_type(character_id, solo, threat)
                 top_lists = zkill_stats['topLists']
                 for top_type in top_lists:
                     if top_type['type'] == 'solarSystem':
@@ -187,24 +189,46 @@ class CharLookup:
                             top_system = top_type['values'][0]['solarSystemName']
                         except:
                             top_system = 'Unknown'
-                intel = '{} is most likely a {}. The past month they have been most active in {}. You have a {}% chance of' \
-                        ' encountering this player solo.'.format(character_name, character_type, top_system, solo)
+                intel = '{}\n{} is most likely a {}. The past month they have been most active in {}. You have a {}%' \
+                        ' chance of encountering this player solo.'.format(special, character_name, character_type, top_system, solo)
                 return intel
             except:
                 loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
                     character_id)
+                kill_url = 'https://zkillboard.com/api/kills/characterID/{}/kills/limit/1/no-items/'.format(character_id)
                 solo = 0
                 threat = 0
-                character_type = await self.character_type(loss_url, solo, threat)
-                intel = '{} is most likely a {}. No further intel available at this time.'.format(character_name, character_type)
+                character_type, special = await self.character_type(loss_url, kill_url, solo, threat)
+                intel = '{}\n{} is most likely a {}. No further intel available at this time.'.format(special, character_name, character_type)
                 return intel
         except:
             intel = '{} is most likely a carebear as we can\'t find any PVP history for them.'.format(character_name)
             return intel
 
-    async def character_type(self, loss_url, solo, threat):
+    async def character_type(self, character_id, solo, threat):
+        titans = [11567, 3764, 671, 23773, 42126, 42241, 45649]
+        supers = [23919, 23917, 23913, 22852, 3514, 42125]
+        probe_launchers = [4258, 4260, 17901, 17938, 28756, 28758]
+        loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
+                    character_id)
+        kill_url = 'https://zkillboard.com/api/kills/characterID/{}/kills/limit/1/no-items/'.format(character_id)
         covert_cyno = 0
         cyno = 0
+        probes = 0
+        lost_ship_type_id = 0
+        special = ' '
+        last_kill = await self.last_kill(kill_url)
+        try:
+            for attacker in last_kill['attackers']:
+                if attacker['character_id'] == character_id:
+                    if attacker['ship_type_id'] in titans:
+                        special = '**This pilot has been seen in a Titan\n**'
+                    elif attacker['ship_type_id'] in supers:
+                        special = '**This pilot has been seen in a Super\n**'
+                    else:
+                        special = ' '
+        except:
+            special = ' '
         async with aiohttp.ClientSession() as session:
             async with session.get(loss_url) as resp:
                 data = await resp.text()
@@ -215,17 +239,38 @@ class CharLookup:
                             covert_cyno = covert_cyno + 1
                         elif item['item_type_id'] == 21096:
                             cyno = cyno + 1
+                        elif item['item_type_id'] in probe_launchers:
+                            probes = probes + 1
+                    lost_ship_type_id = loss['victim']['ship_type_id']
                 if covert_cyno >= 2:
-                    return '**BLOPS Hotdropper**'
+                    return '**BLOPS Hotdropper**', special
                 if cyno >= 5 and (threat <= 30 or threat == 0):
-                    return 'Cyno Alt'
-                if cyno >= 10 and threat >= 31:
-                    return '**Possible Hot Dropper**'
+                    return 'Cyno Alt', special
+                if probes >= 5 and threat >= 51:
+                    return '**PVP Prober**', special
+                if probes >= 5 and (threat <= 50 or threat == 0):
+                    return 'PVE Site Prober', special
+                if cyno >= 5 and threat >= 31:
+                    return '**Possible Hot Dropper**', special
+                if threat <= 30 and lost_ship_type_id == 28352:
+                    return 'Rorqual Pilot', special
                 if threat <= 30:
-                    return 'PVE Pilot'
+                    return 'PVE Pilot', special
                 if solo >= 50:
-                    return 'Solo PVP Pilot'
+                    return 'Solo PVP Pilot', special
                 if solo <= 15:
-                    return 'F1 Monkey'
+                    return 'Fleet Pilot', special
                 if solo <= 49:
-                    return 'Fleet Pilot'
+                    return 'Balanced PVP Pilot', special
+
+    async def last_kill(self, kill_url):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(kill_url) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                print(data)
+                try:
+                    all_time_kills = data[0]['killmail_id']
+                    return data[0]
+                except:
+                    return None
