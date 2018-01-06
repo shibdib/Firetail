@@ -188,7 +188,7 @@ class CharLookup:
                         except:
                             top_system = 'Unknown'
                 intel = '{} is most likely a {}. The past month they have been most active in {}. You have a {}% chance of' \
-                        ' encountering this player solo'.format(character_name, character_type, top_system, solo)
+                        ' encountering this player solo.'.format(character_name, character_type, top_system, solo)
                 return intel
             except:
                 loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
