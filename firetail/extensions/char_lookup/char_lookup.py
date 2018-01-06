@@ -22,7 +22,8 @@ class CharLookup:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Use **!help char** for more info.')
         character_name = ctx.message.content.split(' ', 1)[1]
-        self.logger.info('CharLookup - {} requested character info for the user {}'.format(str(ctx.message.author), character_name))
+        self.logger.info(
+            'CharLookup - {} requested character info for the user {}'.format(str(ctx.message.author), character_name))
         character_id = await ctx.bot.esi_data.esi_search(character_name, 'character')
         try:
             character_data = await ctx.bot.esi_data.character_info(character_id['character'][0])
@@ -43,44 +44,104 @@ class CharLookup:
             solar_system_name = 'N/A'
             victim_corp = 'N/A'
         zkill_stats = await self.zkill_stats(character_id['character'][0])
+        firetail_intel = await self.firetail_intel(character_id['character'][0], character_name, zkill_stats)
         zkill_link = 'https://zkillboard.com/character/{}/'.format(character_id['character'][0])
         eve_prism = 'http://eve-prism.com/?view=character&name={}'.format(urllib.parse.quote(character_name))
         eve_who = 'https://evewho.com/pilot/{}'.format(urllib.parse.quote(character_name))
-        if zkill_stats['allTimeSum']:
-            total_kills = '{0:}'.format(zkill_stats['allTimeSum'])
-            danger_ratio = zkill_stats['dangerRatio']
-            gang_ratio = zkill_stats['gangRatio']
-            solo_kills = '{0:}'.format(zkill_stats['soloKills'])
-        else:
-            total_kills = 'N/A'
-            danger_ratio = 'N/A'
-            gang_ratio = 'N/A'
-            solo_kills = 'N/A'
         try:
-            victim_alliance_raw = await ctx.bot.esi_data.alliance_info(character_data['alliance_id'])
-            victim_alliance = victim_alliance_raw['name']
-        except:
-            victim_alliance = None
+            if zkill_stats['allTimeSum']:
+                total_kills = '{0:}'.format(zkill_stats['allTimeSum'])
+                danger_ratio = zkill_stats['dangerRatio']
+                gang_ratio = zkill_stats['gangRatio']
+                solo_kills = '{0:}'.format(zkill_stats['soloKills'])
+            else:
+                total_kills = 'N/A'
+                danger_ratio = 'N/A'
+                gang_ratio = 'N/A'
+                solo_kills = 'N/A'
+            try:
+                victim_alliance_raw = await ctx.bot.esi_data.alliance_info(character_data['alliance_id'])
+                victim_alliance = victim_alliance_raw['name']
+            except:
+                victim_alliance = None
 
-        embed = make_embed(guild=ctx.guild, title_url="https://zkillboard.com/character/" + str(character_id['character'][0]) + "/",
-                           title=character_data['name'], content='[ZKill]({}) / [EveWho]({}) / [EVE-Prism]({})'.format(zkill_link, eve_who, eve_prism))
-        embed.set_footer(icon_url=ctx.bot.user.avatar_url,
-                         text="Provided Via Firetail Bot")
-        embed.set_thumbnail(url="https://imageserver.eveonline.com/Character/" + str(character_id['character'][0]) + "_64.jpg")
-        if victim_alliance:
-            embed.add_field(name="General Info", value='Alliance:\nCorporation:\nLast Seen Location:\nLast Seen Ship:', inline=True)
-            embed.add_field(name="-", value='{}\n{}\n{}\n{}'.format(victim_alliance, victim_corp, solar_system_name, ship_lost), inline=True)
-            embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:', inline=True)
-            embed.add_field(name="-", value='{}%\n{}%\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills, total_kills), inline=True)
-        else:
-            embed.add_field(name="General Info", value='Corporation:\nLast Seen System:\nLast Seen Ship:', inline=True)
-            embed.add_field(name="-", value='{}\n{}\n{}'.format(victim_corp, solar_system_name, ship_lost), inline=True)
-            embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:', inline=True)
-            embed.add_field(name="-", value='{}%\n{}%\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills, total_kills), inline=True)
-        dest = ctx.author if ctx.bot.config.dm_only else ctx
-        await dest.send(embed=embed)
-        if ctx.bot.config.delete_commands:
-            await ctx.message.delete()
+            embed = make_embed(guild=ctx.guild,
+                               title_url="https://zkillboard.com/character/" + str(character_id['character'][0]) + "/",
+                               title=character_data['name'],
+                               content='[ZKill]({}) / [EveWho]({}) / [EVE-Prism]({})'.format(zkill_link, eve_who,
+                                                                                             eve_prism))
+            embed.set_footer(icon_url=ctx.bot.user.avatar_url,
+                             text="Provided Via Firetail Bot")
+            embed.set_thumbnail(
+                url="https://imageserver.eveonline.com/Character/" + str(character_id['character'][0]) + "_64.jpg")
+            if victim_alliance:
+                embed.add_field(name="Firetail Intel Report", value=firetail_intel,
+                                inline=False)
+                embed.add_field(name="General Info",
+                                value='Alliance:\nCorporation:\nLast Seen Location:\nLast Seen Ship:',
+                                inline=True)
+                embed.add_field(name="-",
+                                value='{}\n{}\n{}\n{}'.format(victim_alliance, victim_corp, solar_system_name,
+                                                              ship_lost),
+                                inline=True)
+                embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:',
+                                inline=True)
+                embed.add_field(name="-",
+                                value='{}%\n{}%\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills, total_kills),
+                                inline=True)
+            else:
+                embed.add_field(name="Firetail Intel Report", value=firetail_intel,
+                                inline=False)
+                embed.add_field(name="General Info", value='Corporation:\nLast Seen System:\nLast Seen Ship:',
+                                inline=True)
+                embed.add_field(name="-", value='{}\n{}\n{}'.format(victim_corp, solar_system_name, ship_lost),
+                                inline=True)
+                embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:',
+                                inline=True)
+                embed.add_field(name="-",
+                                value='{}%\n{}%\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills, total_kills),
+                                inline=True)
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            await dest.send(embed=embed)
+            if ctx.bot.config.delete_commands:
+                await ctx.message.delete()
+        except:
+            try:
+                victim_alliance_raw = await ctx.bot.esi_data.alliance_info(character_data['alliance_id'])
+                victim_alliance = victim_alliance_raw['name']
+            except:
+                victim_alliance = None
+
+            embed = make_embed(guild=ctx.guild,
+                               title_url="https://zkillboard.com/character/" + str(character_id['character'][0]) + "/",
+                               title=character_data['name'],
+                               content='[ZKill]({}) / [EveWho]({}) / [EVE-Prism]({})'.format(zkill_link, eve_who,
+                                                                                             eve_prism))
+            embed.set_footer(icon_url=ctx.bot.user.avatar_url,
+                             text="Provided Via Firetail Bot")
+            embed.set_thumbnail(
+                url="https://imageserver.eveonline.com/Character/" + str(character_id['character'][0]) + "_64.jpg")
+            if victim_alliance:
+                embed.add_field(name="Firetail Intel Report", value=firetail_intel,
+                                inline=False)
+                embed.add_field(name="General Info",
+                                value='Alliance:\nCorporation:\nLast Seen Location:\nLast Seen Ship:',
+                                inline=True)
+                embed.add_field(name="-",
+                                value='{}\n{}\n{}\n{}'.format(victim_alliance, victim_corp, solar_system_name,
+                                                              ship_lost),
+                                inline=True)
+            else:
+                embed.add_field(name="Firetail Intel Report", value=firetail_intel,
+                                inline=False)
+                embed.add_field(name="General Info", value='Corporation:\nLast Seen System:\nLast Seen Ship:',
+                                inline=True)
+                embed.add_field(name="-", value='{}\n{}\n{}'.format(victim_corp, solar_system_name, ship_lost),
+                                inline=True)
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            await dest.send(embed=embed)
+            if ctx.bot.config.delete_commands:
+                await ctx.message.delete()
 
     async def zkill_last_mail(self, character_id):
         async with aiohttp.ClientSession() as session:
@@ -110,3 +171,61 @@ class CharLookup:
                     return data
                 except:
                     return None
+
+    async def firetail_intel(self, character_id, character_name, zkill_stats):
+        try:
+            loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
+                character_id)
+            try:
+                solo = 100 - zkill_stats['gangRatio']
+                threat = zkill_stats['dangerRatio']
+                character_type = await self.character_type(loss_url, solo, threat)
+                top_lists = zkill_stats['topLists']
+                for top_type in top_lists:
+                    if top_type['type'] == 'solarSystem':
+                        try:
+                            top_system = top_type['values'][0]['solarSystemName']
+                        except:
+                            top_system = 'Unknown'
+                intel = '{} is most likely a {}. The past month they have been most active in {}. You have a {}% chance of' \
+                        ' encountering this player solo'.format(character_name, character_type, top_system, solo)
+                return intel
+            except:
+                loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
+                    character_id)
+                solo = 0
+                threat = 0
+                character_type = await self.character_type(loss_url, solo, threat)
+                intel = '{} is most likely a {}. No further intel available at this time.'.format(character_name, character_type)
+                return intel
+        except:
+            intel = '{} is most likely a carebear as we can\'t find any PVP history for them.'.format(character_name)
+            return intel
+
+    async def character_type(self, loss_url, solo, threat):
+        covert_cyno = 0
+        cyno = 0
+        async with aiohttp.ClientSession() as session:
+            async with session.get(loss_url) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                for loss in data:
+                    for item in loss['victim']['items']:
+                        if item['item_type_id'] == 28646:
+                            covert_cyno = covert_cyno + 1
+                        elif item['item_type_id'] == 21096:
+                            cyno = cyno + 1
+                if covert_cyno >= 2:
+                    return '**BLOPS Hotdropper**'
+                if cyno >= 5 and (threat <= 30 or threat == 0):
+                    return 'Cyno Alt'
+                if cyno >= 10 and threat >= 31:
+                    return '**Possible Hot Dropper**'
+                if threat <= 30:
+                    return 'PVE Pilot'
+                if solo >= 50:
+                    return 'Solo PVP Pilot'
+                if solo <= 15:
+                    return 'F1 Monkey'
+                if solo <= 49:
+                    return 'Fleet Pilot'
