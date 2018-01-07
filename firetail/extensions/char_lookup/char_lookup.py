@@ -1,4 +1,5 @@
 from discord.ext import commands
+from statistics import mode
 import aiohttp
 import json
 import urllib
@@ -239,11 +240,32 @@ class CharLookup:
                             probes = probes + 1
                     lost_ship_type_id = loss['victim']['ship_type_id']
                 if covert_cyno >= 2:
-                    return '**BLOPS Hotdropper**', special
+                    try:
+                        attackers = last_kill['attackers']
+                    except:
+                        return '**BLOPS Hotdropper**', special
+                    alliance_ids = []
+                    corporation_ids = []
+                    for attacker in last_kill['attackers']:
+                        try:
+                            alliance_ids.append(attacker['alliance_id'])
+                            corporation_ids.append(attacker['corporation_id'])
+                        except:
+                            corporation_ids.append(attacker['corporation_id'])
+                    try:
+                        dominant_alliance = mode(alliance_ids)
+                        alliance_raw = await self.bot.esi_data.alliance_info(dominant_alliance)
+                        alliance = alliance_raw['name']
+                        return '**BLOPS Hotdropper for {}**'.format(alliance), special
+                    except:
+                        dominant_corp = mode(corporation_ids)
+                        corp_raw = await self.bot.esi_data.corporation_info(dominant_corp)
+                        corp = corp_raw['name']
+                        return '**BLOPS Hotdropper for {}**'.format(corp), special
                 if cyno >= 5 and (threat <= 30 or threat == 0):
                     return 'Cyno Alt', special
                 if probes >= 5 and threat >= 51:
-                    return '**PVP Prober**', special
+                    return '**PVP Prober / Possible FC**', special
                 if probes >= 5 and (threat <= 50 or threat == 0):
                     return 'PVE Site Prober', special
                 if cyno >= 5 and threat >= 31:
