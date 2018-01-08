@@ -41,17 +41,21 @@ class AddKills:
         if 'error' in group_corp and 'error' in group_alliance and group != 9:
             return await ctx.channel.send('Not a valid group ID. Please use **!help addkills** '
                                           'for more info.')
+        try:
+            name = group_corp['name']
+        except:
+            name = group_alliance['name']
         sql = ''' REPLACE INTO add_kills(channelid,serverid,groupid,ownerid)
                   VALUES(?,?,?,?) '''
         values = (channel, server, group, author)
         await db.execute_sql(sql, values)
         self.logger.info('addkills - ' + str(ctx.message.author) + ' added killmail tracking to their server.')
-        return await ctx.channel.send('**Success** - This channel will begin receiving killmails '
-                                      'as they occur.')
+        return await ctx.channel.send('**Success** - This channel will begin receiving killmails for {} '
+                                      'as they occur.'.format(name))
 
     async def removeServer(self, ctx):
-        sql = ''' DELETE FROM add_kills WHERE `serverid` = (?) '''
-        values = (ctx.message.guild.id,)
+        sql = ''' DELETE FROM add_kills WHERE `channelid` = (?) '''
+        values = (ctx.message.channel.id,)
         try:
             await db.execute_sql(sql, values)
         except:
