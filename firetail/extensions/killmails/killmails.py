@@ -121,7 +121,7 @@ class Killmails:
             return self.logger.info('Killmail - Bad Channel Attempted {}'.format(channel_id))
         self.logger.info(('Killmail - Kill # {} has been posted to {}'
                           '').format(kill_id, channel.name))
-        await channel.send(embed=em)
+        return await channel.send(embed=em)
 
     async def request_data(self):
         base_url = "https://redisq.zkillboard.com"
