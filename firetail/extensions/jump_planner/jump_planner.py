@@ -43,6 +43,8 @@ class JumpPlanner:
             return await dest.send('**ERROR:** No System Found With The Name {}'.format(start))
         if '-' in start:
             start = start.upper()
+        else:
+            start = start.title()
         end = route.split(':')[1]
         end = end.split(' ')[0]
         try:
@@ -60,6 +62,8 @@ class JumpPlanner:
             return await dest.send('**ERROR:** No System Found With The Name {}'.format(end))
         if '-' in end:
             end = end.upper()
+        else:
+            end = end.title()
         if start == end:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             self.logger.info('JumpPlanner ERROR - Start and End points were the same'.format(end))
@@ -67,11 +71,11 @@ class JumpPlanner:
         try:
             variables = ctx.message.content.split(' ')[2]
             if ':' in variables:
-                ship = variables.split(':', 1)[0]
+                ship = variables.split(':', 1)[0].title()
                 jdc = variables.split(':', 1)[1]
                 skills = '{}55'.format(jdc)
             else:
-                ship = variables
+                ship = variables.title()
             item_id = await ctx.bot.esi_data.item_id(ship)
             accepted_ship_groups = [898, 659, 485, 547, 902, 30]
             ship_info = await ctx.bot.esi_data.item_info(item_id)
