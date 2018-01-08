@@ -208,7 +208,7 @@ class Core:
         author_repo = "https://github.com/shibdib"
         bot_repo = author_repo + "/Firetail"
         server_url = "https://discord.gg/ZWmzTP3"
-        owner = "Ingame: Mr Twinkie / Discord: Shibdib#3285"
+        owner = "Ingame: Mr Twinkie"
         uptime_str = bot.uptime_str
         invite_str = ("[Click to invite me to your server!]({})"
                       "").format(bot.invite_url)
