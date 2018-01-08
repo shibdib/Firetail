@@ -27,8 +27,16 @@ class CharLookup:
             'CharLookup - {} requested character info for the user {}'.format(str(ctx.message.author), character_name))
         character_id = await ctx.bot.esi_data.esi_search(character_name, 'character')
         try:
-            character_data = await ctx.bot.esi_data.character_info(character_id['character'][0])
-            character_name = character_data['name']
+            if len(character_id['character']) > 1:
+                for id in character_id['character']:
+                    character_data = await ctx.bot.esi_data.character_info(id)
+                    if character_data['name'].lower().strip() == character_name.lower().strip():
+                        character_data = await ctx.bot.esi_data.character_info(character_id['character'][0])
+                        character_name = character_data['name']
+                        break
+            else:
+                character_data = await ctx.bot.esi_data.character_info(character_id['character'][0])
+                character_name = character_data['name']
         except:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             self.logger.info('CharLookup ERROR - {} could not be found'.format(character_name))
