@@ -208,13 +208,13 @@ class Core:
         author_repo = "https://github.com/shibdib"
         bot_repo = author_repo + "/Firetail"
         server_url = "https://discord.gg/ZWmzTP3"
-        owner = await bot.get_user_info(ctx.bot.owner)
+        owner = "Ingame: Mr Twinkie / Discord: Shibdib#3285"
         uptime_str = bot.uptime_str
         invite_str = ("[Click to invite me to your server!]({})"
                       "").format(bot.invite_url)
 
         about = (
-            "I'm a Discord bot to help organise and coordinate EVE Online "
+            "I'm a Python based Discord bot to help organise and coordinate EVE Online "
             "communities!\n\n"
             "To learn about what I do either use the `!help` command, or "
             "check the [documentation here]({bot_repo}).\n\n"
@@ -231,7 +231,7 @@ class Core:
         embed = utils.make_embed(
             msg_type='info', title="About Firetail", content=about)
         embed.set_thumbnail(url=bot.user.avatar_url_as(format='png'))
-        embed.add_field(name="Owner", value=owner)
+        embed.add_field(name="Creator", value=owner)
         embed.add_field(name="Uptime", value=uptime_str)
         embed.add_field(name="Servers", value=server_count)
         embed.add_field(name="Members", value=member_count)

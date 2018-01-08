@@ -94,6 +94,14 @@ class ESI:
                 print(data)
                 return data['typeID']
 
+    async def item_info(self, item_id):
+        async with aiohttp.ClientSession() as session:
+            url = '{}/universe/types/{}/'.format(ESI_URL, item_id)
+            async with session.get(url) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data
+
     async def market_data(self, item_name, station):
         itemid = await self.item_id(item_name)
         if itemid == 0:

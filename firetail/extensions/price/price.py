@@ -30,11 +30,6 @@ class Price:
         if ctx.message.content.split()[0][len(config.bot_prefix):].lower() != 'price':
             lookup = ctx.message.content.split()[0][len(config.bot_prefix):].lower()
             system = self.hub_id[lookup]
-        # handle help request
-        if len(ctx.message.content.split()) > 1:
-            if ctx.message.content.split(' ', 1)[1].lower() == 'help':
-                #  await helptext(client, logger, config, message)
-                return
         data = await ctx.bot.esi_data.market_data(item, system)
         self.logger.info('Price - ' + str(ctx.author) + ' requested price information for a ' + str(item))
         if data == 0:
