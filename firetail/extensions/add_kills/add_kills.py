@@ -14,7 +14,7 @@ class AddKills:
     async def _add_kills(self, ctx):
         """Do '!addkills groupID' to get killmails in the channel.
         Do '!addkills big' to get EVE Wide big kills reported in the channel.
-        Do '!addkills remove' to stop receiving killmails."""
+        Do '!addkills remove' to stop receiving killmails in the channel."""
         if len(ctx.message.content.split()) == 1:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Use **!help addkills** for more info.')
@@ -41,24 +41,31 @@ class AddKills:
         if 'error' in group_corp and 'error' in group_alliance and group != 9:
             return await ctx.channel.send('Not a valid group ID. Please use **!help addkills** '
                                           'for more info.')
+        try:
+            name = group_corp['name']
+        except:
+            if group != 9:
+                name = group_alliance['name']
+            else:
+                name = 'EVE Wide 2b+ Kills'
         sql = ''' REPLACE INTO add_kills(channelid,serverid,groupid,ownerid)
                   VALUES(?,?,?,?) '''
         values = (channel, server, group, author)
         await db.execute_sql(sql, values)
         self.logger.info('addkills - ' + str(ctx.message.author) + ' added killmail tracking to their server.')
-        return await ctx.channel.send('**Success** - This channel will begin receiving killmails '
-                                      'as they occur.')
+        return await ctx.channel.send('**Success** - This channel will begin receiving killmails for {} '
+                                      'as they occur.'.format(name))
 
     async def removeServer(self, ctx):
-        sql = ''' DELETE FROM add_kills WHERE `serverid` = (?) '''
-        values = (ctx.message.guild.id,)
+        sql = ''' DELETE FROM add_kills WHERE `channelid` = (?) '''
+        values = (ctx.message.channel.id,)
         try:
             await db.execute_sql(sql, values)
         except:
-            return await ctx.channel.send('**ERROR** - Failed to remove the server. Contact the bot'
+            return await ctx.channel.send('**ERROR** - Failed to remove killmails. Contact the bot'
                                           ' owner for assistance.')
-        self.logger.info('addkills - ' + str(ctx.message.author) + ' removed killmail tracking from their server.')
-        return await ctx.channel.send('**Success** - This bot will no longer report any killmails on this server.')
+        self.logger.info('addkills - ' + str(ctx.message.author) + ' removed killmail tracking from a channel.')
+        return await ctx.channel.send('**Success** - This bot will no longer report any killmails for this channel.')
 
     @_add_kills.error
     async def _add_kills_error(self, ctx, error):
