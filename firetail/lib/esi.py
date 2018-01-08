@@ -96,7 +96,7 @@ class ESI:
 
     async def item_info(self, item_id):
         async with aiohttp.ClientSession() as session:
-            url = '{}/types/{}/'.format(ESI_URL, item_id)
+            url = '{}/universe/types/{}/'.format(ESI_URL, item_id)
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
