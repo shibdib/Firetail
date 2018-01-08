@@ -30,18 +30,19 @@ class CharLookup:
             if len(character_id['character']) > 1:
                 for id in character_id['character']:
                     character_data = await ctx.bot.esi_data.character_info(id)
-                    if character_data['name'].lower().strip() == character_name.lower().strip():
-                        character_data = await ctx.bot.esi_data.character_info(character_id['character'][0])
+                    if character_data['name'].lower().strip().replace("'", '1') == character_name.lower().strip().replace("'", '1'):
+                        character_id = id
+                        character_data = await ctx.bot.esi_data.character_info(character_id)
                         character_name = character_data['name']
                         break
             else:
-                character_data = await ctx.bot.esi_data.character_info(character_id['character'][0])
+                character_data = await ctx.bot.esi_data.character_info(character_id)
                 character_name = character_data['name']
         except:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             self.logger.info('CharLookup ERROR - {} could not be found'.format(character_name))
             return await dest.send('**ERROR:** No User Found With The Name {}'.format(character_name))
-        latest_killmail, latest_system_id = await self.zkill_last_mail(character_id['character'][0])
+        latest_killmail, latest_system_id = await self.zkill_last_mail(character_id)
         try:
             ship_lost_raw = await ctx.bot.esi_data.type_info_search(latest_killmail['ship_type_id'])
             ship_lost = ship_lost_raw['name']
@@ -53,9 +54,9 @@ class CharLookup:
             ship_lost = 'N/A'
             solar_system_name = 'N/A'
             victim_corp = 'N/A'
-        zkill_stats = await self.zkill_stats(character_id['character'][0])
-        firetail_intel = await self.firetail_intel(character_id['character'][0], character_name, zkill_stats)
-        zkill_link = 'https://zkillboard.com/character/{}/'.format(character_id['character'][0])
+        zkill_stats = await self.zkill_stats(character_id)
+        firetail_intel = await self.firetail_intel(character_id, character_name, zkill_stats)
+        zkill_link = 'https://zkillboard.com/character/{}/'.format(character_id)
         eve_prism = 'http://eve-prism.com/?view=character&name={}'.format(urllib.parse.quote(character_name))
         eve_who = 'https://evewho.com/pilot/{}'.format(urllib.parse.quote(character_name))
         try:
@@ -76,14 +77,14 @@ class CharLookup:
                 victim_alliance = None
 
             embed = make_embed(guild=ctx.guild,
-                               title_url="https://zkillboard.com/character/" + str(character_id['character'][0]) + "/",
+                               title_url="https://zkillboard.com/character/" + str(character_id) + "/",
                                title=character_data['name'],
                                content='[ZKill]({}) / [EveWho]({}) / [EVE-Prism]({})'.format(zkill_link, eve_who,
                                                                                              eve_prism))
             embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                              text="Provided Via Firetail Bot")
             embed.set_thumbnail(
-                url="https://imageserver.eveonline.com/Character/" + str(character_id['character'][0]) + "_64.jpg")
+                url="https://imageserver.eveonline.com/Character/" + str(character_id) + "_64.jpg")
             if victim_alliance:
                 embed.add_field(name="Firetail Intel Report", value=firetail_intel,
                                 inline=False)
@@ -123,14 +124,14 @@ class CharLookup:
                 victim_alliance = None
 
             embed = make_embed(guild=ctx.guild,
-                               title_url="https://zkillboard.com/character/" + str(character_id['character'][0]) + "/",
+                               title_url="https://zkillboard.com/character/" + str(character_id) + "/",
                                title=character_data['name'],
                                content='[ZKill]({}) / [EveWho]({}) / [EVE-Prism]({})'.format(zkill_link, eve_who,
                                                                                              eve_prism))
             embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                              text="Provided Via Firetail Bot")
             embed.set_thumbnail(
-                url="https://imageserver.eveonline.com/Character/" + str(character_id['character'][0]) + "_64.jpg")
+                url="https://imageserver.eveonline.com/Character/" + str(character_id) + "_64.jpg")
             if victim_alliance:
                 embed.add_field(name="Firetail Intel Report", value=firetail_intel,
                                 inline=False)
