@@ -13,7 +13,7 @@ class JumpPlanner:
         self.config = bot.config
         self.logger = bot.logger
 
-    @commands.command(name='jump', aliases='route')
+    @commands.command(name='jump')
     async def _jump(self, ctx):
         """Provides a Jump route.
         '!jump system:system' Gives you the JDC 5 Carrier/Super/Fax route by default.
