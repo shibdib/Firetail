@@ -44,7 +44,10 @@ class AddKills:
         try:
             name = group_corp['name']
         except:
-            name = group_alliance['name']
+            if group != 9:
+                name = group_alliance['name']
+            else:
+                name = 'EVE Wide 2b+ Kills'
         sql = ''' REPLACE INTO add_kills(channelid,serverid,groupid,ownerid)
                   VALUES(?,?,?,?) '''
         values = (channel, server, group, author)
