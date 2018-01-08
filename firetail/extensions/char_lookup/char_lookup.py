@@ -36,6 +36,7 @@ class CharLookup:
                         character_name = character_data['name']
                         break
             else:
+                character_id = character_id['character'][0]
                 character_data = await ctx.bot.esi_data.character_info(character_id)
                 character_name = character_data['name']
         except:
