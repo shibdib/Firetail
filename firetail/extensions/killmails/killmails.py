@@ -18,7 +18,7 @@ class Killmails:
         while not self.bot.is_closed():
             try:
                 data = await self.request_data()
-                if data['killID']:
+                if data is not None and 'killID' in data:
                     await self.process_data(data)
                 else:
                     await asyncio.sleep(15)
