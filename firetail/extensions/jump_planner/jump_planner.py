@@ -57,7 +57,7 @@ class JumpPlanner:
             else:
                 ship = variables.title()
             item_id = await ctx.bot.esi_data.item_id(ship)
-            accepted_ship_groups = [898, 659, 485, 547, 902, 30]
+            accepted_ship_groups = [898, 659, 485, 547, 902, 30, 1538]
             ship_info = await ctx.bot.esi_data.item_info(item_id)
             ship_group_id = ship_info['group_id']
             if ship_group_id not in accepted_ship_groups:
