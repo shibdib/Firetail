@@ -20,7 +20,7 @@ def init_logger(debug_flag=False):
     firetail_format = logging.Formatter(
         '%(asctime)s %(levelname)s %(module)s %(funcName)s %(lineno)d: '
         '%(message)s',
-        datefmt="[%d/%m/%Y %H:%M]")
+        datefmt="[%d/%m/%Y %H:%M:%S]")
 
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setFormatter(firetail_format)
