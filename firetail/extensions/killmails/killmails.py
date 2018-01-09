@@ -22,7 +22,8 @@ class Killmails:
                 else:
                     await asyncio.sleep(15)
                 await asyncio.sleep(1)
-            except:
+            except Exception:
+                self.logger.info('ERROR:', exc_info=True)
                 await asyncio.sleep(5)
 
     async def process_data(self, kill_data):
