@@ -40,16 +40,16 @@ class JumpRange:
             if len(jdc) > 1:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 return await dest.send('**ERROR:** Improper JDC skill level'.format(system))
-            item_id = await ctx.bot.esi_data.item_id(ship)
-            accepted_ship_groups = [898, 659, 485, 547, 902, 30, 1538]
-            ship_info = await ctx.bot.esi_data.item_info(item_id)
-            ship_group_id = ship_info['group_id']
-            if ship_group_id not in accepted_ship_groups:
-                dest = ctx.author if ctx.bot.config.dm_only else ctx
-                self.logger.info('JumpRange ERROR - {} is not a Jump Capable Ship'.format(ship))
-                return await dest.send('**ERROR:** No Jump Capable Ship Found With The Name {}'.format(ship))
         except:
             jdc = 5
+        item_id = await ctx.bot.esi_data.item_id(ship)
+        accepted_ship_groups = [898, 659, 485, 547, 902, 30, 1538]
+        ship_info = await ctx.bot.esi_data.item_info(item_id)
+        ship_group_id = ship_info['group_id']
+        if ship_group_id not in accepted_ship_groups:
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            self.logger.info('JumpRange ERROR - {} is not a Jump Capable Ship'.format(ship))
+            return await dest.send('**ERROR:** No Jump Capable Ship Found With The Name {}'.format(ship))
         url = 'http://evemaps.dotlan.net/range/{},{}/{}'.format(ship, jdc, system)
         embed = make_embed(guild=ctx.guild)
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
