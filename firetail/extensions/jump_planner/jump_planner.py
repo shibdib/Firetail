@@ -1,6 +1,4 @@
 from discord.ext import commands
-import pytz
-from datetime import datetime
 
 from firetail.utils import make_embed
 
