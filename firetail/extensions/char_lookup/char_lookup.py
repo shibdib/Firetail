@@ -296,7 +296,6 @@ class CharLookup:
             async with session.get(kill_url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
-                print(data)
                 try:
                     all_time_kills = data[0]['killmail_id']
                     return data[0]

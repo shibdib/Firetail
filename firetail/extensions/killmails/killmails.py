@@ -1,6 +1,7 @@
 from firetail.lib import db
 from firetail.utils import make_embed
 import asyncio
+import json
 
 
 class Killmails:
@@ -17,7 +18,7 @@ class Killmails:
         while not self.bot.is_closed():
             try:
                 data = await self.request_data()
-                if data['killID']:
+                if data is not None and 'killID' in data:
                     await self.process_data(data)
                 else:
                     await asyncio.sleep(15)
@@ -128,8 +129,9 @@ class Killmails:
         base_url = "https://redisq.zkillboard.com"
         zkill = "{}/listen.php?queueID={}".format(base_url, self.bot.user.id)
         async with self.bot.session.get(zkill) as resp:
-            data = (await resp.json())['package']
+            data = await resp.text()
         try:
+            data = json.loads(data)['package']
             if data.get('killID'):
                 return data
         except:
