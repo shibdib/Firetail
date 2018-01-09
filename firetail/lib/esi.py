@@ -36,9 +36,27 @@ class ESI:
                 data = json.loads(data)
                 return data
 
+    # Location Stuff
+
     async def system_info(self, system_id):
         async with aiohttp.ClientSession() as session:
             url = '{}/universe/systems/{}/'.format(ESI_URL, system_id)
+            async with session.get(url) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data
+
+    async def constellation_info(self, constellation_id):
+        async with aiohttp.ClientSession() as session:
+            url = '{}/universe/constellations/{}/'.format(ESI_URL, constellation_id)
+            async with session.get(url) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data
+
+    async def region_info(self, region_id):
+        async with aiohttp.ClientSession() as session:
+            url = '{}/universe/regions/{}/'.format(ESI_URL, region_id)
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
