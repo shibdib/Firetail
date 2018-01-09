@@ -18,8 +18,12 @@ class JumpRange:
         '!range system SHIP 4' This is also possible to declare a JDC besides 5."""
         self.logger.info('JumpRange - {} requested a jump range map.'.format(str(ctx.message.author)))
         try:
-            system = ctx.message.content.split(' ')[1]
-            ship = ctx.message.content.split(' ')[2]
+            system = ctx.message.content.split(' ')[1].title()
+            if '-' in system:
+                system = system.upper()
+            else:
+                system = system.title()
+            ship = ctx.message.content.split(' ')[2].title()
         except:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Do !help range for more info')
