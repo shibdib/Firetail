@@ -25,7 +25,7 @@ class Recon:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Could not find a location named {}'.format(location))
         if location_type == 'system':
-            self.format_system(ctx, data)
+            await self.format_system(ctx, data)
         # elif location_type == 'constellation':
             # self.format_constellation(ctx, data)
         # elif location_type == 'region':
