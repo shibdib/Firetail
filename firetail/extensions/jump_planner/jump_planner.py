@@ -38,8 +38,8 @@ class JumpPlanner:
                 system_info = await ctx.bot.esi_data.system_info(system_id)
                 if system_info['security_status'] >= 0.5 and x != 0:
                     dest = ctx.author if ctx.bot.config.dm_only else ctx
-                    self.logger.info('JumpPlanner ERROR - {} is a high sec system'.format(system))
-                    return await dest.send('**ERROR:** {} is a high sec system.'.format(system))
+                    self.logger.info('JumpPlanner ERROR - {} is a high security system'.format(system))
+                    return await dest.send('**ERROR:** {} is a high security system, you can only jump out of high security systems.'.format(system))
                 x = x + 1
         except:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
