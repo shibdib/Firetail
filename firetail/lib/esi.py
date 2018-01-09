@@ -91,7 +91,6 @@ class ESI:
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
-                print(data)
                 return data['typeID']
 
     async def item_info(self, item_id):
