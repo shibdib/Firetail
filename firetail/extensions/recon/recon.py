@@ -119,7 +119,7 @@ class Recon:
         region_data = await self.bot.esi_data.region_info(region_id)
         region_name = region_data['name']
         planet_count = len(data['planets'])
-        stargate_count = len(data['50000342'])
+        stargate_count = len(data['stargates'])
         ship_kills, npc_kills, pod_kills = await self.get_kill_info(data['system_id'])
         sov_corp, sov_alliance, sov_faction, sov_battles = await self.get_sov_info(data['system_id'])
         active_sov = False
