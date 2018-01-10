@@ -115,15 +115,15 @@ class LocationScout:
         elif ship_kills > 25:
             report = 'the sight of a recent small fleet fight.'
         elif npc_kills > 1200 and stargate_count != 'N/A':
-            report = 'has multiple capitals or supercapitals ratting.'
+            report = 'to have multiple capitals or supercapitals ratting.'
         elif npc_kills > 800 and stargate_count != 'N/A':
-            report = 'home to multiple subcap ratting ships or potentially supercarrier ratting.'
+            report = 'to have multiple subcap ratting ships or potentially supercarrier ratting.'
         elif npc_kills > 500 and stargate_count != 'N/A':
-            report = 'home to multiple subcap ratting ships or potentially carrier ratting.'
+            report = 'to have multiple subcap ratting ships or potentially carrier ratting.'
         elif npc_kills > 300:
-            report = 'home to multiple subcap ratting ships.'
+            report = 'to have multiple subcap ratting ships.'
         elif npc_kills > 150:
-            report = 'home to a few subcap ratting ships.'
+            report = 'to have a few subcap ratting ships.'
         firetail_intel = '{} is likely {}'.format(name, report)
         embed = make_embed(msg_type='info', title=name,
                            title_url="http://evemaps.dotlan.net/system/{}".format(name.replace(' ', '_')),
