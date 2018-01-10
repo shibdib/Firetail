@@ -82,7 +82,7 @@ class LocationScout:
         if security_status < 0.1:
             sov_corp, sov_alliance, sov_alliance_id = await self.get_sov_info(data['system_id'])
             for fights in sov_battles:
-                if fights['constellation_id'] == constellation_id:
+                if fights['constellation_id'] == constellation_id and fights['defender_score'] != 0.6:
                     active_sov = True
                     target_system_id = fights['solar_system_id']
                     target_system_info = await self.bot.esi_data.system_info(target_system_id)
@@ -95,6 +95,7 @@ class LocationScout:
                     attacker_score = fights['attackers_score']
                     break
         ship_jumps = await self.get_jump_info(data['system_id'])
+        logo_link = 'https://imageserver.eveonline.com/Alliance/{}_64.png'.format(sov_alliance_id)
         zkill_link = "https://zkillboard.com/system/{}".format(data['system_id'])
         dotlan_link = "http://evemaps.dotlan.net/system/{}".format(name.replace(' ', '_'))
         region_dotlan = "http://evemaps.dotlan.net/map/{}".format(region_name.replace(' ', '_'))
@@ -104,6 +105,9 @@ class LocationScout:
         report = 'a fairly dead system.'
         if data['system_id'] in hub_id and ship_kills >= 100:
             report = 'a Trade Hub. A high amount of ganking may be occurring at this time.'
+        elif security_status == -1.0:
+            report = 'a Wormhole system. CCP disabled pretty much every source of data for these so assume everything' \
+                     ' below could be wrong. (Blame CCP)'
         elif data['system_id'] in hub_id:
             report = 'a Trade Hub.'
         elif ship_jumps > 1000 and ship_kills < 25 and npc_kills < 50:
@@ -114,11 +118,11 @@ class LocationScout:
             report = 'the sight of a recent medium fleet fight.'
         elif ship_kills > 25:
             report = 'the sight of a recent small fleet fight.'
-        elif npc_kills > 1200 and stargate_count != 'N/A':
+        elif npc_kills > 1200 and stargate_count != 'N/A' and security_status < 0.5:
             report = 'to have multiple capitals or supercapitals ratting.'
-        elif npc_kills > 800 and stargate_count != 'N/A':
+        elif npc_kills > 800 and stargate_count != 'N/A' and security_status < 0.5:
             report = 'to have multiple subcap ratting ships or potentially supercarrier ratting.'
-        elif npc_kills > 500 and stargate_count != 'N/A':
+        elif npc_kills > 500 and stargate_count != 'N/A' and security_status < 0.5:
             report = 'to have multiple subcap ratting ships or potentially carrier ratting.'
         elif npc_kills > 300:
             report = 'to have multiple subcap ratting ships.'
@@ -130,7 +134,7 @@ class LocationScout:
                            content='[ZKill]({}) / [Dotlan]({})'.format(zkill_link, dotlan_link))
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via firetail Bot")
-        embed.set_thumbnail(url='https://imageserver.eveonline.com/Alliance/{}_64.png'.format(sov_alliance_id))
+        embed.set_thumbnail(url=logo_link)
         embed.add_field(name="Firetail Intel Report", value=firetail_intel,
                         inline=False)
         embed.add_field(name="General Info",
@@ -183,19 +187,13 @@ class LocationScout:
         top_ship_sorted = sorted(system_kills, key=operator.itemgetter("ship_kills"), reverse=True)
         sov_battles = await self.get_active_sov_battles()
         active_sov = False
+        current_fights = []
         for fights in sov_battles:
-            if fights['constellation_id'] == data['constellation_id']:
+            if fights['constellation_id'] == data['constellation_id'] and fights['defender_score'] != 0.6:
                 active_sov = True
                 target_system_id = fights['solar_system_id']
-                target_system_info = await self.bot.esi_data.system_info(target_system_id)
-                target_system_name = target_system_info['name']
-                fight_type_raw = fights['event_type']
-                fight_type = fight_type_raw.replace('_', ' ').title()
-                defender_id = fights['defender_id']
-                defender_name = await self.group_name(defender_id)
-                defender_score = fights['defender_score']
-                attacker_score = fights['attackers_score']
-                break
+                current_fights.append(target_system_id)
+        sov_battle_count = len(current_fights)
         dotlan_link = "http://evemaps.dotlan.net/map/{}/{}".format(region_name.replace(' ', '_'),
                                                                    name.replace(' ', '_'))
         region_dotlan = "http://evemaps.dotlan.net/map/{}".format(region_name.replace(' ', '_'))
@@ -211,13 +209,10 @@ class LocationScout:
         embed.add_field(name="-",
                         value='{}\n[{}]({})\n{}'.format(name, region_name, region_dotlan, systems_count), inline=True)
         if active_sov is True:
-            embed.add_field(name="Active Sov Battle", value='Defender:\nTarget System:\nTarget Structure:'
-                                                            '\nDefender Score:\nAttacker Score:',
-                            inline=False)
-            embed.add_field(name="-",
-                            value='{}\n{}\n{}\n{}\n{}'.format(defender_name, target_system_name, fight_type,
-                                                              defender_score, attacker_score),
+            embed.add_field(name="Active Sov Battles", value='Count:',
                             inline=True)
+            embed.add_field(name="-",
+                            value='{}'.format(sov_battle_count), inline=True)
         embed.add_field(name="Most NPC's Killed",
                         value='1: {} ({} Killed)\n2: {} ({} Killed)\n3: {} ({} Killed)'.format(
                             top_npc_sorted[0]['system'],
@@ -254,28 +249,19 @@ class LocationScout:
             systems = constellation_data['systems']
             for system in systems:
                 ship_kills, npc_kills, pod_kills = await self.get_kill_info(system)
-                ship_jumps = await self.get_jump_info(system)
-                system_name = await self.bot.esi_data.system_name(system)
-                system_kills.append({'system': system_name, "npc_kills": npc_kills, "ship_kills": ship_kills,
-                                     "ship_jumps": ship_jumps})
+                system_kills.append({'system_id': system, "npc_kills": npc_kills, "ship_kills": ship_kills})
         system_count = len(system_kills)
         top_npc_sorted = sorted(system_kills, key=operator.itemgetter("npc_kills"), reverse=True)
         top_ship_sorted = sorted(system_kills, key=operator.itemgetter("ship_kills"), reverse=True)
         sov_battles = await self.get_active_sov_battles()
         active_sov = False
+        current_fights = []
         for fights in sov_battles:
-            if fights['constellation_id'] in data['constellations']:
+            if fights['constellation_id'] in data['constellations'] and fights['defender_score'] != 0.6:
                 active_sov = True
                 target_system_id = fights['solar_system_id']
-                target_system_info = await self.bot.esi_data.system_info(target_system_id)
-                target_system_name = target_system_info['name']
-                fight_type_raw = fights['event_type']
-                fight_type = fight_type_raw.replace('_', ' ').title()
-                defender_id = fights['defender_id']
-                defender_name = await self.group_name(defender_id)
-                defender_score = fights['defender_score']
-                attacker_score = fights['attackers_score']
-                break
+                current_fights.append(target_system_id)
+        sov_battle_count = len(current_fights)
         dotlan_link = "http://evemaps.dotlan.net/map/{}".format(name.replace(' ', '_'))
         embed = make_embed(msg_type='info', title='{} Region'.format(name),
                            title_url="http://evemaps.dotlan.net/map/{}".format(name.replace(' ', '_')),
@@ -288,28 +274,26 @@ class LocationScout:
         embed.add_field(name="-",
                         value='{}\n{}\n{}'.format(name, constellations_count, system_count), inline=True)
         if active_sov is True:
-            embed.add_field(name="Active Sov Battle", value='Defender:\nTarget System:\nTarget Structure:'
-                                                            '\nDefender Score:\nAttacker Score:')
-            embed.add_field(name="-",
-                            value='{}\n{}\n{}\n{}\n{}'.format(defender_name, target_system_name, fight_type,
-                                                              defender_score, attacker_score),
+            embed.add_field(name="Active Sov Battles", value='Count:',
                             inline=True)
+            embed.add_field(name="-",
+                            value='{}'.format(sov_battle_count), inline=True)
         embed.add_field(name="Most NPC's Killed",
                         value='1: {} ({} Killed)\n2: {} ({} Killed)\n3: {} ({} Killed)'.format(
-                            top_npc_sorted[0]['system'],
+                            await self.bot.esi_data.system_name(top_npc_sorted[0]['system_id']),
                             top_npc_sorted[0]['npc_kills'],
-                            top_npc_sorted[1]['system'],
+                            await self.bot.esi_data.system_name(top_npc_sorted[1]['system_id']),
                             top_npc_sorted[1]['npc_kills'],
-                            top_npc_sorted[2]['system'],
+                            await self.bot.esi_data.system_name(top_npc_sorted[2]['system_id']),
                             top_npc_sorted[2]['npc_kills']),
                         inline=False)
         embed.add_field(name="Most Players's Killed",
                         value='1: {} ({} Killed)\n2: {} ({} Killed)\n3: {} ({} Killed)'.format(
-                            top_ship_sorted[0]['system'],
+                            await self.bot.esi_data.system_name(top_ship_sorted[0]['system_id']),
                             top_ship_sorted[0]['ship_kills'],
-                            top_ship_sorted[1]['system'],
+                            await self.bot.esi_data.system_name(top_ship_sorted[1]['system_id']),
                             top_ship_sorted[1]['ship_kills'],
-                            top_ship_sorted[2]['system'],
+                            await self.bot.esi_data.system_name(top_ship_sorted[2]['system_id']),
                             top_ship_sorted[2]['ship_kills']),
                         inline=False)
         if config.dm_only:
