@@ -23,15 +23,16 @@ class GroupLookup:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Use **!help group** for more info.')
         group_name = ctx.message.content.split(' ', 1)[1]
-        self.logger.info('GroupLookup - {} requested group info for the group {}'.format(str(ctx.message.author), group_name))
+        self.logger.info('GroupLookup - {} requested group info for the group {}'.format(str(ctx.message.author),
+                                                                                         group_name))
         try:
             group = 'corporation'
             group_id = await ctx.bot.esi_data.esi_search(group_name, group)
             if len(group_id['corporation']) > 1:
-                for id in group_id['corporation']:
-                    group_data = await ctx.bot.esi_data.corporation_info(id)
+                for corporation_id in group_id['corporation']:
+                    group_data = await ctx.bot.esi_data.corporation_info(corporation_id)
                     if group_data['name'].lower().strip() == group_name.lower().strip():
-                        group_id = id
+                        group_id = corporation_id
                         group_data = await ctx.bot.esi_data.corporation_info(group_id)
                         break
             else:
@@ -51,17 +52,17 @@ class GroupLookup:
                 alliance_info = await ctx.bot.esi_data.alliance_info(alliance_id)
                 alliance_name = alliance_info['name']
                 alliance = True
-            except:
+            except Exception:
                 alliance = False
-        except:
+        except Exception:
             try:
                 group = 'alliance'
                 group_id = await ctx.bot.esi_data.esi_search(group_name, group)
                 if len(group_id['alliance']) > 1:
-                    for id in group_id['alliance']:
-                        group_data = await ctx.bot.esi_data.alliance_info(id)
+                    for ally_id in group_id['alliance']:
+                        group_data = await ctx.bot.esi_data.alliance_info(ally_id)
                         if group_data['name'].lower().strip() == group_name.lower().strip():
-                            group_id = id
+                            group_id = ally_id
                             group_data = await ctx.bot.esi_data.alliance_info(group_id)
                             break
                 else:
@@ -72,7 +73,7 @@ class GroupLookup:
                 eve_who = 'https://evewho.com/alli/{}'.format(urllib.parse.quote(group_name))
                 dotlan = 'http://evemaps.dotlan.net/alliance/{}'.format(urllib.parse.quote(group_name))
                 logo = 'https://imageserver.eveonline.com/Alliance/{}_64.png'.format(group_id)
-            except:
+            except Exception:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 self.logger.info('GroupLookup ERROR - {} could not be found'.format(group_name))
                 return await dest.send('**ERROR:** No Group Found With The Name {}'.format(group_name))
@@ -84,11 +85,11 @@ class GroupLookup:
             if zkill_stats['hasSupers']:
                 try:
                     super_count = len(zkill_stats['supers']['supercarriers']['data'])
-                except:
+                except Exception:
                     super_count = 'N/A'
                 try:
                     titan_count = len(zkill_stats['supers']['titans']['data'])
-                except:
+                except Exception:
                     titan_count = 'N/A'
             else:
                 super_count = 'N/A'
@@ -97,7 +98,7 @@ class GroupLookup:
                 try:
                     if top['type'] == 'solarSystem':
                         most_active_system = top['values'][0]['solarSystemName']
-                except:
+                except Exception:
                     most_active_system = 'N/A'
         else:
             total_kills = 'N/A'
@@ -119,24 +120,32 @@ class GroupLookup:
             embed.add_field(name="General Info", value='Name:\nTicker:\nMember Count:\nAlliance:',
                             inline=True)
             embed.add_field(name="-",
-                            value='{}\n{}\n{}\n{}'.format(group_data['name'], group_data['ticker'], group_data['member_count'], alliance_name),
+                            value='{}\n{}\n{}\n{}'.format(group_data['name'], group_data['ticker'],
+                                                          group_data['member_count'], alliance_name),
                             inline=True)
-            embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:\nKnown Super Count:\nKnown Titan Count:\nMost Active System:',
+            embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:'
+                                                   '\nKnown Super Count:\nKnown Titan Count:\nMost Active System:',
                             inline=True)
             embed.add_field(name="-",
-                            value='{}%\n{}%\n{}\n{}\n{}\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills, total_kills, super_count, titan_count, most_active_system),
+                            value='{}%\n{}%\n{}\n{}\n{}\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills,
+                                                                        total_kills, super_count, titan_count,
+                                                                        most_active_system),
                             inline=True)
             embed.add_field(name="Description", value=corp_description[:1023])
         elif group == 'corporation' and not alliance:
             embed.add_field(name="General Info", value='Name:\nTicker:\nMember Count:',
                             inline=True)
             embed.add_field(name="-",
-                            value='{}\n{}\n{}'.format(group_data['name'], group_data['ticker'], group_data['member_count']),
+                            value='{}\n{}\n{}'.format(group_data['name'], group_data['ticker'],
+                                                      group_data['member_count']),
                             inline=True)
-            embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:\nKnown Super Count:\nKnown Titan Count:\nMost Active System:',
+            embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:'
+                                                   '\nKnown Super Count:\nKnown Titan Count:\nMost Active System:',
                             inline=True)
             embed.add_field(name="-",
-                            value='{}%\n{}%\n{}\n{}\n{}\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills, total_kills, super_count, titan_count, most_active_system),
+                            value='{}%\n{}%\n{}\n{}\n{}\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills,
+                                                                        total_kills, super_count, titan_count,
+                                                                        most_active_system),
                             inline=True)
             embed.add_field(name="Description", value=corp_description[:1023])
         elif group == 'alliance':
@@ -145,10 +154,13 @@ class GroupLookup:
             embed.add_field(name="-",
                             value='{}\n{}'.format(group_data['name'], group_data['ticker']),
                             inline=True)
-            embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:\nKnown Super Count:\nKnown Titan Count:\nMost Active System:',
+            embed.add_field(name="PVP Info", value='Threat Rating:\nGang Ratio:\nSolo Kills:\nTotal Kills:\nKnown '
+                                                   'Super Count:\nKnown Titan Count:\nMost Active System:',
                             inline=True)
             embed.add_field(name="-",
-                            value='{}%\n{}%\n{}\n{}\n{}\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills, total_kills, super_count, titan_count, most_active_system),
+                            value='{}%\n{}%\n{}\n{}\n{}\n{}\n{}'.format(danger_ratio, gang_ratio, solo_kills,
+                                                                        total_kills, super_count, titan_count,
+                                                                        most_active_system),
                             inline=True)
         dest = ctx.author if ctx.bot.config.dm_only else ctx
         await dest.send(embed=embed)
@@ -164,5 +176,5 @@ class GroupLookup:
                 try:
                     all_time_kills = data['allTimeSum']
                     return data
-                except:
+                except Exception:
                     return None

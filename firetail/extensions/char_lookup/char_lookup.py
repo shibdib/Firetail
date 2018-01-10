@@ -30,7 +30,9 @@ class CharLookup:
             if len(character_id['character']) > 1:
                 for id in character_id['character']:
                     character_data = await ctx.bot.esi_data.character_info(id)
-                    if character_data['name'].lower().strip().replace("'", '1') == character_name.lower().strip().replace("'", '1'):
+                    if character_data['name'].lower().strip().replace("'",
+                                                                      '1') == character_name.lower().strip().replace(
+                            "'", '1'):
                         character_id = id
                         character_data = await ctx.bot.esi_data.character_info(character_id)
                         character_name = character_data['name']
@@ -39,7 +41,7 @@ class CharLookup:
                 character_id = character_id['character'][0]
                 character_data = await ctx.bot.esi_data.character_info(character_id)
                 character_name = character_data['name']
-        except:
+        except Exception:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             self.logger.info('CharLookup ERROR - {} could not be found'.format(character_name))
             return await dest.send('**ERROR:** No User Found With The Name {}'.format(character_name))
@@ -51,7 +53,7 @@ class CharLookup:
             solar_system_name = solar_system_info['name']
             victim_corp_raw = await ctx.bot.esi_data.corporation_info(character_data['corporation_id'])
             victim_corp = victim_corp_raw['name']
-        except:
+        except Exception:
             ship_lost = 'N/A'
             solar_system_name = 'N/A'
             victim_corp = 'N/A'
@@ -74,7 +76,7 @@ class CharLookup:
             try:
                 victim_alliance_raw = await ctx.bot.esi_data.alliance_info(character_data['alliance_id'])
                 victim_alliance = victim_alliance_raw['name']
-            except:
+            except Exception:
                 victim_alliance = None
 
             embed = make_embed(guild=ctx.guild,
@@ -117,11 +119,11 @@ class CharLookup:
             await dest.send(embed=embed)
             if ctx.bot.config.delete_commands:
                 await ctx.message.delete()
-        except:
+        except Exception:
             try:
                 victim_alliance_raw = await ctx.bot.esi_data.alliance_info(character_data['alliance_id'])
                 victim_alliance = victim_alliance_raw['name']
-            except:
+            except Exception:
                 victim_alliance = None
 
             embed = make_embed(guild=ctx.guild,
@@ -163,7 +165,7 @@ class CharLookup:
                 data = json.loads(data)
                 try:
                     victim_id = data[0]['victim']['character_id']
-                except:
+                except Exception:
                     victim_id = 0
                 if victim_id == character_id:
                     return data[0]['victim'], data[0]['solar_system_id']
@@ -172,7 +174,7 @@ class CharLookup:
                         try:
                             if attacker['character_id'] == character_id:
                                 return attacker, data[0]['solar_system_id']
-                        except:
+                        except Exception:
                             return None, None
 
     async def zkill_stats(self, character_id):
@@ -184,7 +186,7 @@ class CharLookup:
                 try:
                     all_time_kills = data['allTimeSum']
                     return data
-                except:
+                except Exception:
                     return None
 
     async def firetail_intel(self, character_id, character_name, zkill_stats):
@@ -197,19 +199,22 @@ class CharLookup:
                 if top_type['type'] == 'solarSystem':
                     try:
                         top_system = top_type['values'][0]['solarSystemName']
-                    except:
+                    except Exception:
                         top_system = 'Unknown'
             intel = '{}\n{} is most likely a {}. The past month they have been most active in {}. You have a {}%' \
-                    ' chance of encountering this player solo.'.format(special, character_name, character_type, top_system, solo)
+                    ' chance of encountering this player solo.'.format(special, character_name, character_type,
+                                                                       top_system, solo)
             return intel
-        except:
+        except Exception:
             loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
                 character_id)
             kill_url = 'https://zkillboard.com/api/kills/characterID/{}/kills/limit/1/no-items/'.format(character_id)
             solo = 0
             threat = 0
             character_type, special = await self.character_type(character_id, solo, threat)
-            intel = '{}\n{} is most likely a {}. No further intel available at this time.'.format(special, character_name, character_type)
+            intel = '{}\n{} is most likely a {}. No further intel available at this time.'.format(special,
+                                                                                                  character_name,
+                                                                                                  character_type)
             return intel
 
     async def character_type(self, character_id, solo, threat):
@@ -217,7 +222,7 @@ class CharLookup:
         supers = [23919, 23917, 23913, 22852, 3514, 42125]
         probe_launchers = [4258, 4260, 17901, 17938, 28756, 28758]
         loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
-                    character_id)
+            character_id)
         kill_url = 'https://zkillboard.com/api/kills/characterID/{}/kills/limit/1/no-items/'.format(character_id)
         covert_cyno = 0
         cyno = 0
@@ -234,7 +239,7 @@ class CharLookup:
                         special = '**This pilot has been seen in a Super\n**'
                     else:
                         special = ' '
-        except:
+        except Exception:
             special = ' '
         async with aiohttp.ClientSession() as session:
             async with session.get(loss_url) as resp:
@@ -252,7 +257,7 @@ class CharLookup:
                 if covert_cyno >= 2:
                     try:
                         attackers = last_kill['attackers']
-                    except:
+                    except Exception:
                         return '**BLOPS Hotdropper**', special
                     alliance_ids = []
                     corporation_ids = []
@@ -260,14 +265,14 @@ class CharLookup:
                         try:
                             alliance_ids.append(attacker['alliance_id'])
                             corporation_ids.append(attacker['corporation_id'])
-                        except:
+                        except Exception:
                             corporation_ids.append(attacker['corporation_id'])
                     try:
                         dominant_alliance = mode(alliance_ids)
                         alliance_raw = await self.bot.esi_data.alliance_info(dominant_alliance)
                         alliance = alliance_raw['name']
                         return '**BLOPS Hotdropper for {}**'.format(alliance), special
-                    except:
+                    except Exception:
                         dominant_corp = mode(corporation_ids)
                         corp_raw = await self.bot.esi_data.corporation_info(dominant_corp)
                         corp = corp_raw['name']
@@ -299,5 +304,5 @@ class CharLookup:
                 try:
                     all_time_kills = data[0]['killmail_id']
                     return data[0]
-                except:
+                except Exception:
                     return None

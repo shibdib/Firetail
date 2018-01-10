@@ -33,7 +33,7 @@ class ExtensionManager:
             loaded_ext.append(ext)
         for ext in ext_files:
             count_ext += 1
-            ext_name = ("firetail.extensions."+ext)
+            ext_name = ("firetail.extensions." + ext)
             is_loaded = ext_name in loaded_ext
             status = ":black_small_square:"
             if is_loaded:
@@ -44,22 +44,22 @@ class ExtensionManager:
             count_loaded, count_ext)
         embed = utils.make_embed(msg_type='info',
                                  title='Available Extensions',
-                                 content=count_msg+msg)
+                                 content=count_msg + msg)
         await ctx.send(embed=embed)
 
     @ext.command()
     async def unload(self, ctx, ext):
         """Unload an extension."""
         bot = ctx.bot
-        ext_name = ("firetail.extensions."+ext)
+        ext_name = ("firetail.extensions." + ext)
         if ext_name in bot.extensions:
             bot.unload_extension(ext_name)
             embed = utils.make_embed(msg_type='success',
-                                     title=ext+' extension unloaded.')
+                                     title=ext + ' extension unloaded.')
             await ctx.send(embed=embed)
         else:
             embed = utils.make_embed(
-                msg_type='error', title=ext+' extension not loaded.')
+                msg_type='error', title=ext + ' extension not loaded.')
             await ctx.send(embed=embed)
 
     @ext.command()
@@ -70,15 +70,15 @@ class ExtensionManager:
         ext_dir = os.path.join(os.path.dirname(__file__), "..", ext_folder)
         ext_files = [name for _, name, _ in pkgutil.iter_modules([ext_dir])]
         if ext in ext_files:
-            ext_name = ("firetail.extensions."+ext)
+            ext_name = ("firetail.extensions." + ext)
             was_loaded = ext_name in bot.extensions
             try:
                 bot.unload_extension(ext_name)
                 bot.load_extension(ext_name)
                 if was_loaded:
-                    msg = ext+' extension reloaded.'
+                    msg = ext + ' extension reloaded.'
                 else:
-                    msg = ext+' extension loaded.'
+                    msg = ext + ' extension loaded.'
                 embed = utils.make_embed(msg_type='success', title=msg)
                 await ctx.send(embed=embed)
             except Exception as e:
@@ -86,13 +86,13 @@ class ExtensionManager:
                 #    str(ext), type(e).__name__, e))
                 embed = utils.make_embed(
                     msg_type='error',
-                    title='Error when loading '+str(ext),
+                    title='Error when loading ' + str(ext),
                     content='{}: {}'.format(type(e).__name__, e))
                 await ctx.send(embed=embed)
         else:
             embed = utils.make_embed(
                 msg_type='error',
-                title=ext+' extension not found.')
+                title=ext + ' extension not found.')
             await ctx.send(embed=embed)
 
     @ext.command()

@@ -14,7 +14,6 @@ log = logging.getLogger("firetail")
 
 
 def init_events(bot, launcher=None):
-
     @bot.event
     async def on_connect():
         if hasattr(bot, 'launch_time'):
@@ -110,4 +109,5 @@ def init_events(bot, launcher=None):
 
     @bot.event
     async def on_member_ban(guild, user):
-        log.info("New Ban Reported. Guild ID/Name: {}/{} -- Member ID/Name: {}/{}".format(str(guild.id), guild.name, str(user.id), user.name))
+        log.info("New Ban Reported. Guild ID/Name: {}/{} -- Member ID/Name: {}/{}".format(str(guild.id), guild.name,
+                                                                                          str(user.id), user.name))

@@ -10,9 +10,9 @@ def colour(*args):
     """
     arg = args[0] if args else None
     if isinstance(arg, str):
-        colour = arg
+        color = arg
         try:
-            return getattr(discord.Colour, colour)()
+            return getattr(discord.Colour, color)()
         except AttributeError:
             return discord.Colour.lighter_grey()
     if isinstance(arg, discord.Guild):

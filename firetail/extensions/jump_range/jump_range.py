@@ -24,14 +24,14 @@ class JumpRange:
             else:
                 system = system.title()
             ship = ctx.message.content.split(' ')[2].title()
-        except:
+        except Exception:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Do !help range for more info')
         try:
             search = 'solar_system'
             system_id = await ctx.bot.esi_data.esi_search(system, search)
             system_id = system_id['solar_system'][0]
-        except:
+        except Exception:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             self.logger.info('JumpRange ERROR - {} could not be found'.format(system))
             return await dest.send('**ERROR:** No System Found With The Name {}'.format(system))
@@ -40,7 +40,7 @@ class JumpRange:
             if len(jdc) > 1:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 return await dest.send('**ERROR:** Improper JDC skill level'.format(system))
-        except:
+        except Exception:
             jdc = 5
         item_id = await ctx.bot.esi_data.item_id(ship)
         accepted_ship_groups = [898, 659, 485, 547, 902, 30, 1538]

@@ -107,8 +107,8 @@ class LocationScout:
             if data['system_id'] in hub_id and ship_kills >= 100:
                 report = 'a Trade Hub. A high amount of ganking may be occurring at this time.'
             elif security_status == -1.0:
-                report = 'a Wormhole system. CCP disabled pretty much every source of data for these so assume everything' \
-                         ' below could be wrong. (Blame CCP)'
+                report = 'a Wormhole system. CCP disabled pretty much every source of data for these so assume' \
+                         ' everything below could be wrong. (Blame CCP)'
             elif data['system_id'] in hub_id:
                 report = 'a Trade Hub.'
             elif ship_jumps > 1000 and ship_kills < 25 and npc_kills < 50:
@@ -386,5 +386,5 @@ class LocationScout:
                 data = json.loads(data)
                 try:
                     return data["name"]
-                except:
+                except Exception:
                     return 'Unknown'
