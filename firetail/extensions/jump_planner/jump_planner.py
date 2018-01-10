@@ -18,10 +18,11 @@ class JumpPlanner:
         '!jump system:system:system:system' accepts multiple waypoints.
         '!jump system:system SHIP' accepts a different jump capable ship as input.
         '!jump system:system SHIP:4' This is also possible to declare a JDC besides 5."""
+        global system
         self.logger.info('JumpPlanner - {} requested a jump route.'.format(str(ctx.message.author)))
         try:
             route = ctx.message.content.split(' ')[1]
-        except:
+        except Exception:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Do !help jump for more info')
         systems = route.split(':')
@@ -37,9 +38,10 @@ class JumpPlanner:
                 if system_info['security_status'] >= 0.5 and x != 0:
                     dest = ctx.author if ctx.bot.config.dm_only else ctx
                     self.logger.info('JumpPlanner ERROR - {} is a high security system'.format(system))
-                    return await dest.send('**ERROR:** {} is a high security system, you can only jump out of high security systems.'.format(system))
+                    return await dest.send('**ERROR:** {} is a high security system, you can only jump out of high'
+                                           ' security systems.'.format(system))
                 x = x + 1
-        except:
+        except Exception:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
             return await dest.send('**ERROR:** No System Found With The Name {}'.format(system))
@@ -62,7 +64,7 @@ class JumpPlanner:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 self.logger.info('JumpPlanner ERROR - {} is not a Jump Capable Ship'.format(ship))
                 return await dest.send('**ERROR:** No Jump Capable Ship Found With The Name {}'.format(ship))
-        except:
+        except Exception:
             ship = 'Aeon'
             skills = '555'
         url = 'http://evemaps.dotlan.net/jump/{},{}/{}'.format(ship, skills, route)

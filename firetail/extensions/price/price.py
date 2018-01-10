@@ -11,12 +11,12 @@ class Price:
         self.logger = bot.logger
 
     hub_id = {'jita': 60003760,
-            'amarr': 60008494,
-            'dodixie': 60011866,
-            'rens': 60004588,
-            'hek': 60005686}
+              'amarr': 60008494,
+              'dodixie': 60011866,
+              'rens': 60004588,
+              'hek': 60005686}
 
-    @commands.command(name='price', aliases=["jita", "amarr", "dodixie", "rens", "hek",])
+    @commands.command(name='price', aliases=["jita", "amarr", "dodixie", "rens", "hek", ])
     async def _price(self, ctx):
         """Gets you price information from the top trade hubs.
         Use **!price item** or **!amarr item** (Works for Jita, Amarr, Dodixie, Rens, Hek)"""

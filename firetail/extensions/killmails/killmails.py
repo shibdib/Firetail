@@ -75,7 +75,7 @@ class Killmails:
         try:
             victim_id = kill_data['killmail']['victim']['character_id']
             victim_name = await self.bot.esi_data.character_name(victim_id)
-        except:
+        except Exception:
             victim_name = None
         ship_lost_id = kill_data['killmail']['victim']['ship_type_id']
         ship_lost_raw = await self.bot.esi_data.type_info_search(ship_lost_id)
@@ -87,7 +87,7 @@ class Killmails:
             victim_alliance_id = kill_data['killmail']['victim']['alliance_id']
             victim_alliance_raw = await self.bot.esi_data.alliance_info(victim_alliance_id)
             victim_alliance = victim_alliance_raw['name']
-        except:
+        except Exception:
             victim_alliance = None
         solar_system_id = kill_data['killmail']['solar_system_id']
         solar_system_info = await self.bot.esi_data.system_info(solar_system_id)
@@ -119,7 +119,7 @@ class Killmails:
                          value="Structure Value: " + value + "\nCorp: " + str(victim_corp))
         try:
             channel = bot.get_channel(int(channel_id))
-        except:
+        except Exception:
             return self.logger.info('Killmail - Bad Channel Attempted {}'.format(channel_id))
         self.logger.info(('Killmail - Kill # {} has been posted to {}'
                           '').format(kill_id, channel.name))
@@ -134,5 +134,5 @@ class Killmails:
             data = json.loads(data)['package']
             if data.get('killID'):
                 return data
-        except:
+        except Exception:
             return None

@@ -36,14 +36,14 @@ class AddKills:
         group_alliance = await self.bot.esi_data.alliance_info(group)
         # Check if this is a remove request
         if ctx.message.content.split(' ', 1)[1].lower() == 'remove':
-            return await self.removeServer(ctx)
+            return await self.remove_server(ctx)
         # Verify group exists
         if 'error' in group_corp and 'error' in group_alliance and group != 9:
             return await ctx.channel.send('Not a valid group ID. Please use **!help addkills** '
                                           'for more info.')
         try:
             name = group_corp['name']
-        except:
+        except Exception:
             if group != 9:
                 name = group_alliance['name']
             else:
@@ -56,12 +56,12 @@ class AddKills:
         return await ctx.channel.send('**Success** - This channel will begin receiving killmails for {} '
                                       'as they occur.'.format(name))
 
-    async def removeServer(self, ctx):
+    async def remove_server(self, ctx):
         sql = ''' DELETE FROM add_kills WHERE `channelid` = (?) '''
         values = (ctx.message.channel.id,)
         try:
             await db.execute_sql(sql, values)
-        except:
+        except Exception:
             return await ctx.channel.send('**ERROR** - Failed to remove killmails. Contact the bot'
                                           ' owner for assistance.')
         self.logger.info('addkills - ' + str(ctx.message.author) + ' removed killmail tracking from a channel.')

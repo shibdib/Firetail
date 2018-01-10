@@ -20,7 +20,7 @@ class EveStatus:
             if data.get('start_time'):
                 status = 'Online'
                 player_count = data.get('players')
-        except:
+        except Exception:
             status = 'Offline'
             player_count = 'N/A'
 
@@ -28,10 +28,8 @@ class EveStatus:
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via Firetail Bot")
         embed.set_thumbnail(url="https://image.eveonline.com/Alliance/434243723_64.png")
-        embed.add_field(name="Status", value="Server State:\nPlayer Count:",
-                     inline=True)
-        embed.add_field(name="-", value="{}\n{}".format(status, player_count),
-                     inline=True)
+        embed.add_field(name="Status", value="Server State:\nPlayer Count:", inline=True)
+        embed.add_field(name="-", value="{}\n{}".format(status, player_count), inline=True)
         dest = ctx.author if ctx.bot.config.dm_only else ctx
         await dest.send(embed=embed)
         if ctx.bot.config.delete_commands:

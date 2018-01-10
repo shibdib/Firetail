@@ -5,8 +5,6 @@ from sqlite3 import Error
 async def create_connection(db_file):
     """ create a database connection to the SQLite database
         specified by db_file
-    :param logger:
-    :param conn: Connection object
     :param db_file: database file
     :return: Connection object or None
     """
@@ -23,7 +21,6 @@ async def create_connection(db_file):
 
 async def create_table(conn, create_table_sql):
     """ create a table from the create_table_sql statement
-    :param logger:
     :param conn: Connection object
     :param create_table_sql: a CREATE TABLE statement
     :return:

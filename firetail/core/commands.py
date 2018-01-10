@@ -85,11 +85,11 @@ class Core:
         """
 
         statuses = {
-            "online"    : discord.Status.online,
-            "idle"      : discord.Status.idle,
-            "dnd"       : discord.Status.dnd,
-            "invisible" : discord.Status.invisible
-            }
+            "online": discord.Status.online,
+            "idle": discord.Status.idle,
+            "dnd": discord.Status.dnd,
+            "invisible": discord.Status.invisible
+        }
 
         game = ctx.me.game
 
@@ -312,9 +312,9 @@ class Core:
         for perm, bitshift in perm_dict.items():
             if bool((req_perms.value >> bitshift) & 1):
                 if bool((chan_perms.value >> bitshift) & 1):
-                    msg += ":white_small_square:  {perm}\n".format(perm)
+                    msg += ":white_small_square:  {}\n".format(perm)
                 else:
-                    msg += ":black_small_square:  {perm}\n".format(perm)
+                    msg += ":black_small_square:  {}\n".format(perm)
         try:
             if chan_perms.embed_links:
                 embed = utils.make_embed(
@@ -343,7 +343,7 @@ class Core:
     @commands.command(name="ping")
     async def _ping(self, ctx):
         """Gets the discord server response time."""
-        msg = ("{0:.2f} ms").format(ctx.bot.ws.latency * 1000)
+        msg = "{0:.2f} ms".format(ctx.bot.ws.latency * 1000)
         embed = utils.make_embed(
             msg_type='info',
             title='Bot Latency: {}'.format(msg))
