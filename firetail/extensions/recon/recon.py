@@ -168,7 +168,7 @@ class Recon:
                 break
         dotlan_link = "http://evemaps.dotlan.net/map/{}/{}".format(region_name, name)
         firetail_intel = 'Placeholders are super cool.'
-        embed = make_embed(msg_type='info', title='{} Constellation',
+        embed = make_embed(msg_type='info', title='{} Constellation'.format(name),
                            title_url="http://evemaps.dotlan.net/map/{}/{}".format(region_name, name),
                            content='[Dotlan]({})'.format(dotlan_link))
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
@@ -183,29 +183,29 @@ class Recon:
         if active_sov is True:
             embed.add_field(name="Active Sov Battle", value='Defender:\nTarget System:\nTarget Structure:'
                                                             '\nDefender Score:\nAttacker Score:',
-                        inline=False)
+                            inline=False)
             embed.add_field(name="-",
                             value='{}\n{}\n{}\n{}\n{}'.format(defender_name, target_system_name, fight_type,
                                                               defender_score, attacker_score),
                             inline=True)
-        embed.add_field(name="Most NPC's Killed", value='1:\n2:\n3:')
-        embed.add_field(name="-",
-                        value='{} ({} Killed)\n{} ({} Killed)\n{} ({} Killed)'.format(top_npc_sorted[0]['system'],
-                                                                                      top_npc_sorted[0]['npc_kills'],
-                                                                                      top_npc_sorted[1]['system'],
-                                                                                      top_npc_sorted[1]['npc_kills'],
-                                                                                      top_npc_sorted[2]['system'],
-                                                                                      top_npc_sorted[2]['npc_kills']),
-                        inline=True)
-        embed.add_field(name="Most Players's Killed", value='1:\n2:\n3:')
-        embed.add_field(name="-",
-                        value='{} ({} Killed)\n{} ({} Killed)\n{} ({} Killed)'.format(top_ship_sorted[0]['system'],
-                                                                                      top_ship_sorted[0]['ship_kills'],
-                                                                                      top_ship_sorted[1]['system'],
-                                                                                      top_ship_sorted[1]['ship_kills'],
-                                                                                      top_ship_sorted[2]['system'],
-                                                                                      top_ship_sorted[2]['ship_kills']),
-                        inline=True)
+        embed.add_field(name="Most NPC's Killed",
+                        value='1: {} ({} Killed)\n2: {} ({} Killed)\n3: {} ({} Killed)'.format(
+                            top_npc_sorted[0]['system'],
+                            top_npc_sorted[0]['npc_kills'],
+                            top_npc_sorted[1]['system'],
+                            top_npc_sorted[1]['npc_kills'],
+                            top_npc_sorted[2]['system'],
+                            top_npc_sorted[2]['npc_kills']),
+                        inline=False)
+        embed.add_field(name="Most Players's Killed",
+                        value='1: {} ({} Killed)\n2: {} ({} Killed)\n3: {} ({} Killed)'.format(
+                            top_ship_sorted[0]['system'],
+                            top_ship_sorted[0]['ship_kills'],
+                            top_ship_sorted[1]['system'],
+                            top_ship_sorted[1]['ship_kills'],
+                            top_ship_sorted[2]['system'],
+                            top_ship_sorted[2]['ship_kills']),
+                        inline=False)
         if config.dm_only:
             await ctx.author.send(embed=embed)
         else:
