@@ -3,6 +3,7 @@ from firetail.utils import make_embed
 
 import aiohttp
 import json
+import operator
 
 
 class Recon:
@@ -27,8 +28,8 @@ class Recon:
             return await dest.send('**ERROR:** Could not find a location named {}'.format(location))
         if location_type == 'system':
             await self.format_system(ctx, data)
-        # elif location_type == 'constellation':
-        # self.format_constellation(ctx, data)
+        elif location_type == 'constellation':
+            await self.format_constellation(ctx, data)
         # elif location_type == 'region':
         # self.format_region(ctx, data)
 
@@ -133,7 +134,84 @@ class Recon:
         if config.delete_commands:
             await ctx.message.delete()
 
-    # async def format_constellation(self, ctx, data):
+    async def format_constellation(self, ctx, data):
+        config = self.config
+        name = data['name']
+        region_id = data['region_id']
+        region_data = await self.bot.esi_data.region_info(region_id)
+        region_name = region_data['name']
+        systems = data['systems']
+        systems_count = len(data['systems'])
+        system_kills = []
+        for system in systems:
+            ship_kills, npc_kills, pod_kills = await self.get_kill_info(system)
+            ship_jumps = await self.get_jump_info(system)
+            system_name = await self.bot.esi_data.system_name(system)
+            system_kills.append({'system': system_name, "npc_kills": npc_kills, "ship_kills": ship_kills,
+                                 "ship_jumps": ship_jumps})
+        top_npc_sorted = sorted(system_kills, key=operator.itemgetter("npc_kills"), reverse=True)
+        top_ship_sorted = sorted(system_kills, key=operator.itemgetter("ship_kills"), reverse=True)
+        sov_battles = await self.get_active_sov_battles()
+        active_sov = False
+        for fights in sov_battles:
+            if fights['constellation_id'] == data['constellation_id']:
+                active_sov = True
+                target_system_id = fights['solar_system_id']
+                target_system_info = await self.bot.esi_data.system_info(target_system_id)
+                target_system_name = target_system_info['name']
+                fight_type_raw = fights['event_type']
+                fight_type = fight_type_raw.replace('_', ' ').title()
+                defender_id = fights['defender_id']
+                defender_name = await self.group_name(defender_id)
+                defender_score = fights['defender_score']
+                attacker_score = fights['attackers_score']
+                break
+        dotlan_link = "http://evemaps.dotlan.net/map/{}/{}".format(region_name, name)
+        firetail_intel = 'Placeholders are super cool.'
+        embed = make_embed(msg_type='info', title='{} Constellation',
+                           title_url="http://evemaps.dotlan.net/map/{}/{}".format(region_name, name),
+                           content='[Dotlan]({})'.format(dotlan_link))
+        embed.set_footer(icon_url=ctx.bot.user.avatar_url,
+                         text="Provided Via firetail Bot")
+        embed.set_thumbnail(url='https://imageserver.eveonline.com/Alliance/1_64.png')
+        embed.add_field(name="Firetail Intel Report", value=firetail_intel,
+                        inline=False)
+        embed.add_field(name="General Info",
+                        value='Name:\nRegion:\nNumber of Systems:')
+        embed.add_field(name="-",
+                        value='{}\n{}\n{}'.format(name, region_name, systems_count), inline=True)
+        if active_sov is True:
+            embed.add_field(name="Active Sov Battle", value='Defender:\nTarget System:\nTarget Structure:'
+                                                            '\nDefender Score:\nAttacker Score:',
+                        inline=False)
+            embed.add_field(name="-",
+                            value='{}\n{}\n{}\n{}\n{}'.format(defender_name, target_system_name, fight_type,
+                                                              defender_score, attacker_score),
+                            inline=True)
+        embed.add_field(name="Most NPC's Killed", value='1:\n2:\n3:')
+        embed.add_field(name="-",
+                        value='{} ({} Killed)\n{} ({} Killed)\n{} ({} Killed)'.format(top_npc_sorted[0]['system'],
+                                                                                      top_npc_sorted[0]['npc_kills'],
+                                                                                      top_npc_sorted[1]['system'],
+                                                                                      top_npc_sorted[1]['npc_kills'],
+                                                                                      top_npc_sorted[2]['system'],
+                                                                                      top_npc_sorted[2]['npc_kills']),
+                        inline=True)
+        embed.add_field(name="Most Players's Killed", value='1:\n2:\n3:')
+        embed.add_field(name="-",
+                        value='{} ({} Killed)\n{} ({} Killed)\n{} ({} Killed)'.format(top_ship_sorted[0]['system'],
+                                                                                      top_ship_sorted[0]['ship_kills'],
+                                                                                      top_ship_sorted[1]['system'],
+                                                                                      top_ship_sorted[1]['ship_kills'],
+                                                                                      top_ship_sorted[2]['system'],
+                                                                                      top_ship_sorted[2]['ship_kills']),
+                        inline=True)
+        if config.dm_only:
+            await ctx.author.send(embed=embed)
+        else:
+            await ctx.channel.send(embed=embed)
+        if config.delete_commands:
+            await ctx.message.delete()
 
     # async def format_region(self, ctx, data):
 
