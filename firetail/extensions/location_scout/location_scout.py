@@ -289,8 +289,7 @@ class LocationScout:
                         value='{}\n{}\n{}'.format(name, constellations_count, system_count), inline=True)
         if active_sov is True:
             embed.add_field(name="Active Sov Battle", value='Defender:\nTarget System:\nTarget Structure:'
-                                                            '\nDefender Score:\nAttacker Score:',
-                            inline=False)
+                                                            '\nDefender Score:\nAttacker Score:')
             embed.add_field(name="-",
                             value='{}\n{}\n{}\n{}\n{}'.format(defender_name, target_system_name, fight_type,
                                                               defender_score, attacker_score),
