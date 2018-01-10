@@ -94,8 +94,11 @@ class GroupLookup:
                 super_count = 'N/A'
                 titan_count = 'N/A'
             for top in zkill_stats['topLists']:
-                if top['type'] == 'solarSystem':
-                    most_active_system = top['values'][0]['solarSystemName']
+                try:
+                    if top['type'] == 'solarSystem':
+                        most_active_system = top['values'][0]['solarSystemName']
+                except:
+                    most_active_system = 'N/A'
         else:
             total_kills = 'N/A'
             danger_ratio = 'N/A'
