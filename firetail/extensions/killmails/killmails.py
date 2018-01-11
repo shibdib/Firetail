@@ -122,14 +122,13 @@ class Killmails:
             channel_name = channel.name
         except Exception:
             self.logger.info('Killmail - Bad Channel Attempted {} removing'.format(channel_id))
-            return self.remove_bad_channel(channel_id)
+            return await self.remove_bad_channel(channel_id)
         self.logger.info(('Killmail - Kill # {} has been posted to {}'
                           '').format(kill_id, channel_name))
         try:
             return await channel.send(embed=em)
         except Exception:
             return self.logger.info('Killmail - Message failed to send to channel {} due to {}'.format(channel_id, Exception))
-
 
     async def request_data(self):
         base_url = "https://redisq.zkillboard.com"
