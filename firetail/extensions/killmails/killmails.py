@@ -119,11 +119,17 @@ class Killmails:
                          value="Structure Value: " + value + "\nCorp: " + str(victim_corp))
         try:
             channel = bot.get_channel(int(channel_id))
+            channel_name = channel.name
         except Exception:
-            return self.logger.info('Killmail - Bad Channel Attempted {}'.format(channel_id))
+            self.logger.info('Killmail - Bad Channel Attempted {} removing'.format(channel_id))
+            return self.remove_bad_channel(channel_id)
         self.logger.info(('Killmail - Kill # {} has been posted to {}'
-                          '').format(kill_id, channel.name))
-        return await channel.send(embed=em)
+                          '').format(kill_id, channel_name))
+        try:
+            return await channel.send(embed=em)
+        except Exception:
+            return self.logger.info('Killmail - Message failed to send to channel {} due to {}'.format(channel_id, Exception))
+
 
     async def request_data(self):
         base_url = "https://redisq.zkillboard.com"
@@ -136,3 +142,12 @@ class Killmails:
                 return data
         except Exception:
             return None
+
+    async def remove_bad_channel(self, channel_id):
+        sql = ''' DELETE FROM add_kills WHERE `channelid` = (?) '''
+        values = (channel_id,)
+        try:
+            await db.execute_sql(sql, values)
+        except Exception:
+            self.logger.info('Killmail - ERROR Failed to remove channel')
+        return self.logger.info('Killmail - Bad Channel removed successfully')
