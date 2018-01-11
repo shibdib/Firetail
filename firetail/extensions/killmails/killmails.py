@@ -145,8 +145,5 @@ class Killmails:
     async def remove_bad_channel(self, channel_id):
         sql = ''' DELETE FROM add_kills WHERE `channelid` = (?) '''
         values = (channel_id,)
-        try:
-            await db.execute_sql(sql, values)
-        except Exception:
-            self.logger.info('Killmail - ERROR Failed to remove channel')
+        await db.execute_sql(sql, values)
         return self.logger.info('Killmail - Bad Channel removed successfully')
