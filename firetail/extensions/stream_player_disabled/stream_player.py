@@ -73,12 +73,21 @@ class StreamPlayer:
         while not self.bot.is_closed():
             if self.voice is not None:
                 if not self.voice.is_playing():
-                    if len(self.song_queue) >= 1:
-                        url = self.song_queue[0]['url']
-                        ctx = self.song_queue[0]['ctx']
+                    song_queue = []
+                    for requests in self.song_queue:
+                        ctx = requests['ctx']
+                        if ctx.guild.id == self.voice.guild.id:
+                            song_queue.append(requests)
+                    if len(song_queue) >= 1:
+                        url = song_queue[0]['url']
+                        ctx = song_queue[0]['ctx']
                         self.voice.stop()
                         player = await YTDLSource.from_url(url, loop=self.bot.loop)
-                        self.song_queue.pop(0)
+                        count = 0
+                        for requests in self.song_queue:
+                            if requests['url'] == song_queue['url'] and requests['ctx'] == song_queue['ctx']:
+                                self.song_queue.pop(count)
+                            count = count + 1
                         self.voice.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
                         self.current_provider.clear()
                         self.current_provider.add(ctx.author.id)
@@ -112,7 +121,7 @@ class StreamPlayer:
         `!stop` to stop the current song and remove the bot from the voice channel.
         `!volume 0-100` to set the volume percentage."""
 
-        if ctx.author.voice.channel:
+        if ctx.author.voice:
             if ctx.voice_client is None:
                 await ctx.author.voice.channel.connect()
             if ctx.author.voice.channel != ctx.voice_client.channel and not ctx.voice_client.is_playing():
@@ -177,11 +186,16 @@ class StreamPlayer:
     @commands.command()
     async def queue(self, ctx):
         """Gets current song queue"""
+        song_queue = []
+        for requests in self.song_queue:
+            request_ctx = requests['ctx']
+            if request_ctx.guild.id == ctx.guild.id:
+                song_queue.append(requests)
 
-        if len(self.song_queue) > 0:
+        if len(song_queue) > 0:
             queued = ''
             number = 0
-            for song in self.song_queue:
+            for song in song_queue:
                 number = number + 1
                 queued += str('\n{}. {}'.format(number, song['url']))
                 embed = make_embed(msg_type='info', title='Current Queue',
@@ -199,6 +213,11 @@ class StreamPlayer:
         The song requester can automatically skip.
         3 skip votes are needed for the song to be skipped.
         """
+        song_queue = []
+        for requests in self.song_queue:
+            request_ctx = requests['ctx']
+            if request_ctx.guild.id == ctx.guild.id:
+                song_queue.append(requests)
 
         if not ctx.voice_client.is_playing():
             return await ctx.send('Not playing any stream_player right now... Do !yt to add a song.')
@@ -213,13 +232,17 @@ class StreamPlayer:
             if total_votes >= 3 or ctx.author.id in self.current_provider:
                 await ctx.send('Skip vote passed, skipping song...')
                 self.skip_votes.clear()
-                url = self.song_queue[0]['url']
-                ctx = self.song_queue[0]['ctx']
+                url = song_queue[0]['url']
+                ctx = song_queue[0]['ctx']
                 ctx.voice_client.stop()
                 player = await YTDLSource.from_url(url, loop=self.bot.loop)
                 ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-                ctx = self.song_queue[0]['ctx']
-                self.song_queue.pop(0)
+                ctx = song_queue[0]['ctx']
+                count = 0
+                for requests in self.song_queue:
+                    if requests['url'] == song_queue['url'] and requests['ctx'] == song_queue['ctx']:
+                        self.song_queue.pop(count)
+                    count = count + 1
                 embed = make_embed(msg_type='info', title='Now playing: {}'.format(player.title),
                                    content="Requested By: {}\n[Direct Link]({})".format(ctx.author.name,
                                                                                         player.url))
