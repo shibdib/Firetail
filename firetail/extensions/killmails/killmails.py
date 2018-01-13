@@ -171,7 +171,7 @@ class Killmails:
                                  victim_corp_zkill),
                          inline=False)
         elif victim_name is None and victim_alliance is not None:
-            em.add_field(name="Structure Info",
+            em.add_field(name="Kill Info",
                          value="Corp: [{}]({})\nAlliance: [{}]({})"
                          .format(victim_corp,
                                  victim_corp_zkill,
@@ -179,7 +179,7 @@ class Killmails:
                                  victim_alliance_zkill),
                          inline=False)
         elif victim_name is None and victim_alliance is None:
-            em.add_field(name="Structure Info",
+            em.add_field(name="Kill Info",
                          value="Corp: [{}]({})".format(victim_corp, victim_corp_zkill), inline=False)
         if final_blow_name is not None and final_blow_alliance is not None:
             em.add_field(name="Final Blow",
