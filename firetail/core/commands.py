@@ -204,6 +204,8 @@ class Core:
     @commands.command(name="about")
     async def _about(self, ctx):
         """Shows info about Firetail"""
+        memory = memory_usage()
+        memory_format = '{0:,.2f}'.format(memory['rss'] / 1024)
         bot = ctx.bot
         author_repo = "https://github.com/shibdib"
         bot_repo = author_repo + "/Firetail"
@@ -237,7 +239,8 @@ class Core:
         embed.add_field(name="Members", value=member_count)
         embed.add_field(name="Commands Used", value=bot.command_count)
         embed.add_field(name="Messages Read", value=bot.message_count)
-        embed.add_field(name="Invite Link", value=invite_str)
+        embed.add_field(name="Current Memory Usage", value='{} MB'.format(memory_format))
+        embed.add_field(name="Invite Link", value=invite_str, inline=False)
         footer_txt = ("For support, contact us on our Discord server. "
                       "Invite Code: ZWmzTP3")
         embed.set_footer(text=footer_txt)
@@ -420,6 +423,25 @@ class Core:
             embed = utils.make_embed(
                 msg_type='info', title="Prefix is {}".format(prefix))
             await ctx.send(embed=embed)
+
+
+def memory_usage():
+    """Memory usage of the current process in kilobytes."""
+    status = None
+    result = {'peak': 0, 'rss': 0}
+    try:
+        # This will only work on systems with a /proc file system
+        # (like Linux).
+        status = open('/proc/self/status')
+        for line in status:
+            parts = line.split()
+            key = parts[0][2:-1].lower()
+            if key in result:
+                result[key] = int(parts[1])
+    finally:
+        if status is not None:
+            status.close()
+    return result
 
 
 def setup(bot):
