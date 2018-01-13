@@ -16,7 +16,8 @@ class LocationScout:
 
     @commands.command(name='scout', aliases=["recon", "system", "wormhole"])
     async def _scout(self, ctx):
-        """Gets you information for systems/wormholes/constellations/regions.
+        """Gets you location info
+        Supports systems/wormholes/constellations/regions.
         Use **!scout location** or **!recon location**"""
         if len(ctx.message.content.split()) == 1:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
