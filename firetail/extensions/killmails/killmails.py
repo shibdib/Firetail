@@ -43,7 +43,6 @@ class Killmails:
             #  Get all group id's from the mail
             attacker_group_ids = []
             loss_group_ids = []
-            group_ids = []
             if loss:
                 loss_group_ids.append(int(kill_data['killmail']['victim']['corporation_id']))
                 if 'alliance_id' in kill_data['killmail']['victim']:
@@ -53,19 +52,19 @@ class Killmails:
                     attacker_group_ids.append(int(attacker['corporation_id']))
                 if 'alliance_id' in attacker:
                     attacker_group_ids.append(int(attacker['alliance_id']))
-            if loss and killmail_group_id in loss_group_ids:
-                await self.process_kill(channel_id, kill_data, False, True)
-            if killmail_group_id in attacker_group_ids:
+            if loss and killmail_group_id in attacker_group_ids:
                 await self.process_kill(channel_id, kill_data)
+            if killmail_group_id in loss_group_ids:
+                await self.process_kill(channel_id, kill_data, False, True)
             for ext in self.bot.extensions:
                 if 'add_kills' in ext:
                     sql = "SELECT * FROM add_kills"
                     other_channels = await db.select(sql)
                     for add_kills in other_channels:
                         if add_kills[3] in attacker_group_ids:
-                            await self.process_kill(add_kills[1], kill_data, False, True)
-                        if add_kills[3] in loss_group_ids:
                             await self.process_kill(add_kills[1], kill_data)
+                        if add_kills[3] in loss_group_ids:
+                            await self.process_kill(add_kills[1], kill_data, False, True)
                         if add_kills[3] == 9 and kill_data['zkb']['totalValue'] >= big_kills_value:
                             await self.process_kill(add_kills[1], kill_data, True)
             if kill_data['zkb']['totalValue'] >= big_kills_value and big_kills:
