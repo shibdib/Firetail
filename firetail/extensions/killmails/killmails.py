@@ -76,6 +76,7 @@ class Killmails:
         try:
             victim_id = kill_data['killmail']['victim']['character_id']
             victim_name = await self.bot.esi_data.character_name(victim_id)
+            victim_zkill = "https://zkillboard.com/character/{}/".format(victim_id)
         except Exception:
             victim_name = None
         ship_lost_id = kill_data['killmail']['victim']['ship_type_id']
@@ -84,29 +85,35 @@ class Killmails:
         victim_corp_id = kill_data['killmail']['victim']['corporation_id']
         victim_corp_raw = await self.bot.esi_data.corporation_info(victim_corp_id)
         victim_corp = victim_corp_raw['name']
+        victim_corp_zkill = "https://zkillboard.com/corporation/{}/".format(victim_corp_id)
         try:
             victim_alliance_id = kill_data['killmail']['victim']['alliance_id']
             victim_alliance_raw = await self.bot.esi_data.alliance_info(victim_alliance_id)
             victim_alliance = victim_alliance_raw['name']
+            victim_alliance_zkill = "https://zkillboard.com/alliance/{}/".format(victim_alliance_id)
         except Exception:
             victim_alliance = None
         for attacker in kill_data['killmail']['attackers']:
-            if 'final_blow' == 'true':
+            if attacker['final_blow'] == True:
                 try:
                     final_blow_id = attacker['character_id']
                     final_blow_name = await self.bot.esi_data.character_name(final_blow_id)
+                    final_blow_zkill = "https://zkillboard.com/character/{}/".format(final_blow_id)
                 except Exception:
-                    final_blow_name = None
+                    final_blow_name = False
                 final_blow_ship_id = attacker['ship_type_id']
                 final_blow_ship_raw = await self.bot.esi_data.type_info_search(final_blow_ship_id)
+                final_blow_ship_zkill = "https://zkillboard.com/ship/{}/".format(final_blow_ship_id)
                 final_blow_ship = final_blow_ship_raw['name']
                 final_blow_corp_id = attacker['corporation_id']
                 final_blow_corp_raw = await self.bot.esi_data.corporation_info(final_blow_corp_id)
                 final_blow_corp = final_blow_corp_raw['name']
+                final_blow_corp_zkill = "https://zkillboard.com/corporation/{}/".format(final_blow_corp_id)
                 try:
                     final_blow_alliance_id = attacker['alliance_id']
                     final_blow_alliance_raw = await self.bot.esi_data.alliance_info(final_blow_alliance_id)
                     final_blow_alliance = final_blow_alliance_raw['name']
+                    final_blow_alliance_zkill = "https://zkillboard.com/alliance/{}/".format(final_blow_alliance_id)
                 except Exception:
                     final_blow_alliance = None
                 break
@@ -114,58 +121,86 @@ class Killmails:
         solar_system_id = kill_data['killmail']['solar_system_id']
         solar_system_info = await self.bot.esi_data.system_info(solar_system_id)
         solar_system_name = solar_system_info['name']
+        killmail_zkill = "https://zkillboard.com/kill/{}/".format(kill_id)
         if '-' in solar_system_name:
             solar_system_name = solar_system_name.upper()
-        title = ship_lost + " Destroyed in "
+        title = "{} Destroyed in {}".format(ship_lost, solar_system_name)
         if big:
-            title = "BIG KILL REPORTED: " + ship_lost + " Destroyed in "
-        em = make_embed(msg_type='info', title=title.title() + str(solar_system_name),
-                        title_url="https://zkillboard.com/kill/" + str(kill_id) + "/",
-                        content='Killed At: ' + kill_time + ' EVE')
+            title = "BIG KILL REPORTED: {} Destroyed in {}".format(ship_lost, solar_system_name)
+        em = make_embed(msg_type='info', title=title.title(),
+                        title_url=killmail_zkill,
+                        content='Killed At: {} EVE\nValue: {}\n[zKill Link]({})'.format(kill_time, value, killmail_zkill))
         em.set_footer(icon_url=self.bot.user.avatar_url,
                       text="Provided Via firetail Bot + ZKill")
         em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
         if victim_name is not None and victim_alliance is not None:
             em.add_field(name="Victim",
-                         value="Name: {}\nShip Value: {}\nCorp: {}\nAlliance: {}".format(victim_name, value, victim_corp
-                                                                                         , victim_alliance),
-                         inline=True)
+                         value="Name: [{}]({})\nCorp: [{}]({})\nAlliance: [{}]({})"
+                         .format(victim_name,
+                                 victim_zkill,
+                                 victim_corp,
+                                 victim_corp_zkill,
+                                 victim_alliance,
+                                 victim_alliance_zkill),
+                         inline=False)
         elif victim_name is not None and victim_alliance is None:
             em.add_field(name="Victim",
-                         value="Name: {}\nShip Value: {}\nCorp: {}".format(victim_name, value, victim_corp),
-                         inline=True)
+                         value="Name: [{}]({})\nCorp: [{}]({})"
+                         .format(victim_name,
+                                 victim_zkill,
+                                 victim_corp,
+                                 victim_corp_zkill),
+                         inline=False)
         elif victim_name is None and victim_alliance is not None:
             em.add_field(name="Structure Info",
-                         value="Structure Value: {}\nCorp: {}\nAlliance: {}".format(value, victim_corp,
-                                                                                    victim_alliance),
-                         inline=True)
+                         value="Corp: [{}]({})\nAlliance: [{}]({})"
+                         .format(victim_corp,
+                                 victim_corp_zkill,
+                                 victim_alliance,
+                                 victim_alliance_zkill),
+                         inline=False)
         elif victim_name is None and victim_alliance is None:
             em.add_field(name="Structure Info",
-                         value="Structure Value: {}\nCorp: {}".format(value, victim_corp),
-                         inline=True)
+                         value="Corp: [{}]({})".format(victim_corp, victim_corp_zkill), inline=False)
         if final_blow_name is not None and final_blow_alliance is not None:
             em.add_field(name="Final Blow",
-                         value="Name: {}\nShip: {}\nCorp: {}\nAlliance: {}".format(final_blow_name, final_blow_ship,
-                                                                                   final_blow_corp,
-                                                                                   final_blow_alliance),
-                         inline=True)
+                         value="Name: [{}]({})\nShip: [{}]({})\nCorp: [{}]({})\nAlliance: [{}]({})"
+                         .format(final_blow_name,
+                                 final_blow_zkill,
+                                 final_blow_ship,
+                                 final_blow_ship_zkill,
+                                 final_blow_corp,
+                                 final_blow_corp_zkill,
+                                 final_blow_alliance,
+                                 final_blow_alliance_zkill),
+                         inline=False)
         elif final_blow_name is not None and final_blow_alliance is None:
             em.add_field(name="Final Blow",
-                         value="Name: {}\nShip: {}\nCorp: {}".format(final_blow_name, final_blow_ship,
-                                                                     final_blow_corp),
-                         inline=True)
-        elif victim_name is None and victim_alliance is not None:
+                         value="Name: [{}]({})\nShip: [{}]({})\nCorp: [{}]({})"
+                         .format(final_blow_name,
+                                 final_blow_zkill,
+                                 final_blow_ship,
+                                 final_blow_ship_zkill,
+                                 final_blow_corp,
+                                 final_blow_corp_zkill), inline=False)
+        elif final_blow_name is None and final_blow_alliance is not None:
             em.add_field(name="Final Blow",
-                         value="Name: {}\nStructure: {}\nCorp: {}\nAlliance: {}".format(final_blow_name,
-                                                                                        final_blow_ship,
-                                                                                        final_blow_corp,
-                                                                                        final_blow_alliance),
-                         inline=True)
-        elif victim_name is None and victim_alliance is None:
+                         value="Structure: [{}]({})\nCorp: [{}]({})\nAlliance: [{}]({})"
+                         .format(final_blow_ship,
+                                 final_blow_ship_zkill,
+                                 final_blow_corp,
+                                 final_blow_corp_zkill,
+                                 final_blow_alliance,
+                                 final_blow_alliance_zkill),
+                         inline=False)
+        elif final_blow_name is False and final_blow_alliance is None:
             em.add_field(name="Final Blow",
-                         value="Name: {}\nStructure: {}\nCorp: {}".format(final_blow_name, final_blow_ship,
-                                                                          final_blow_corp),
-                         inline=True)
+                         value="Structure: [{}]({})\nCorp: [{}]({})"
+                         .format(final_blow_ship,
+                                 final_blow_ship_zkill,
+                                 final_blow_corp,
+                                 final_blow_corp_zkill),
+                         inline=False)
         try:
             channel = bot.get_channel(int(channel_id))
             channel_name = channel.name
