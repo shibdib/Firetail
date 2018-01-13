@@ -100,8 +100,8 @@ class StreamPlayer:
     @commands.command()
     async def yt(self, ctx, *, url):
         """Streams from a URL
-        `!yt https://www.youtube.com/watch?v=RubBzkZzpUA` to stream audio, if a song is already playing it gets added to
-        a queue.
+        `!yt https://www.youtube.com/watch?v=RubBzkZzpUA` to stream audio
+        If a song is already playing it gets added to a queue.
         `!skip` Votes to skip a song, requires 3 votes.
         `!pause` Pauses the current song.
         `!play` Resumes the current paused song.
@@ -190,7 +190,8 @@ class StreamPlayer:
 
     @commands.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
-        """Vote to skip a song. The song requester can automatically skip.
+        """Vote to skip a song.
+        The song requester can automatically skip.
         3 skip votes are needed for the song to be skipped.
         """
 
