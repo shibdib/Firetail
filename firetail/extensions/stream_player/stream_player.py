@@ -80,7 +80,8 @@ class StreamPlayer:
                         self.current_provider.clear()
                         self.current_provider.add(ctx.author.id)
                         embed = make_embed(msg_type='info', title='Now playing From Queue: {}'.format(player.title),
-                                           content="[Direct Link]({})".format(player.url))
+                                           content="Requested By: {}\n[Direct Link]({})".format(ctx.author.name,
+                                                                                                player.url))
                         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                                          text="Provided Via Firetail Bot")
                         dest = ctx.author if ctx.bot.config.dm_only else ctx
@@ -128,7 +129,8 @@ class StreamPlayer:
             player = await YTDLSource.from_url(url, loop=self.bot.loop)
             ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
             embed = make_embed(msg_type='info', title='Now playing: {}'.format(player.title),
-                               content="[Direct Link]({})".format(player.url))
+                               content="Requested By: {}\n[Direct Link]({})".format(ctx.author.name,
+                                                                                    player.url))
             embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                              text="Provided Via Firetail Bot")
             dest = ctx.author if ctx.bot.config.dm_only else ctx
@@ -212,10 +214,12 @@ class StreamPlayer:
                 ctx = self.song_queue[0]['ctx']
                 ctx.voice_client.stop()
                 player = await YTDLSource.from_url(url, loop=self.bot.loop)
-                self.song_queue.pop(0)
                 ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+                ctx = self.song_queue[0]['ctx']
+                self.song_queue.pop(0)
                 embed = make_embed(msg_type='info', title='Now playing: {}'.format(player.title),
-                                   content="[Link]({})".format(player.url))
+                                   content="Requested By: {}\n[Direct Link]({})".format(ctx.author.name,
+                                                                                        player.url))
                 embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                                  text="Provided Via Firetail Bot")
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
