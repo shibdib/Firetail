@@ -68,6 +68,7 @@ class Killmails:
 
     async def process_kill(self, channel_id, kill_data, big=False):
         bot = self.bot
+        final_blow_name, final_blow_ship, final_blow_corp, final_blow_alliance = None, None, None, None
         kill_id = kill_data['killID']
         kill_time = kill_data['killmail']['killmail_time'].split('T', 1)[1][:-4]
         value_raw = kill_data['zkb']['totalValue']
@@ -89,6 +90,27 @@ class Killmails:
             victim_alliance = victim_alliance_raw['name']
         except Exception:
             victim_alliance = None
+        for attacker in kill_data['killmail']['attackers']:
+            if 'final_blow' == 'true':
+                try:
+                    final_blow_id = attacker['character_id']
+                    final_blow_name = await self.bot.esi_data.character_name(final_blow_id)
+                except Exception:
+                    final_blow_name = None
+                final_blow_ship_id = attacker['ship_type_id']
+                final_blow_ship_raw = await self.bot.esi_data.type_info_search(final_blow_ship_id)
+                final_blow_ship = final_blow_ship_raw['name']
+                final_blow_corp_id = attacker['corporation_id']
+                final_blow_corp_raw = await self.bot.esi_data.corporation_info(final_blow_corp_id)
+                final_blow_corp = final_blow_corp_raw['name']
+                try:
+                    final_blow_alliance_id = attacker['alliance_id']
+                    final_blow_alliance_raw = await self.bot.esi_data.alliance_info(final_blow_alliance_id)
+                    final_blow_alliance = final_blow_alliance_raw['name']
+                except Exception:
+                    final_blow_alliance = None
+                break
+
         solar_system_id = kill_data['killmail']['solar_system_id']
         solar_system_info = await self.bot.esi_data.system_info(solar_system_id)
         solar_system_name = solar_system_info['name']
@@ -105,18 +127,45 @@ class Killmails:
         em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
         if victim_name is not None and victim_alliance is not None:
             em.add_field(name="Victim",
-                         value="Name: " + str(victim_name) + "\nShip Value: " + value + " \nCorp: " + str(victim_corp) +
-                               " \nAlliance: " + str(victim_alliance) + " \n ")
+                         value="Name: {}\nShip Value: {}\nCorp: {}\nAlliance: {}".format(victim_name, value, victim_corp
+                                                                                         , victim_alliance),
+                         inline=True)
         elif victim_name is not None and victim_alliance is None:
             em.add_field(name="Victim",
-                         value="Name: " + str(victim_name) + "\nShip Value: " + value + " \nCorp: " + str(victim_corp))
+                         value="Name: {}\nShip Value: {}\nCorp: {}".format(victim_name, value, victim_corp),
+                         inline=True)
         elif victim_name is None and victim_alliance is not None:
             em.add_field(name="Structure Info",
-                         value="Structure Value: " + value + "\nCorp: " + str(victim_corp) + " \nAlliance: " +
-                               str(victim_alliance) + " \n ")
+                         value="Structure Value: {}\nCorp: {}\nAlliance: {}".format(value, victim_corp,
+                                                                                    victim_alliance),
+                         inline=True)
         elif victim_name is None and victim_alliance is None:
             em.add_field(name="Structure Info",
-                         value="Structure Value: " + value + "\nCorp: " + str(victim_corp))
+                         value="Structure Value: {}\nCorp: {}".format(value, victim_corp),
+                         inline=True)
+        if final_blow_name is not None and final_blow_alliance is not None:
+            em.add_field(name="Final Blow",
+                         value="Name: {}\nShip: {}\nCorp: {}\nAlliance: {}".format(final_blow_name, final_blow_ship,
+                                                                                   final_blow_corp,
+                                                                                   final_blow_alliance),
+                         inline=True)
+        elif final_blow_name is not None and final_blow_alliance is None:
+            em.add_field(name="Final Blow",
+                         value="Name: {}\nShip: {}\nCorp: {}".format(final_blow_name, final_blow_ship,
+                                                                     final_blow_corp),
+                         inline=True)
+        elif victim_name is None and victim_alliance is not None:
+            em.add_field(name="Final Blow",
+                         value="Name: {}\nStructure: {}\nCorp: {}\nAlliance: {}".format(final_blow_name,
+                                                                                        final_blow_ship,
+                                                                                        final_blow_corp,
+                                                                                        final_blow_alliance),
+                         inline=True)
+        elif victim_name is None and victim_alliance is None:
+            em.add_field(name="Final Blow",
+                         value="Name: {}\nStructure: {}\nCorp: {}".format(final_blow_name, final_blow_ship,
+                                                                          final_blow_corp),
+                         inline=True)
         try:
             channel = bot.get_channel(int(channel_id))
             channel_name = channel.name
@@ -128,7 +177,8 @@ class Killmails:
         try:
             return await channel.send(embed=em)
         except Exception:
-            return self.logger.info('Killmail - Message failed to send to channel {} due to {}'.format(channel_id, Exception))
+            return self.logger.info(
+                'Killmail - Message failed to send to channel {} due to {}'.format(channel_id, Exception))
 
     async def request_data(self):
         base_url = "https://redisq.zkillboard.com"
