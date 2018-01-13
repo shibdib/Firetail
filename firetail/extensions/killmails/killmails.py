@@ -41,24 +41,30 @@ class Killmails:
             if kill_data['zkb']['npc'] or not kill_data['killmail']['victim']['corporation_id']:
                 break
             #  Get all group id's from the mail
+            attacker_group_ids = []
+            loss_group_ids = []
             group_ids = []
             if loss:
-                group_ids.append(int(kill_data['killmail']['victim']['corporation_id']))
+                loss_group_ids.append(int(kill_data['killmail']['victim']['corporation_id']))
                 if 'alliance_id' in kill_data['killmail']['victim']:
-                    group_ids.append(int(kill_data['killmail']['victim']['alliance_id']))
+                    loss_group_ids.append(int(kill_data['killmail']['victim']['alliance_id']))
             for attacker in kill_data['killmail']['attackers']:
                 if 'corporation_id' in attacker:
-                    group_ids.append(int(attacker['corporation_id']))
+                    attacker_group_ids.append(int(attacker['corporation_id']))
                 if 'alliance_id' in attacker:
-                    group_ids.append(int(attacker['alliance_id']))
-            if killmail_group_id in group_ids:
+                    attacker_group_ids.append(int(attacker['alliance_id']))
+            if loss and killmail_group_id in loss_group_ids:
+                await self.process_kill(channel_id, kill_data, False, True)
+            if killmail_group_id in attacker_group_ids:
                 await self.process_kill(channel_id, kill_data)
             for ext in self.bot.extensions:
                 if 'add_kills' in ext:
                     sql = "SELECT * FROM add_kills"
                     other_channels = await db.select(sql)
                     for add_kills in other_channels:
-                        if add_kills[3] in group_ids:
+                        if add_kills[3] in attacker_group_ids:
+                            await self.process_kill(add_kills[1], kill_data, False, True)
+                        if add_kills[3] in loss_group_ids:
                             await self.process_kill(add_kills[1], kill_data)
                         if add_kills[3] == 9 and kill_data['zkb']['totalValue'] >= big_kills_value:
                             await self.process_kill(add_kills[1], kill_data, True)
@@ -66,7 +72,7 @@ class Killmails:
                 channel_id = config.killmail['bigKillsChannel']
                 await self.process_kill(channel_id, kill_data, True)
 
-    async def process_kill(self, channel_id, kill_data, big=False):
+    async def process_kill(self, channel_id, kill_data, big=False, loss=False):
         bot = self.bot
         final_blow_name, final_blow_ship, final_blow_corp, final_blow_alliance = None, None, None, None
         kill_id = kill_data['killID']
@@ -93,7 +99,9 @@ class Killmails:
             victim_alliance_zkill = "https://zkillboard.com/alliance/{}/".format(victim_alliance_id)
         except Exception:
             victim_alliance = None
+        attacker_count = 0
         for attacker in kill_data['killmail']['attackers']:
+            attacker_count = attacker_count + 1
             if attacker['final_blow'] == True:
                 try:
                     final_blow_id = attacker['character_id']
@@ -117,22 +125,34 @@ class Killmails:
                 except Exception:
                     final_blow_alliance = None
                 break
-
         solar_system_id = kill_data['killmail']['solar_system_id']
         solar_system_info = await self.bot.esi_data.system_info(solar_system_id)
         solar_system_name = solar_system_info['name']
+        location_id = kill_data['zkb']['locationID']
+        location_info = await self.bot.esi_data.planet_info(location_id)
+        location_name = location_info['name']
+        solo = kill_data['zkb']['solo']
+        awox = kill_data['zkb']['awox']
+        special_info = ''
+        if awox:
+            special_info = '**~Possible AWOX~**'
+        elif solo:
+            special_info = '**~Solo kill~**'
         killmail_zkill = "https://zkillboard.com/kill/{}/".format(kill_id)
         if '-' in solar_system_name:
             solar_system_name = solar_system_name.upper()
         title = "{} Destroyed in {}".format(ship_lost, solar_system_name)
+        message_type = 'success'
         if big:
             title = "BIG KILL REPORTED: {} Destroyed in {}".format(ship_lost, solar_system_name)
-        em = make_embed(msg_type='info', title=title.title(),
-                        title_url=killmail_zkill,
-                        content='Killed At: {} EVE\nValue: {}\n[zKill Link]({})'.format(kill_time, value, killmail_zkill))
+            message_type = 'info'
+        if loss:
+            message_type = 'error'
+        em = make_embed(msg_type=message_type, title=title,
+                        title_url=killmail_zkill)
         em.set_footer(icon_url=self.bot.user.avatar_url,
                       text="Provided Via firetail Bot + ZKill")
-        em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(ship_lost_id) + "_64.png")
+        em.set_thumbnail(url="https://image.eveonline.com/Type/{}_64.png".format(ship_lost_id))
         if victim_name is not None and victim_alliance is not None:
             em.add_field(name="Victim",
                          value="Name: [{}]({})\nCorp: [{}]({})\nAlliance: [{}]({})"
@@ -201,6 +221,14 @@ class Killmails:
                                  final_blow_corp,
                                  final_blow_corp_zkill),
                          inline=False)
+        em.add_field(name="Details",
+                     value='{}\nTime: {} EVE\nValue: {} ISK\nNearest Celestial: {}\n[zKill Link]({})'
+                     .format(special_info,
+                             kill_time,
+                             value,
+                             location_name,
+                             killmail_zkill),
+                     inline=False)
         try:
             channel = bot.get_channel(int(channel_id))
             channel_name = channel.name

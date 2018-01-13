@@ -70,6 +70,14 @@ class ESI:
                 data = json.loads(data)
                 return data
 
+    async def planet_info(self, planet_id):
+        async with aiohttp.ClientSession() as session:
+            url = '{}/universe/planets/{}/'.format(ESI_URL, planet_id)
+            async with session.get(url) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data
+
     # Character Stuff
 
     async def character_info(self, character_id):
