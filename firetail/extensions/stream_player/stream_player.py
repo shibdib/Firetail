@@ -69,8 +69,8 @@ class StreamPlayer:
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
             if self.voice is not None:
-                if len(self.song_queue) >= 1:
-                    if not self.voice.is_playing():
+                if not self.voice.is_playing():
+                    if len(self.song_queue) >= 1:
                         url = self.song_queue[0]['url']
                         ctx = self.song_queue[0]['ctx']
                         self.voice.stop()
@@ -90,7 +90,7 @@ class StreamPlayer:
                         self.skip_votes.clear()
                         self.song_queue.clear()
 
-                        await ctx.voice_client.disconnect()
+                        await self.voice.disconnect()
                         await asyncio.sleep(15)
                 else:
                     await asyncio.sleep(60)
