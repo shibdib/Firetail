@@ -40,6 +40,16 @@ async def create_tables(db):
                                         ownerid INTEGER NOT NULL
                                     ); """
         await create_table(db, zkill_table)
+        # create sov_tracker table
+        sov_tracker_table = """ CREATE TABLE IF NOT EXISTS sov_tracker (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        channel_id INTEGER NOT NULL,
+                                        fight_type STRING NOT NULL,
+                                        system_id INTEGER NOT NULL,
+                                        defender_score INTEGER NOT NULL,
+                                        attackers_score INTEGER NOT NULL
+                                    ); """
+        await create_table(db, sov_tracker_table)
     else:
         print('Database: Unable to connect to the database at ' + db_file)
 
