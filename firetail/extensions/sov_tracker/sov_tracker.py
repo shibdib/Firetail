@@ -42,8 +42,12 @@ class SovTracker:
                                 fight_type = fights['fight_type'].replace('_', ' ').title()
                                 defender_id = fights['defender_id']
                                 defender_name = await self.group_name(defender_id)
+                                if tracked[4] < defender_score:
+                                    winning = 1
+                                else:
+                                    winning = 2
                                 await self.report_current(system_data, fight_type, defender_name, defender_score,
-                                                          attacker_score, None, tracked[1])
+                                                          attacker_score, None, tracked[1], winning)
                                 sql = ''' UPDATE sov_tracker SET `defender_score` = (?), `attackers_score` = (?) 
                                 WHERE `system_id` = (?) AND `fight_type` = (?) '''
                                 values = (defender_score, attacker_score, fight_system_id, fight_fight_type,)
@@ -70,7 +74,13 @@ class SovTracker:
         if len(ctx.message.content.split()) == 1:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Use **!help sov** for more info.')
-        location = ctx.message.content.split(' ', 1)[1]
+        location = ctx.message.content.split(' ')[1]
+        if location.lower() == 'remove':
+            if len(ctx.message.content.split()) == 2:
+                dest = ctx.author if ctx.bot.config.dm_only else ctx
+                return await dest.send('**ERROR:** To remove a system from tracking do `!sov remove system`')
+            location = ctx.message.content.split(' ')[2]
+            await self.remove(ctx, location)
         system_data = await self.get_data(location)
         self.logger.info('SovTracker - {} requested information for {}'.format(ctx.author, location))
         if system_data is None:
@@ -82,10 +92,8 @@ class SovTracker:
                 fight_type_raw = fights['event_type']
                 fight_type = fight_type_raw.replace('_', ' ').title()
                 start_time = datetime.strptime(fights['start_time'], '%Y-%m-%dT%H:%M:%SZ')
-                print(start_time)
                 time = datetime.now(pytz.timezone('UTC')).strftime('%Y-%m-%dT%H:%M:%SZ')
                 current_time = datetime.strptime(time, '%Y-%m-%dT%H:%M:%SZ')
-                print(current_time)
                 defender_id = fights['defender_id']
                 defender_name = await self.group_name(defender_id)
                 if current_time > start_time:
@@ -110,7 +118,15 @@ class SovTracker:
             return None
 
     async def report_current(self, system_data, fight_type, defender_name, defender_score, attacker_score, ctx=None,
-                             channel_id=None):
+                             channel_id=None, winning=None):
+            defender_score = '{}%'.format(defender_score*100)
+            attacker_score = '{}%'.format(attacker_score*100)
+            if winning == 1:
+                defender_score = '{} :arrow_up:'.format(defender_score)
+                attacker_score = '{} :arrow_down:'.format(attacker_score)
+            elif winning == 2:
+                defender_score = '{} :arrow_down:'.format(defender_score)
+                attacker_score = '{} :arrow_up:'.format(attacker_score)
             constellation_data = await self.bot.esi_data.constellation_info(system_data['constellation_id'])
             constellation_name = constellation_data['name']
             region_id = constellation_data['region_id']
@@ -123,8 +139,7 @@ class SovTracker:
             title = 'Active Sov Battle Reported In: {}'.format(system_data['name'])
             embed = make_embed(msg_type='info', title=title,
                                title_url=dotlan_link,
-                               content='[ZKill]({}) / [{}]({}) / [Constellation: {}]({})\nBot will report changes in '
-                                       'this battle.'.
+                               content='[ZKill]({}) / [{}]({}) / [Constellation: {}]({})\nBot is tracking this battle.'.
                                format(zkill_link,
                                       system_data['name'],
                                       dotlan_link,
@@ -199,6 +214,18 @@ class SovTracker:
                              text="Provided Via firetail Bot")
             channel = self.bot.get_channel(channel_id)
             await channel.send(embed=embed)
+
+    async def remove(self, ctx, location):
+        system_data = await self.get_data(location)
+        self.logger.info('SovTracker - {} requested information for {}'.format(ctx.author, location))
+        if system_data is None:
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            return await dest.send('**ERROR:** Could not find a location named {}'.format(location))
+        sql = ''' DELETE FROM sov_tracker WHERE `system_id` = (?) '''
+        values = (system_data['system_id'],)
+        await db.execute_sql(sql, values)
+        dest = ctx.author if ctx.bot.config.dm_only else ctx
+        return await dest.send('No longer tracking sov battles in {}'.format(system_data['name']))
 
     async def get_active_sov_battles(self):
         async with aiohttp.ClientSession() as session:
