@@ -36,7 +36,7 @@ class JumpPlanner:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
                 return await dest.send('**ERROR:** No System Found With The Name {}'.format(system))
-            if len(system_id['solar_system']) > 0:
+            if len(system_id['solar_system']) > 1:
                 system_id = await ctx.bot.esi_data.esi_search(system, search, 'false')
                 if 'solar_system' not in system_id:
                     dest = ctx.author if ctx.bot.config.dm_only else ctx
