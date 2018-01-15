@@ -25,7 +25,7 @@ class SovTracker:
             try:
                 sql = "SELECT * FROM sov_tracker"
                 sov_tracking = await db.select(sql)
-                sov_battles = await self.get_active_sov_battles()
+                sov_battles = await self.bot.esi_data.get_active_sov_battles()
                 for tracked in sov_tracking:
                     active = False
                     tracked_system_id = tracked[3]
@@ -39,7 +39,7 @@ class SovTracker:
                             defender_score = fights['defender_score']
                             attacker_score = fights['attackers_score']
                             if defender_score != tracked[4] or attacker_score != tracked[5]:
-                                fight_type = fights['fight_type'].replace('_', ' ').title()
+                                fight_type = fights['event_type'].replace('_', ' ').title()
                                 defender_id = fights['defender_id']
                                 defender_name = await self.group_name(defender_id)
                                 if tracked[4] < defender_score:
@@ -86,7 +86,7 @@ class SovTracker:
         if system_data is None:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Could not find a location named {}'.format(location))
-        sov_battles = await self.get_active_sov_battles()
+        sov_battles = await self.bot.esi_data.get_active_sov_battles()
         for fights in sov_battles:
             if fights['solar_system_id'] == system_data['system_id']:
                 fight_type_raw = fights['event_type']
@@ -226,14 +226,6 @@ class SovTracker:
         await db.execute_sql(sql, values)
         dest = ctx.author if ctx.bot.config.dm_only else ctx
         return await dest.send('No longer tracking sov battles in {}'.format(system_data['name']))
-
-    async def get_active_sov_battles(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                    'https://esi.tech.ccp.is/latest/sovereignty/campaigns/?datasource=tranquility') as resp:
-                data = await resp.text()
-                data = json.loads(data)
-                return data
 
     async def get_sov_info(self, system_id):
         async with aiohttp.ClientSession() as session:
