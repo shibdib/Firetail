@@ -28,23 +28,36 @@ class SovTracker:
                 sov_battles = await self.get_active_sov_battles()
                 for tracked in sov_tracking:
                     active = False
+                    tracked_system_id = tracked[3]
+                    tracked_fight_type = tracked[2]
+                    system_data = await self.bot.esi_data.system_info(tracked_system_id)
                     for fights in sov_battles:
-                        if fights['solar_system_id'] == tracked['system_id'] and fights['event_type'] == tracked['fight_type']:
+                        fight_system_id = fights['solar_system_id']
+                        fight_fight_type = fights['event_type']
+                        if fight_system_id == tracked_system_id and fight_fight_type == tracked_fight_type:
                             active = True
                             defender_score = fights['defender_score']
                             attacker_score = fights['attackers_score']
-                            if defender_score != tracked['defender_score'] or attacker_score != tracked['attacker_score']:
-                                system_data = await self.bot.esi_data.system_info(tracked['system_id'])
+                            if defender_score != tracked[4] or attacker_score != tracked[5]:
                                 fight_type = fights['fight_type'].replace('_', ' ').title()
                                 defender_id = fights['defender_id']
                                 defender_name = await self.group_name(defender_id)
                                 await self.report_current(system_data, fight_type, defender_name, defender_score,
-                                                          attacker_score, None, tracked['channel_id'])
+                                                          attacker_score, None, tracked[1])
+                                sql = ''' UPDATE sov_tracker SET `defender_score` = (?), `attackers_score` = (?) 
+                                WHERE `system_id` = (?) AND `fight_type` = (?) '''
+                                values = (defender_score, attacker_score, fight_system_id, fight_fight_type,)
+                                await db.execute_sql(sql, values)
                     if active is False:
                         sql = ''' DELETE FROM sov_tracker WHERE `system_id` = (?) AND `fight_type` = (?) '''
-                        values = (tracked['system_id'], tracked['event_type'],)
+                        values = (tracked_system_id, tracked_fight_type,)
                         await db.execute_sql(sql, values)
-                await asyncio.sleep(120)
+                        if tracked[4] > tracked[5]:
+                            winner = 'Defender'
+                        else:
+                            winner = 'Attacker'
+                        await self.report_ended(system_data, tracked_fight_type, winner, tracked[1])
+                await asyncio.sleep(60)
             except Exception:
                 self.logger.info('ERROR:', exc_info=True)
                 await asyncio.sleep(120)
@@ -52,7 +65,7 @@ class SovTracker:
     @commands.command(name='sov', aliases=["wand", "cancer"])
     async def _sov_tracker(self, ctx):
         """Sets the bot to track a sov fight
-        `!sov system` to have the bot report every 2 minutes (if it's changed) the latest sov fight scores.
+        `!sov system` to have the bot report every minute (if it's changed) the latest sov fight scores.
         It will also report upcoming fights."""
         if len(ctx.message.content.split()) == 1:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
@@ -68,14 +81,17 @@ class SovTracker:
             if fights['solar_system_id'] == system_data['system_id']:
                 fight_type_raw = fights['event_type']
                 fight_type = fight_type_raw.replace('_', ' ').title()
-                start_time = datetime.strptime(fights['start_time'], '%Y-%m-%dT%H:%M:%SZ').date()
-                current_time = datetime.strptime(str(datetime.now(pytz.timezone('UTC'))), '%Y-%m-%dT%H:%M:%SZ').date()
+                start_time = datetime.strptime(fights['start_time'], '%Y-%m-%dT%H:%M:%SZ')
+                print(start_time)
+                time = datetime.now(pytz.timezone('UTC')).strftime('%Y-%m-%dT%H:%M:%SZ')
+                current_time = datetime.strptime(time, '%Y-%m-%dT%H:%M:%SZ')
+                print(current_time)
                 defender_id = fights['defender_id']
                 defender_name = await self.group_name(defender_id)
                 if current_time > start_time:
                     defender_score = fights['defender_score']
                     attacker_score = fights['attackers_score']
-                    sql = ''' REPLACE INTO sov_tracker(channel_id,fight_type,system_id,defender_score,attacker_score)
+                    sql = ''' REPLACE INTO sov_tracker(channel_id,fight_type,system_id,defender_score,attackers_score)
                   VALUES(?,?,?,?,?) '''
                     values = (ctx.channel.id, fight_type_raw, system_data['system_id'], defender_score, attacker_score)
                     await db.execute_sql(sql, values)
@@ -108,7 +124,7 @@ class SovTracker:
             embed = make_embed(msg_type='info', title=title,
                                title_url=dotlan_link,
                                content='[ZKill]({}) / [{}]({}) / [Constellation: {}]({})\nBot will report changes in '
-                                       'this battle every 2 minutes.'.
+                                       'this battle.'.
                                format(zkill_link,
                                       system_data['name'],
                                       dotlan_link,
@@ -121,7 +137,7 @@ class SovTracker:
             embed.add_field(name="-",
                             value='{}\n{}\n{}\n{}'.format(defender_name, fight_type, defender_score, attacker_score),
                             inline=True)
-            if ctx is None:
+            if channel_id is None:
                 await ctx.channel.send(embed=embed)
             else:
                 channel = self.bot.get_channel(channel_id)
@@ -154,6 +170,35 @@ class SovTracker:
                             value='{}\n{}'.format(defender_name, fight_type),
                             inline=True)
             await ctx.channel.send(embed=embed)
+
+    async def report_ended(self, system_data, tracked_fight_type, winner, channel_id):
+            fight_type_raw = tracked_fight_type
+            fight_type = fight_type_raw.replace('_', ' ').title()
+            constellation_data = await self.bot.esi_data.constellation_info(system_data['constellation_id'])
+            constellation_name = constellation_data['name']
+            region_id = constellation_data['region_id']
+            region_data = await self.bot.esi_data.region_info(region_id)
+            region_name = region_data['name']
+            zkill_link = "https://zkillboard.com/system/{}".format(system_data['system_id'])
+            dotlan_link = "http://evemaps.dotlan.net/system/{}".format(system_data['name'].replace(' ', '_'))
+            constellation_dotlan = "http://evemaps.dotlan.net/map/{}/{}".format(region_name.replace(' ', '_'),
+                                                                                constellation_name.replace(' ', '_'))
+            title = 'Sov Battle In {} has ended.'.format(system_data['name'])
+            embed = make_embed(msg_type='info', title=title,
+                               title_url=dotlan_link,
+                               content='[ZKill]({}) / [{}]({}) / [Constellation: {}]({})\n\nThe {} fight has ended with'
+                                       ' the {} claiming victory.'.
+                               format(zkill_link,
+                                      system_data['name'],
+                                      dotlan_link,
+                                      constellation_name,
+                                      constellation_dotlan,
+                                      fight_type,
+                                      winner))
+            embed.set_footer(icon_url=self.bot.user.avatar_url,
+                             text="Provided Via firetail Bot")
+            channel = self.bot.get_channel(channel_id)
+            await channel.send(embed=embed)
 
     async def get_active_sov_battles(self):
         async with aiohttp.ClientSession() as session:
