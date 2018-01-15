@@ -107,7 +107,7 @@ class Killmails:
                     final_blow_name = await self.bot.esi_data.character_name(final_blow_id)
                     final_blow_zkill = "https://zkillboard.com/character/{}/".format(final_blow_id)
                 except Exception:
-                    final_blow_name = False
+                    final_blow_name = None
                 final_blow_ship_id = attacker['ship_type_id']
                 final_blow_ship_raw = await self.bot.esi_data.type_info_search(final_blow_ship_id)
                 final_blow_ship_zkill = "https://zkillboard.com/ship/{}/".format(final_blow_ship_id)
