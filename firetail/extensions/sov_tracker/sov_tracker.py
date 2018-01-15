@@ -80,7 +80,7 @@ class SovTracker:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 return await dest.send('**ERROR:** To remove a system from tracking do `!sov remove system`')
             location = ctx.message.content.split(' ')[2]
-            await self.remove(ctx, location)
+            return await self.remove(ctx, location)
         system_data = await self.get_data(location)
         self.logger.info('SovTracker - {} requested information for {}'.format(ctx.author, location))
         if system_data is None:
