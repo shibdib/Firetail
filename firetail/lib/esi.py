@@ -18,11 +18,11 @@ class ESI:
                 data = json.loads(data)
                 return data
 
-    async def esi_search(self, item, category):
+    async def esi_search(self, item, category, strict='true'):
         async with aiohttp.ClientSession() as session:
             url = ('{}/search/?categories={}&datasource=tranquility'
-                   '&language=en-us&search={}&strict=true'
-                   '').format(ESI_URL, category, item)
+                   '&language=en-us&search={}&strict={}'
+                   '').format(ESI_URL, category, item, strict)
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
