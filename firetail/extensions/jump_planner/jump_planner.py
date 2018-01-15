@@ -29,23 +29,28 @@ class JumpPlanner:
         skills = '555'
         jdc = '5'
         x = 0
+        url_route = []
         for system in systems:
             search = 'solar_system'
-            system_id = await ctx.bot.esi_data.esi_search(system, search)
+            system_id = await ctx.bot.esi_data.esi_search(system, search, 'false')
             if 'solar_system' not in system_id:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
                 return await dest.send('**ERROR:** No System Found With The Name {}'.format(system))
             if len(system_id['solar_system']) > 1:
-                system_id = await ctx.bot.esi_data.esi_search(system, search, 'false')
+                system_id = await ctx.bot.esi_data.esi_search(system, search)
                 if 'solar_system' not in system_id:
                     dest = ctx.author if ctx.bot.config.dm_only else ctx
                     self.logger.info('JumpRange ERROR - Multiple systems found matching {}'.format(system))
                     return await dest.send('**ERROR:** Multiple systems found matching {}, please be more specific'.
                                        format(system))
+                system_info = await self.bot.esi_data.system_info(system_id['solar_system'][0])
+                system_name = system_info['name']
+                url_route.append(system_name)
             else:
                 system_info = await self.bot.esi_data.system_info(system_id['solar_system'][0])
                 system_name = system_info['name']
+                url_route.append(system_name)
             if system_info['security_status'] >= 0.5 and x != 0:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 self.logger.info('JumpPlanner ERROR - {} is a high security system'.format(system))
@@ -74,8 +79,9 @@ class JumpPlanner:
         except Exception:
             ship = 'Aeon'
             skills = '555'
-        url = 'http://evemaps.dotlan.net/jump/{},{}/{}'.format(ship, skills, route)
-        clean_route = route.replace(':', ' to ')
+        url_route = ':'.join(url_route)
+        url = 'http://evemaps.dotlan.net/jump/{},{}/{}'.format(ship, skills, url_route)
+        clean_route = url_route.replace(':', ' to ')
         embed = make_embed(guild=ctx.guild)
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via Firetail Bot + Dotlan")
