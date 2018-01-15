@@ -49,8 +49,11 @@ class CharLookup:
         ship_lost = 'No Killmails Found'
         solar_system_name = 'N/A'
         if latest_killmail is not None:
-            ship_lost_raw = await ctx.bot.esi_data.type_info_search(latest_killmail['ship_type_id'])
-            ship_lost = ship_lost_raw['name']
+            if 'ship_type_id' in latest_killmail:
+                ship_lost_raw = await ctx.bot.esi_data.type_info_search(latest_killmail['ship_type_id'])
+                ship_lost = ship_lost_raw['name']
+            else:
+                ship_lost = 'N/A'
             solar_system_info = await ctx.bot.esi_data.system_info(latest_system_id)
             solar_system_name = solar_system_info['name']
         victim_corp_raw = await ctx.bot.esi_data.corporation_info(character_data['corporation_id'])
