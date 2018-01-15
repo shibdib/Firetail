@@ -167,15 +167,15 @@ class CharLookup:
                     victim_id = data[0]['victim']['character_id']
                 except Exception:
                     victim_id = 0
-                if victim_id == character_id:
-                    return data[0]['victim'], data[0]['solar_system_id']
-                else:
-                    for attacker in data[0]['attackers']:
-                        try:
-                            if attacker['character_id'] == character_id:
-                                return attacker, data[0]['solar_system_id']
-                        except Exception:
-                            return None, None
+                try:
+                    if victim_id == character_id:
+                        return data[0]['victim'], data[0]['solar_system_id']
+                    else:
+                        for attacker in data[0]['attackers']:
+                                if attacker['character_id'] == character_id:
+                                    return attacker, data[0]['solar_system_id']
+                except Exception:
+                    return None, None
 
     async def zkill_stats(self, character_id):
         async with aiohttp.ClientSession() as session:
