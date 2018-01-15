@@ -234,7 +234,10 @@ class SovTracker:
         embed.set_footer(icon_url=self.bot.user.avatar_url,
                          text="Provided Via firetail Bot")
         channel = self.bot.get_channel(channel_id)
-        await channel.send(embed=embed)
+        try:
+            await channel.send(embed=embed)
+        except:
+            return None
 
     async def remove(self, ctx, location):
         system_data = await self.get_data(location)
