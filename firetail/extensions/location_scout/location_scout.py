@@ -79,7 +79,7 @@ class LocationScout:
             else:
                 stargate_count = 'N/A'
             ship_kills, npc_kills, pod_kills = await self.get_kill_info(data['system_id'])
-            sov_battles = await self.get_active_sov_battles()
+            sov_battles = await self.bot.esi_data.get_active_sov_battles()
             active_sov = False
             if security_status < 0.1:
                 sov_corp, sov_alliance, sov_alliance_id = await self.get_sov_info(data['system_id'])
@@ -96,7 +96,7 @@ class LocationScout:
                         defender_score = fights['defender_score']
                         attacker_score = fights['attackers_score']
                         break
-            ship_jumps = await self.get_jump_info(data['system_id'])
+            ship_jumps = self.bot.esi_data.get_jump_info(data['system_id'])
             logo_link = 'https://imageserver.eveonline.com/Alliance/{}_64.png'.format(sov_alliance_id)
             zkill_link = "https://zkillboard.com/system/{}".format(data['system_id'])
             dotlan_link = "http://evemaps.dotlan.net/system/{}".format(name.replace(' ', '_'))
@@ -189,7 +189,7 @@ class LocationScout:
                                      "ship_jumps": ship_jumps})
             top_npc_sorted = sorted(system_kills, key=operator.itemgetter("npc_kills"), reverse=True)
             top_ship_sorted = sorted(system_kills, key=operator.itemgetter("ship_kills"), reverse=True)
-            sov_battles = await self.get_active_sov_battles()
+            sov_battles = await self.bot.esi_data.get_active_sov_battles()
             active_sov = False
             current_fights = []
             for fights in sov_battles:
@@ -261,7 +261,7 @@ class LocationScout:
             system_count = len(system_kills)
             top_npc_sorted = sorted(system_kills, key=operator.itemgetter("npc_kills"), reverse=True)
             top_ship_sorted = sorted(system_kills, key=operator.itemgetter("ship_kills"), reverse=True)
-            sov_battles = await self.get_active_sov_battles()
+            sov_battles = await self.bot.esi_data.get_active_sov_battles()
             active_sov = False
             current_fights = []
             for fights in sov_battles:
@@ -329,33 +329,6 @@ class LocationScout:
                         pod_kills = system['pod_kills']
                         break
                 return ship_kills, npc_kills, pod_kills
-
-    async def get_jump_info(self, system_id):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                    'https://esi.tech.ccp.is/latest/universe/system_jumps/?datasource=tranquility') as resp:
-                data = await resp.text()
-                data = json.loads(data)
-                ship_jumps = 0
-                for system in data:
-                    if system['system_id'] == system_id:
-                        ship_jumps = system['ship_jumps']
-                return ship_jumps
-
-    async def get_incursion_info(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.get('https://esi.tech.ccp.is/latest/incursions/?datasource=tranquility') as resp:
-                data = await resp.text()
-                data = json.loads(data)
-                return data
-
-    async def get_active_sov_battles(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                    'https://esi.tech.ccp.is/latest/sovereignty/campaigns/?datasource=tranquility') as resp:
-                data = await resp.text()
-                data = json.loads(data)
-                return data
 
     async def get_sov_info(self, system_id):
         async with aiohttp.ClientSession() as session:
