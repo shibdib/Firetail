@@ -29,6 +29,7 @@ class JumpPlanner:
         skills = '555'
         jdc = '5'
         x = 0
+        url_route = []
         for system in systems:
             search = 'solar_system'
             system_id = await ctx.bot.esi_data.esi_search(system, search)
@@ -48,6 +49,7 @@ class JumpPlanner:
                 return await dest.send('**ERROR:** {} is a high security system, you can only jump out of high'
                                        ' security systems.'.format(system))
             x = x + 1
+            url_route.append(system_info['name'])
         try:
             variables = ctx.message.content.split(' ')[2]
             if ':' in variables:
@@ -70,8 +72,9 @@ class JumpPlanner:
         except Exception:
             ship = 'Aeon'
             skills = '555'
-        url = 'http://evemaps.dotlan.net/jump/{},{}/{}'.format(ship, skills, route)
-        clean_route = route.replace(':', ' to ')
+        url_route = ':'.join(url_route)
+        url = 'http://evemaps.dotlan.net/jump/{},{}/{}'.format(ship, skills, url_route)
+        clean_route = url_route.replace(':', ' to ')
         embed = make_embed(guild=ctx.guild)
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via Firetail Bot + Dotlan")
