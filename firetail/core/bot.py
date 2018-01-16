@@ -22,6 +22,7 @@ class Firetail(commands.Bot):
         self.core_dir = os.path.dirname(os.path.realpath(__file__))
         self.config = config
         self.bot_users = []
+        self.repeat_offender = []
         self.last_command = None
         self.token = config.bot_token
         self.req_perms = discord.Permissions(config.bot_permissions)
