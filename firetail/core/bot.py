@@ -39,12 +39,12 @@ class Firetail(commands.Bot):
             pages = await self.formatter.format_help_for(
                 ctx, ctx.invoked_subcommand)
             for page in pages:
-                await ctx.send(page)
+                await ctx.author.send(page)
         else:
             pages = await self.formatter.format_help_for(
                 ctx, ctx.command)
             for page in pages:
-                await ctx.send(page)
+                await ctx.author.send(page)
 
     async def shutdown(self, *, restart=False):
         """Shutdown the bot.

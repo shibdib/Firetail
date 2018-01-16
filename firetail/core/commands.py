@@ -170,6 +170,7 @@ class Core:
             await ctx.send(embed=embed)
 
     @commands.command(name="uptime")
+    @checks.spam_check()
     async def _uptime(self, ctx):
         """Shows bot uptime"""
         uptime_str = ctx.bot.uptime_str
@@ -184,6 +185,7 @@ class Core:
             await ctx.send("Uptime: {}".format(uptime_str))
 
     @commands.command(name="botinvite")
+    @checks.spam_check()
     async def _bot_invite(self, ctx, plain_url: bool = False):
         """Shows bot invite url"""
         invite_url = ctx.bot.invite_url
@@ -202,6 +204,7 @@ class Core:
             await ctx.send("Invite URL: <{}>".format(invite_url))
 
     @commands.command(name="about")
+    @checks.spam_check()
     async def _about(self, ctx):
         """Shows info about Firetail"""
         memory = memory_usage()
@@ -335,6 +338,7 @@ class Core:
             await ctx.author.send(embed=embed)
 
     @_get.command(name="sessions_resumed")
+    @checks.spam_check()
     async def _sessions_resumed(self, ctx):
         """Gets the number of websocket reconnections."""
         r_c = ctx.bot.resumed_count
@@ -344,6 +348,7 @@ class Core:
         await ctx.send(embed=embed)
 
     @commands.command(name="ping")
+    @checks.spam_check()
     async def _ping(self, ctx):
         """Gets the discord server response time."""
         msg = "{0:.2f} ms".format(ctx.bot.ws.latency * 1000)
@@ -391,6 +396,8 @@ class Core:
             await ctx.send(embed=embed)
 
     @commands.command(name="prefix")
+    @checks.is_co_owner()
+    @checks.spam_check()
     async def _prefix(self, ctx, *, new_prefix: str = None):
         """Get and set server prefix.
         Use the argument 'reset' to reset the guild prefix to default.
