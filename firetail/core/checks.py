@@ -24,9 +24,9 @@ async def check_is_mod(ctx):
 async def check_spam(ctx):
     spam_list = ctx.bot.bot_users
     spam_list_length = len(spam_list)
-    if spam_list_length >= 15:
+    if spam_list_length >= 10:
         if ctx.bot.last_command is not None:
-            iterations = (time.time() - ctx.bot.last_command)/10
+            iterations = int((time.time() - ctx.bot.last_command) / 30)
             if iterations > spam_list_length:
                 iterations = spam_list_length - 1
             x = 0
@@ -35,13 +35,23 @@ async def check_spam(ctx):
                 x += 1
     ctx.bot.last_command = time.time()
     spam_list.append(ctx.author.id)
-    if spam_list_length >= 10 and spam_list.count(ctx.author.id) > 0.40*spam_list_length:
-        if ctx.channel.permissions_for(ctx.bot).manage_messages:
+    spam_count = spam_list.count(ctx.author.id)
+    threshold = 0.40 * spam_list_length
+    if spam_list_length >= 7 and spam_count > threshold:
+        wait_time = int((spam_count - threshold) * 30)
+        if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.message.delete()
-            return False
+            await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
+                                  ' Try again in {} seconds'.
+                                  format(wait_time))
+        else:
+            await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
+                                  ' Try again in {} seconds'.
+                                  format(wait_time))
         return False
+    if spam_list_length >= 25:
+        spam_list.pop(0)
     return True
-
 
 
 def is_owner():
