@@ -1,4 +1,5 @@
 import discord
+import time
 from discord.ext import commands
 
 
@@ -20,6 +21,39 @@ async def check_is_mod(ctx):
     return ctx.channel.permissions_for(ctx.author).manage_messages
 
 
+async def check_spam(ctx):
+    spam_list = ctx.bot.bot_users
+    spam_list_length = len(spam_list)
+    if spam_list_length >= 10:
+        if ctx.bot.last_command is not None:
+            iterations = int((time.time() - ctx.bot.last_command) / 30)
+            if iterations > spam_list_length:
+                iterations = spam_list_length - 1
+            x = 0
+            while x < iterations:
+                spam_list.pop(0)
+                x += 1
+    ctx.bot.last_command = time.time()
+    spam_list.append(ctx.author.id)
+    spam_count = spam_list.count(ctx.author.id)
+    threshold = 0.40 * spam_list_length
+    if spam_list_length >= 7 and spam_count > threshold:
+        wait_time = int((spam_count - threshold) * 30)
+        if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.message.delete()
+            await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
+                                  ' Try again in {} seconds'.
+                                  format(wait_time))
+        else:
+            await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
+                                  ' Try again in {} seconds'.
+                                  format(wait_time))
+        return False
+    if spam_list_length >= 25:
+        spam_list.pop(0)
+    return True
+
+
 def is_owner():
     return commands.check(check_is_owner)
 
@@ -34,6 +68,10 @@ def is_admin():
 
 def is_mod():
     return commands.check(check_is_mod)
+
+
+def spam_check():
+    return commands.check(check_spam)
 
 
 async def check_permissions(ctx, perms):

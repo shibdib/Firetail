@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from firetail.utils import make_embed
+from firetail.core import checks
 
 
 class JumpPlanner:
@@ -12,6 +13,7 @@ class JumpPlanner:
         self.logger = bot.logger
 
     @commands.command(name='jump')
+    @checks.spam_check()
     async def _jump(self, ctx):
         """Provides a Jump route.
         '!jump system:system' Gives you the JDC 5 Carrier/Super/Fax route by default.
@@ -28,23 +30,28 @@ class JumpPlanner:
         systems = route.split(':')
         skills = '555'
         jdc = '5'
-        try:
-            x = 0
-            for system in systems:
-                search = 'solar_system'
-                system_id = await ctx.bot.esi_data.esi_search(system, search)
-                system_id = system_id['solar_system'][0]
-                system_info = await ctx.bot.esi_data.system_info(system_id)
-                if system_info['security_status'] >= 0.5 and x != 0:
-                    dest = ctx.author if ctx.bot.config.dm_only else ctx
-                    self.logger.info('JumpPlanner ERROR - {} is a high security system'.format(system))
-                    return await dest.send('**ERROR:** {} is a high security system, you can only jump out of high'
-                                           ' security systems.'.format(system))
-                x = x + 1
-        except Exception:
-            dest = ctx.author if ctx.bot.config.dm_only else ctx
-            self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
-            return await dest.send('**ERROR:** No System Found With The Name {}'.format(system))
+        x = 0
+        url_route = []
+        for system in systems:
+            search = 'solar_system'
+            system_id = await ctx.bot.esi_data.esi_search(system, search)
+            if system_id is None:
+                dest = ctx.author if ctx.bot.config.dm_only else ctx
+                self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
+                return await dest.send('**ERROR:** No system found with the name {}'.format(system))
+            if system_id is False:
+                dest = ctx.author if ctx.bot.config.dm_only else ctx
+                self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
+                return await dest.send('**ERROR:** Multiple systems found matching {}, please be more specific'.
+                                       format(system))
+            system_info = await ctx.bot.esi_data.system_info(system_id['solar_system'][0])
+            if system_info['security_status'] >= 0.5 and x != 0:
+                dest = ctx.author if ctx.bot.config.dm_only else ctx
+                self.logger.info('JumpPlanner ERROR - {} is a high security system'.format(system))
+                return await dest.send('**ERROR:** {} is a high security system, you can only jump out of high'
+                                       ' security systems.'.format(system))
+            x = x + 1
+            url_route.append(system_info['name'])
         try:
             variables = ctx.message.content.split(' ')[2]
             if ':' in variables:
@@ -67,8 +74,9 @@ class JumpPlanner:
         except Exception:
             ship = 'Aeon'
             skills = '555'
-        url = 'http://evemaps.dotlan.net/jump/{},{}/{}'.format(ship, skills, route)
-        clean_route = route.replace(':', ' to ')
+        url_route = ':'.join(url_route)
+        url = 'http://evemaps.dotlan.net/jump/{},{}/{}'.format(ship, skills, url_route)
+        clean_route = url_route.replace(':', ' to ')
         embed = make_embed(guild=ctx.guild)
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via Firetail Bot + Dotlan")

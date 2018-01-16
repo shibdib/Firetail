@@ -5,6 +5,7 @@ import urllib
 import re
 
 from firetail.utils import make_embed
+from firetail.core import checks
 
 
 class GroupLookup:
@@ -16,6 +17,7 @@ class GroupLookup:
         self.logger = bot.logger
 
     @commands.command(name='group', aliases=["corp", "alliance"])
+    @checks.spam_check()
     async def _group(self, ctx):
         """Shows corp and alliance information.
         Do '!group name'"""

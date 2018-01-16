@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from firetail.utils import make_embed
+from firetail.core import checks
 
 
 class JumpRange:
@@ -12,6 +13,7 @@ class JumpRange:
         self.logger = bot.logger
 
     @commands.command(name='range')
+    @checks.spam_check()
     async def _range(self, ctx):
         """Provides Jump Range.
         '!range system SHIP' Gives you the JDC/JF 5 range for a ship by default.
@@ -27,14 +29,19 @@ class JumpRange:
         except Exception:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Do !help range for more info')
-        try:
-            search = 'solar_system'
-            system_id = await ctx.bot.esi_data.esi_search(system, search)
-            system_id = system_id['solar_system'][0]
-        except Exception:
+        search = 'solar_system'
+        system_id = await ctx.bot.esi_data.esi_search(system, search)
+        if system_id is None:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
-            self.logger.info('JumpRange ERROR - {} could not be found'.format(system))
-            return await dest.send('**ERROR:** No System Found With The Name {}'.format(system))
+            self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
+            return await dest.send('**ERROR:** No system found with the name {}'.format(system))
+        if system_id is False:
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
+            return await dest.send('**ERROR:** Multiple systems found matching {}, please be more specific'.
+                                   format(system))
+        system_info = await ctx.bot.esi_data.system_info(system_id['solar_system'][0])
+        system = system_info['name']
         try:
             jdc = ctx.message.content.split(' ')[3]
             if len(jdc) > 1:

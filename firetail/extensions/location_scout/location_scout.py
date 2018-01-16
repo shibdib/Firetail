@@ -1,5 +1,6 @@
 from discord.ext import commands
 from firetail.utils import make_embed
+from firetail.core import checks
 
 import aiohttp
 import json
@@ -15,6 +16,7 @@ class LocationScout:
         self.logger = bot.logger
 
     @commands.command(name='scout', aliases=["recon", "system", "wormhole"])
+    @checks.spam_check()
     async def _scout(self, ctx):
         """Gets you location info
         Supports systems/wormholes/constellations/regions.
@@ -37,21 +39,21 @@ class LocationScout:
 
     async def get_data(self, location):
         data = await self.bot.esi_data.esi_search(location, 'solar_system')
-        if data is not None and 'solar_system' in data:
+        if data is not None and data is not False and 'solar_system' in data:
             location_type = 'system'
             system_id = data['solar_system'][0]
             system_info = await self.bot.esi_data.system_info(system_id)
             return system_info, location_type
         else:
             data = await self.bot.esi_data.esi_search(location, 'region')
-            if data is not None and 'region' in data:
+            if data is not None and data is not False and 'region' in data:
                 location_type = 'region'
                 region_id = data['region'][0]
                 region_info = await self.bot.esi_data.region_info(region_id)
                 return region_info, location_type
             else:
                 data = await self.bot.esi_data.esi_search(location, 'constellation')
-                if data is not None and 'constellation' in data:
+                if data is not None and data is not False and 'constellation' in data:
                     location_type = 'constellation'
                     constellation_id = data['constellation'][0]
                     constellation_info = await self.bot.esi_data.constellation_info(constellation_id)
@@ -96,7 +98,7 @@ class LocationScout:
                         defender_score = fights['defender_score']
                         attacker_score = fights['attackers_score']
                         break
-            ship_jumps = self.bot.esi_data.get_jump_info(data['system_id'])
+            ship_jumps = await self.bot.esi_data.get_jump_info(data['system_id'])
             logo_link = 'https://imageserver.eveonline.com/Alliance/{}_64.png'.format(sov_alliance_id)
             zkill_link = "https://zkillboard.com/system/{}".format(data['system_id'])
             dotlan_link = "http://evemaps.dotlan.net/system/{}".format(name.replace(' ', '_'))
@@ -183,7 +185,7 @@ class LocationScout:
             system_kills = []
             for system in systems:
                 ship_kills, npc_kills, pod_kills = await self.get_kill_info(system)
-                ship_jumps = await self.get_jump_info(system)
+                ship_jumps = await self.bot.esi_data.get_jump_info(data['system_id'])
                 system_name = await self.bot.esi_data.system_name(system)
                 system_kills.append({'system': system_name, "npc_kills": npc_kills, "ship_kills": ship_kills,
                                      "ship_jumps": ship_jumps})

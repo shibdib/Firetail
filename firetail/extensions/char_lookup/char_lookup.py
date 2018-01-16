@@ -46,17 +46,18 @@ class CharLookup:
             self.logger.info('CharLookup ERROR - {} could not be found'.format(character_name))
             return await dest.send('**ERROR:** No User Found With The Name {}'.format(character_name))
         latest_killmail, latest_system_id = await self.zkill_last_mail(character_id)
-        try:
-            ship_lost_raw = await ctx.bot.esi_data.type_info_search(latest_killmail['ship_type_id'])
-            ship_lost = ship_lost_raw['name']
+        ship_lost = 'No Killmails Found'
+        solar_system_name = 'N/A'
+        if latest_killmail is not None:
+            if 'ship_type_id' in latest_killmail:
+                ship_lost_raw = await ctx.bot.esi_data.type_info_search(latest_killmail['ship_type_id'])
+                ship_lost = ship_lost_raw['name']
+            else:
+                ship_lost = 'N/A'
             solar_system_info = await ctx.bot.esi_data.system_info(latest_system_id)
             solar_system_name = solar_system_info['name']
-            victim_corp_raw = await ctx.bot.esi_data.corporation_info(character_data['corporation_id'])
-            victim_corp = victim_corp_raw['name']
-        except Exception:
-            ship_lost = 'N/A'
-            solar_system_name = 'N/A'
-            victim_corp = 'N/A'
+        victim_corp_raw = await ctx.bot.esi_data.corporation_info(character_data['corporation_id'])
+        victim_corp = victim_corp_raw['name']
         zkill_stats = await self.zkill_stats(character_id)
         firetail_intel = await self.firetail_intel(character_id, character_name, zkill_stats)
         zkill_link = 'https://zkillboard.com/character/{}/'.format(character_id)
@@ -167,15 +168,15 @@ class CharLookup:
                     victim_id = data[0]['victim']['character_id']
                 except Exception:
                     victim_id = 0
-                if victim_id == character_id:
-                    return data[0]['victim'], data[0]['solar_system_id']
-                else:
-                    for attacker in data[0]['attackers']:
-                        try:
-                            if attacker['character_id'] == character_id:
-                                return attacker, data[0]['solar_system_id']
-                        except Exception:
-                            return None, None
+                try:
+                    if victim_id == character_id:
+                        return data[0]['victim'], data[0]['solar_system_id']
+                    else:
+                        for attacker in data[0]['attackers']:
+                                if attacker['character_id'] == character_id:
+                                    return attacker, data[0]['solar_system_id']
+                except Exception:
+                    return None, None
 
     async def zkill_stats(self, character_id):
         async with aiohttp.ClientSession() as session:
@@ -198,10 +199,11 @@ class CharLookup:
             for top_type in top_lists:
                 if top_type['type'] == 'solarSystem':
                     try:
-                        top_system = top_type['values'][0]['solarSystemName']
+                        top_system = 'The past week they have been most active in {}'.format(
+                            top_type['values'][0]['solarSystemName'])
                     except Exception:
-                        top_system = 'Unknown'
-            intel = '{}\n{} is most likely a {}. The past month they have been most active in {}. You have a {}%' \
+                        top_system = 'This player has not been active recently'
+            intel = '{}\n{} is most likely a {}. {}. You have a {}%' \
                     ' chance of encountering this player solo.'.format(special, character_name, character_type,
                                                                        top_system, solo)
             return intel
@@ -280,9 +282,9 @@ class CharLookup:
                 if cyno >= 5 and (threat <= 30 or threat == 0):
                     return 'Cyno Alt', special
                 if probes >= 5 and threat >= 51:
-                    return '**PVP Prober / Possible FC**', special
+                    return '**Combat Prober / Possible FC**', special
                 if probes >= 5 and (threat <= 50 or threat == 0):
-                    return 'PVE Site Prober', special
+                    return 'Exploration Pilot', special
                 if cyno >= 5 and threat >= 31:
                     return '**Possible Hot Dropper**', special
                 if threat <= 30 and lost_ship_type_id == 28352:

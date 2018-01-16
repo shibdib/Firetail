@@ -1,6 +1,7 @@
 from discord.ext import commands
 from firetail.lib import db
 from firetail.utils import make_embed
+from firetail.core import checks
 
 import aiohttp
 import asyncio
@@ -67,6 +68,7 @@ class SovTracker:
                 await asyncio.sleep(120)
 
     @commands.command(name='sov', aliases=["wand", "cancer"])
+    @checks.spam_check()
     async def _sov_tracker(self, ctx):
         """Sets the bot to track a sov fight
         `!sov system` to have the bot report every minute (if it's changed) the latest sov fight scores.
@@ -80,7 +82,7 @@ class SovTracker:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 return await dest.send('**ERROR:** To remove a system from tracking do `!sov remove system`')
             location = ctx.message.content.split(' ')[2]
-            await self.remove(ctx, location)
+            return await self.remove(ctx, location)
         system_data = await self.get_data(location)
         self.logger.info('SovTracker - {} requested information for {}'.format(ctx.author, location))
         if system_data is None:
@@ -109,13 +111,11 @@ class SovTracker:
                     await self.report_upcoming(ctx, system_data, fight_type, defender_name)
 
     async def get_data(self, location):
-        data = await self.bot.esi_data.esi_search(location, 'solar_system')
-        if data is not None and 'solar_system' in data:
-            system_id = data['solar_system'][0]
-            system_info = await self.bot.esi_data.system_info(system_id)
-            return system_info
-        else:
+        search = 'solar_system'
+        data = await self.bot.esi_data.esi_search(location, search)
+        if data is None or data is False:
             return None
+        return await self.bot.esi_data.system_info(data['solar_system'][0])
 
     async def report_current(self, system_data, fight_type, defender_name, defender_score, attacker_score, ctx=None,
                              channel_id=None, winning=None):
@@ -234,7 +234,10 @@ class SovTracker:
         embed.set_footer(icon_url=self.bot.user.avatar_url,
                          text="Provided Via firetail Bot")
         channel = self.bot.get_channel(channel_id)
-        await channel.send(embed=embed)
+        try:
+            await channel.send(embed=embed)
+        except:
+            return None
 
     async def remove(self, ctx, location):
         system_data = await self.get_data(location)
