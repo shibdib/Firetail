@@ -28,28 +28,23 @@ class JumpRange:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Do !help range for more info')
         search = 'solar_system'
-        system_id = await ctx.bot.esi_data.esi_search(system, search, 'false')
-        if 'solar_system' not in system_id:
+        system_id = await ctx.bot.esi_data.esi_search(system, search)
+        if system_id is None:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
-            self.logger.info('JumpRange ERROR - {} could not be found'.format(system))
-            return await dest.send('**ERROR:** No System Found With The Name {}'.format(system))
-        if len(system_id['solar_system']) > 1:
-            system_id = await ctx.bot.esi_data.esi_search(system, search)
-            if 'solar_system' not in system_id:
-                dest = ctx.author if ctx.bot.config.dm_only else ctx
-                self.logger.info('JumpRange ERROR - Multiple systems found matching {}'.format(system))
-                return await dest.send('**ERROR:** Multiple systems found matching {}, please be more specific'.
+            self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
+            return await dest.send('**ERROR:** No system found with the name {}'.format(system))
+        if system_id is False:
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
+            return await dest.send('**ERROR:** Multiple systems found matching {}, please be more specific'.
                                    format(system))
-            system_info = await self.bot.esi_data.system_info(system_id['solar_system'][0])
-            system_name = system_info['name']
-        else:
-            system_data = await self.bot.esi_data.system_info(system_id['solar_system'][0])
-            system_name = system_data['name']
+        system_info = await ctx.bot.esi_data.system_info(system_id['solar_system'][0])
+        system = system_info['name']
         try:
             jdc = ctx.message.content.split(' ')[3]
             if len(jdc) > 1:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
-                return await dest.send('**ERROR:** Improper JDC skill level')
+                return await dest.send('**ERROR:** Improper JDC skill level'.format(system))
         except Exception:
             jdc = 5
         item_id = await ctx.bot.esi_data.item_id(ship)
@@ -60,11 +55,11 @@ class JumpRange:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             self.logger.info('JumpRange ERROR - {} is not a Jump Capable Ship'.format(ship))
             return await dest.send('**ERROR:** No Jump Capable Ship Found With The Name {}'.format(ship))
-        url = 'http://evemaps.dotlan.net/range/{},{}/{}'.format(ship, jdc, system_name)
+        url = 'http://evemaps.dotlan.net/range/{},{}/{}'.format(ship, jdc, system)
         embed = make_embed(guild=ctx.guild)
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via Firetail Bot + Dotlan")
-        embed.add_field(name="Jump range for a {} from {} with JDC {}".format(ship, system_name, jdc), value=url)
+        embed.add_field(name="Jump range for a {} from {} with JDC {}".format(ship, system, jdc), value=url)
         dest = ctx.author if ctx.bot.config.dm_only else ctx
         await dest.send(embed=embed)
         if ctx.bot.config.delete_commands:

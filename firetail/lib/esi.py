@@ -18,15 +18,28 @@ class ESI:
                 data = json.loads(data)
                 return data
 
-    async def esi_search(self, item, category, strict='true'):
+    async def esi_search(self, item, category):
         async with aiohttp.ClientSession() as session:
             url = ('{}/search/?categories={}&datasource=tranquility'
-                   '&language=en-us&search={}&strict={}'
-                   '').format(ESI_URL, category, item, strict)
+                   '&language=en-us&search={}&strict=false'
+                   '').format(ESI_URL, category, item)
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
-                return data
+                if category in data:
+                    if len(data[category]) > 1:
+                        url = ('{}/search/?categories={}&datasource=tranquility'
+                               '&language=en-us&search={}&strict=true'
+                               '').format(ESI_URL, category, item)
+                        async with session.get(url) as strict:
+                            data = await strict.text()
+                            data = json.loads(data)
+                            if category not in data:
+                                return False
+                            return data
+                    else:
+                        return data
+                return None
 
     async def type_info_search(self, type_id):
         async with aiohttp.ClientSession() as session:

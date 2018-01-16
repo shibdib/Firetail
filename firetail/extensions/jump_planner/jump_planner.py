@@ -29,33 +29,24 @@ class JumpPlanner:
         skills = '555'
         jdc = '5'
         x = 0
-        url_route = []
         for system in systems:
             search = 'solar_system'
-            system_id = await ctx.bot.esi_data.esi_search(system, search, 'false')
-            if 'solar_system' not in system_id:
+            system_id = await ctx.bot.esi_data.esi_search(system, search)
+            if system_id is None:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
-                return await dest.send('**ERROR:** No System Found With The Name {}'.format(system))
-            if len(system_id['solar_system']) > 1:
-                system_id = await ctx.bot.esi_data.esi_search(system, search)
-                if 'solar_system' not in system_id:
-                    dest = ctx.author if ctx.bot.config.dm_only else ctx
-                    self.logger.info('JumpRange ERROR - Multiple systems found matching {}'.format(system))
-                    return await dest.send('**ERROR:** Multiple systems found matching {}, please be more specific'.
+                return await dest.send('**ERROR:** No system found with the name {}'.format(system))
+            if system_id is False:
+                dest = ctx.author if ctx.bot.config.dm_only else ctx
+                self.logger.info('JumpPlanner ERROR - {} could not be found'.format(system))
+                return await dest.send('**ERROR:** Multiple systems found matching {}, please be more specific'.
                                        format(system))
-                system_info = await self.bot.esi_data.system_info(system_id['solar_system'][0])
-                system_name = system_info['name']
-                url_route.append(system_name)
-            else:
-                system_info = await self.bot.esi_data.system_info(system_id['solar_system'][0])
-                system_name = system_info['name']
-                url_route.append(system_name)
+            system_info = await ctx.bot.esi_data.system_info(system_id['solar_system'][0])
             if system_info['security_status'] >= 0.5 and x != 0:
                 dest = ctx.author if ctx.bot.config.dm_only else ctx
                 self.logger.info('JumpPlanner ERROR - {} is a high security system'.format(system))
                 return await dest.send('**ERROR:** {} is a high security system, you can only jump out of high'
-                                       ' security systems.'.format(system_name))
+                                       ' security systems.'.format(system))
             x = x + 1
         try:
             variables = ctx.message.content.split(' ')[2]
@@ -79,9 +70,8 @@ class JumpPlanner:
         except Exception:
             ship = 'Aeon'
             skills = '555'
-        url_route = ':'.join(url_route)
-        url = 'http://evemaps.dotlan.net/jump/{},{}/{}'.format(ship, skills, url_route)
-        clean_route = url_route.replace(':', ' to ')
+        url = 'http://evemaps.dotlan.net/jump/{},{}/{}'.format(ship, skills, route)
+        clean_route = route.replace(':', ' to ')
         embed = make_embed(guild=ctx.guild)
         embed.set_footer(icon_url=ctx.bot.user.avatar_url,
                          text="Provided Via Firetail Bot + Dotlan")

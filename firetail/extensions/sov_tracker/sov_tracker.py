@@ -109,13 +109,11 @@ class SovTracker:
                     await self.report_upcoming(ctx, system_data, fight_type, defender_name)
 
     async def get_data(self, location):
-        data = await self.bot.esi_data.esi_search(location, 'solar_system')
-        if data is not None and 'solar_system' in data:
-            system_id = data['solar_system'][0]
-            system_info = await self.bot.esi_data.system_info(system_id)
-            return system_info
-        else:
+        search = 'solar_system'
+        data = await self.bot.esi_data.esi_search(location, search)
+        if data is None or data is False:
             return None
+        return await self.bot.esi_data.system_info(data['solar_system'][0])
 
     async def report_current(self, system_data, fight_type, defender_name, defender_score, attacker_score, ctx=None,
                              channel_id=None, winning=None):

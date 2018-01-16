@@ -37,21 +37,21 @@ class LocationScout:
 
     async def get_data(self, location):
         data = await self.bot.esi_data.esi_search(location, 'solar_system')
-        if data is not None and 'solar_system' in data:
+        if data is not None and data is not False and 'solar_system' in data:
             location_type = 'system'
             system_id = data['solar_system'][0]
             system_info = await self.bot.esi_data.system_info(system_id)
             return system_info, location_type
         else:
             data = await self.bot.esi_data.esi_search(location, 'region')
-            if data is not None and 'region' in data:
+            if data is not None and data is not False and 'region' in data:
                 location_type = 'region'
                 region_id = data['region'][0]
                 region_info = await self.bot.esi_data.region_info(region_id)
                 return region_info, location_type
             else:
                 data = await self.bot.esi_data.esi_search(location, 'constellation')
-                if data is not None and 'constellation' in data:
+                if data is not None and data is not False and 'constellation' in data:
                     location_type = 'constellation'
                     constellation_id = data['constellation'][0]
                     constellation_info = await self.bot.esi_data.constellation_info(constellation_id)

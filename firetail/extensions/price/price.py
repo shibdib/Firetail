@@ -31,10 +31,10 @@ class Price:
             lookup = ctx.message.content.split()[0][len(config.bot_prefix):].lower()
             system = self.hub_id[lookup]
         data = await ctx.bot.esi_data.market_data(item, system)
-        self.logger.info('Price - ' + str(ctx.author) + ' requested price information for a ' + str(item))
+        self.logger.info('Price - {} requested price information for a {}'.format(ctx.author, item))
         if data == 0:
-            self.logger.info('Price - ' + str(item) + ' could not be found')
-            msg = item + " was not found, are you sure it's an item?"
+            self.logger.info('Price - {} could not be found'.format(item))
+            msg = "{} was not found, are you sure it's an item?".format(item)
             if config.dm_only:
                 await ctx.author.send(msg)
             else:
@@ -50,14 +50,14 @@ class Price:
             sellmin = '{0:,.2f}'.format(float(data['sell']['min']))
             sellavg = '{0:,.2f}'.format(float(data['sell']['weightedAverage']))
             em = make_embed(msg_type='info', title=item.title(),
-                            title_url="https://market.fuzzwork.co.uk/type/" + str(typeid) + "/",
+                            title_url="https://market.fuzzwork.co.uk/type/{}/".format(typeid),
                             content="Price information from " + lookup.title())
             em.set_footer(icon_url=ctx.bot.user.avatar_url,
                           text="Provided Via firetail Bot + Fuzzwork Market")
-            em.set_thumbnail(url="https://image.eveonline.com/Type/" + str(typeid) + "_64.png")
-            em.add_field(name="Buy", value="Low: " + buymin + " \nAvg: " + buyavg + " \nHigh: " + buymax + " \n ",
+            em.set_thumbnail(url="https://image.eveonline.com/Type/{}_64.png".format(typeid))
+            em.add_field(name="Buy", value="Low: {}\nAvg: {}\nHigh: {}".format(buymin, buyavg, buymax),
                          inline=True)
-            em.add_field(name="Sell", value="Low: " + sellmin + " \nAvg: " + sellavg + " \nHigh: " + sellmax + " \n ",
+            em.add_field(name="Sell", value="Low: {}\nAvg: {}\nHigh: {}".format(sellmin, sellavg, sellmax),
                          inline=True)
             if config.dm_only:
                 await ctx.author.send(embed=em)
