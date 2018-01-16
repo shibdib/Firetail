@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from firetail.utils import make_embed
+from firetail.core import checks
 
 
 class EveStatus:
@@ -12,8 +13,11 @@ class EveStatus:
         self.logger = bot.logger
 
     @commands.command(name='status', aliases=["tq", "eve"])
+    @checks.spam_check()
     async def _time(self, ctx):
         """Shows the current status of TQ."""
+        # Spam Check
+
         self.logger.info('EveStatus - {} requested server info.'.format(str(ctx.message.author)))
         data = await ctx.bot.esi_data.server_info()
         try:

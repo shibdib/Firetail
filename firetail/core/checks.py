@@ -1,4 +1,5 @@
 import discord
+import time
 from discord.ext import commands
 
 
@@ -20,6 +21,29 @@ async def check_is_mod(ctx):
     return ctx.channel.permissions_for(ctx.author).manage_messages
 
 
+async def check_spam(ctx):
+    spam_list = ctx.bot.bot_users
+    spam_list_length = len(spam_list)
+    if spam_list_length >= 15:
+        if ctx.bot.last_command is not None:
+            iterations = (time.time() - ctx.bot.last_command)/10
+            if iterations > spam_list_length:
+                iterations = spam_list_length - 1
+            x = 0
+            while x < iterations:
+                spam_list.pop(0)
+                x += 1
+    ctx.bot.last_command = time.time()
+    spam_list.append(ctx.author.id)
+    if spam_list_length >= 10 and spam_list.count(ctx.author.id) > 0.40*spam_list_length:
+        if ctx.channel.permissions_for(ctx.bot).manage_messages:
+            await ctx.message.delete()
+            return False
+        return False
+    return True
+
+
+
 def is_owner():
     return commands.check(check_is_owner)
 
@@ -34,6 +58,10 @@ def is_admin():
 
 def is_mod():
     return commands.check(check_is_mod)
+
+
+def spam_check():
+    return commands.check(check_spam)
 
 
 async def check_permissions(ctx, perms):

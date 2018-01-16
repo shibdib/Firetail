@@ -1,5 +1,6 @@
 from discord.ext import commands
 from firetail.utils import make_embed
+from firetail.core import checks
 
 
 class Price:
@@ -17,6 +18,7 @@ class Price:
               'hek': 60005686}
 
     @commands.command(name='price', aliases=["jita", "amarr", "dodixie", "rens", "hek", ])
+    @checks.spam_check()
     async def _price(self, ctx):
         """Gets you price information from the top trade hubs.
         Use **!price item** or **!amarr item** (Works for Jita, Amarr, Dodixie, Rens, Hek)"""

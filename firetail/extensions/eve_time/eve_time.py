@@ -3,6 +3,7 @@ import pytz
 from datetime import datetime
 
 from firetail.utils import make_embed
+from firetail.core import checks
 
 
 class EveTime:
@@ -23,6 +24,7 @@ class EveTime:
     }
 
     @commands.command(name='time')
+    @checks.spam_check()
     async def _time(self, ctx):
         """Shows the time in a range of timezones."""
         self.logger.info('EveTime - {} requested time info.'.format(str(ctx.message.author)))

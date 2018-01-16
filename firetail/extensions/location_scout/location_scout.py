@@ -1,5 +1,6 @@
 from discord.ext import commands
 from firetail.utils import make_embed
+from firetail.core import checks
 
 import aiohttp
 import json
@@ -15,6 +16,7 @@ class LocationScout:
         self.logger = bot.logger
 
     @commands.command(name='scout', aliases=["recon", "system", "wormhole"])
+    @checks.spam_check()
     async def _scout(self, ctx):
         """Gets you location info
         Supports systems/wormholes/constellations/regions.

@@ -1,6 +1,7 @@
 from discord.ext import commands
 from firetail.lib import db
 from firetail.utils import make_embed
+from firetail.core import checks
 
 import aiohttp
 import asyncio
@@ -67,6 +68,7 @@ class SovTracker:
                 await asyncio.sleep(120)
 
     @commands.command(name='sov', aliases=["wand", "cancer"])
+    @checks.spam_check()
     async def _sov_tracker(self, ctx):
         """Sets the bot to track a sov fight
         `!sov system` to have the bot report every minute (if it's changed) the latest sov fight scores.

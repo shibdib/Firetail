@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from firetail.utils import make_embed
+from firetail.core import checks
 
 
 class JumpPlanner:
@@ -12,6 +13,7 @@ class JumpPlanner:
         self.logger = bot.logger
 
     @commands.command(name='jump')
+    @checks.spam_check()
     async def _jump(self, ctx):
         """Provides a Jump route.
         '!jump system:system' Gives you the JDC 5 Carrier/Super/Fax route by default.

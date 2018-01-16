@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 from firetail.utils import make_embed
+from firetail.core import checks
 
 
 class JumpRange:
@@ -12,6 +13,7 @@ class JumpRange:
         self.logger = bot.logger
 
     @commands.command(name='range')
+    @checks.spam_check()
     async def _range(self, ctx):
         """Provides Jump Range.
         '!range system SHIP' Gives you the JDC/JF 5 range for a ship by default.
