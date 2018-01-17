@@ -26,10 +26,11 @@ setup(
     packages=find_packages(),
 
     install_requires=[
-        'discord.py',
+        'discord.py[voice]',
         'python-dateutil>=2.6',
         'asyncpg>=0.13',
-        'pytz'
+        'pytz',
+        'youtube_dl'
     ],
 
     dependency_links=[
