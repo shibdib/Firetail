@@ -24,7 +24,8 @@ class CharLookup:
             return await dest.send('**ERROR:** Use **!help char** for more info.')
         character_name = ctx.message.content.split(' ', 1)[1]
         if '@' in character_name:
-            character_name = character_name.replace('@', '')[:-5]
+            member = ctx.guild.get_member(int(character_name.replace('<@', '').replace('>', '').replace('!', '')))
+            character_name = member.display_name
         self.logger.info(
             'CharLookup - {} requested character info for the user {}'.format(str(ctx.message.author), character_name))
         character_id = await ctx.bot.esi_data.esi_search(character_name, 'character')
