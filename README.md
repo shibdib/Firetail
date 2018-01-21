@@ -1,14 +1,12 @@
 # Firetail
-[![BCH compliance](https://bettercodehub.com/edge/badge/shibdib/Firetail?branch=master)](https://bettercodehub.com/)
 
 An EVE Online Discord Bot (Continuation of Dramiel)
 
 
-This is still in the early planning stages. Aiming for a Christmas release of something stable.
+[Invite the public bot today!](https://discordapp.com/oauth2/authorize?client_id=389952638327717928&scope=bot&permissions=0)
 
 
-
-https://discord.gg/ZWmzTP3 To discuss.
+[To discuss.](https://discord.gg/ZWmzTP3)
 
 
 # Ideas
