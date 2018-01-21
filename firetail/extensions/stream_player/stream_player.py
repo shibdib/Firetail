@@ -62,6 +62,7 @@ class StreamPlayer:
         self.config = bot.config
         self.logger = bot.logger
         self.skip_votes = set()
+        self.skipped_user = set()
         self.current_provider = set()
         self.voice = None
 
@@ -69,12 +70,14 @@ class StreamPlayer:
     async def yt(self, ctx, *, url):
         """Streams from a URL
         `!yt https://www.youtube.com/watch?v=RubBzkZzpUA` to stream audio
-        If a song is already playing it gets added to a queue.
         `!skip` Votes to skip a song, requires 3 votes.
         `!pause` Pauses the current song.
         `!play` Resumes the current paused song.
         `!stop` to stop the current song and remove the bot from the voice channel.
         `!volume 0-100` to set the volume percentage."""
+
+        if ctx.author.id in self.skipped_user:
+            return await dest.send('You just got skipped, let someone else pick something')
 
         if ctx.author.voice:
             if ctx.voice_client is None:
@@ -97,8 +100,10 @@ class StreamPlayer:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             self.voice = ctx.voice_client
             await dest.send(embed=embed)
-            await ctx.message.delete()
+            if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+                await ctx.message.delete()
             self.current_provider.clear()
+            self.skipped_user.clear()
             self.skip_votes.clear()
             self.current_provider.add(ctx.author.id)
         else:
@@ -113,26 +118,39 @@ class StreamPlayer:
 
         ctx.voice_client.source.volume = volume
         await ctx.author.send("Changed volume to {}%".format(volume))
-        await ctx.message.delete()
+        if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.message.delete()
 
     @commands.command()
     async def stop(self, ctx):
         """Stops and disconnects the bot from voice"""
-        if ctx.author.id != self.current_provider:
+        if ctx.author.id not in self.current_provider:
             return await ctx.send("ERROR: Only the person who requested the song can stop it. Try `!skip` instead.")
 
         self.current_provider.clear()
         self.skip_votes.clear()
 
         await ctx.voice_client.disconnect()
-        await ctx.message.delete()
+        if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.message.delete()
 
     @commands.command()
     async def pause(self, ctx):
         """Pauses the current song"""
+        if ctx.author.id not in self.current_provider:
+            return await ctx.send("ERROR: Only the person who requested the song can stop it. Try `!skip` instead.")
 
-        await ctx.voice_client.pause()
-        await ctx.message.delete()
+        ctx.voice_client.pause()
+        if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.message.delete()
+
+    @commands.command()
+    async def play(self, ctx):
+        """Continues the current song"""
+
+        ctx.voice_client.play()
+        if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+            await ctx.message.delete()
 
     @commands.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
@@ -151,6 +169,8 @@ class StreamPlayer:
                 await ctx.send('Skip vote passed, stopping song.. Add a new song using `!yt`')
                 self.skip_votes.clear()
                 ctx.voice_client.stop()
+                self.skipped_user.clear()
+                self.skipped_user.add(self.current_provider)
                 self.current_provider.clear()
                 self.current_provider.add(ctx.author.id)
             else:
