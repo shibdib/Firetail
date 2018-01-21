@@ -94,7 +94,7 @@ class ESI:
     async def get_jump_info(self, system_id):
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    'https://esi.tech.ccp.is/latest/universe/system_jumps/?datasource=tranquility') as resp:
+                    '{}/universe/system_jumps/'.format(ESI_URL)) as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 ship_jumps = 0
@@ -105,7 +105,7 @@ class ESI:
 
     async def get_incursion_info(self):
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://esi.tech.ccp.is/latest/incursions/?datasource=tranquility') as resp:
+            async with session.get('{}/incursions/'.format(ESI_URL)) as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 return data
@@ -183,7 +183,7 @@ class ESI:
     async def get_active_sov_battles(self):
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    'https://esi.tech.ccp.is/latest/sovereignty/campaigns/?datasource=tranquility') as resp:
+                    '{}/sovereignty/campaigns/?datasource=tranquility'.format(ESI_URL)) as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 return data
