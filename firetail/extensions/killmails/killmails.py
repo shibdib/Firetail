@@ -108,10 +108,14 @@ class Killmails:
                     final_blow_zkill = "https://zkillboard.com/character/{}/".format(final_blow_id)
                 except Exception:
                     final_blow_name = None
-                final_blow_ship_id = attacker['ship_type_id']
-                final_blow_ship_raw = await self.bot.esi_data.type_info_search(final_blow_ship_id)
-                final_blow_ship_zkill = "https://zkillboard.com/ship/{}/".format(final_blow_ship_id)
-                final_blow_ship = final_blow_ship_raw['name']
+                try:
+                    final_blow_ship_id = attacker['ship_type_id']
+                    final_blow_ship_raw = await self.bot.esi_data.type_info_search(final_blow_ship_id)
+                    final_blow_ship_zkill = "https://zkillboard.com/ship/{}/".format(final_blow_ship_id)
+                    final_blow_ship = final_blow_ship_raw['name']
+                except Exception:
+                    final_blow_ship = 'UNK'
+                    final_blow_ship_zkill = "https://zkillboard.com/ship/1/"
                 final_blow_corp_id = attacker['corporation_id']
                 final_blow_corp_raw = await self.bot.esi_data.corporation_info(final_blow_corp_id)
                 final_blow_corp = final_blow_corp_raw['name']
