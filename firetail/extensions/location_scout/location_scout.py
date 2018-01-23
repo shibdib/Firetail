@@ -185,7 +185,7 @@ class LocationScout:
             system_kills = []
             for system in systems:
                 ship_kills, npc_kills, pod_kills = await self.get_kill_info(system)
-                ship_jumps = await self.bot.esi_data.get_jump_info(data['system_id'])
+                ship_jumps = await self.bot.esi_data.get_jump_info(system)
                 system_name = await self.bot.esi_data.system_name(system)
                 system_kills.append({'system': system_name, "npc_kills": npc_kills, "ship_kills": ship_kills,
                                      "ship_jumps": ship_jumps})
