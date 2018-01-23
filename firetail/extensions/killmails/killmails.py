@@ -24,7 +24,7 @@ class Killmails:
                     await asyncio.sleep(15)
                 await asyncio.sleep(1)
             except Exception:
-                self.logger.info('ERROR:', exc_info=True)
+                self.logger.exception('ERROR:')
                 await asyncio.sleep(5)
 
     async def process_data(self, kill_data):
@@ -236,15 +236,15 @@ class Killmails:
             channel = bot.get_channel(int(channel_id))
             channel_name = channel.name
         except Exception:
-            self.logger.info('Killmail - Bad Channel Attempted {} removing'.format(channel_id))
+            self.logger.exception('Killmail - Bad Channel Attempted {} removing'.format(channel_id))
             return await self.remove_bad_channel(channel_id)
         self.logger.info(('Killmail - Kill # {} has been posted to {}'
                           '').format(kill_id, channel_name))
         try:
             return await channel.send(embed=em)
         except Exception:
-            return self.logger.info(
-                'Killmail - Message failed to send to channel {} due to {}'.format(channel_id, Exception))
+            return self.logger.exception(
+                'Killmail - Killmail ID {} failed to send to channel {} due to..'.format(kill_id, channel_id))
 
     async def request_data(self):
         base_url = "https://redisq.zkillboard.com"
