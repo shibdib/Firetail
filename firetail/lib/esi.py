@@ -110,6 +110,14 @@ class ESI:
                 data = json.loads(data)
                 return data
 
+    async def get_active_sov_battles(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                    '{}/sovereignty/campaigns/?datasource=tranquility'.format(ESI_URL)) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data
+
     # Character Stuff
 
     async def character_info(self, character_id):
@@ -167,23 +175,15 @@ class ESI:
                 data = json.loads(data)
                 return data
 
-    async def market_data(self, item_name, station):
+    async def market_data(self, item_name, location):
         itemid = await self.item_id(item_name)
         if itemid == 0:
             return itemid
         else:
             async with aiohttp.ClientSession() as session:
                 baseurl = 'https://market.fuzzwork.co.uk/aggregates'
-                url = '{}/?station={}&types={}'.format(baseurl, station, itemid)
+                url = '{}/?{}&types={}'.format(baseurl, location, itemid)
                 async with session.get(url) as resp:
                     data = await resp.text()
                 data = json.loads(data)
                 return data[str(itemid)]
-
-    async def get_active_sov_battles(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                    '{}/sovereignty/campaigns/?datasource=tranquility'.format(ESI_URL)) as resp:
-                data = await resp.text()
-                data = json.loads(data)
-                return data
