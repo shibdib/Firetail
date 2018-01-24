@@ -27,30 +27,12 @@ class Price:
             return await dest.send('**ERROR:** Use **!help price** for more info.')
         config = self.config
         item = ctx.message.content.split(' ', 1)[1]
-        location = 'station=60003760'
+        system = 60003760
         lookup = 'Jita'
         if ctx.message.content.split()[0][len(config.bot_prefix):].lower() != 'price':
-            location = None
             lookup = ctx.message.content.split()[0][len(config.bot_prefix):].lower()
-            if lookup in self.hub_id:
-                location = 'station={}'.format(self.hub_id[lookup])
-            else:
-                if lookup == 'the':
-                    lookup = 'the {}'.format(ctx.message.content.split(' ', 1))
-                    item = ctx.message.content.split(' ', 2)[2]
-                data = await self.bot.esi_data.esi_search(lookup, 'region')
-                if data is not None and data is not False and 'region' in data:
-                    location = 'region={}'.format(data['region'][0])
-            if location is None:
-                msg = "{} was not found, this command only accepts regions and trade hubs".format(lookup)
-                if config.dm_only:
-                    await ctx.author.send(msg)
-                else:
-                    await ctx.channel.send(msg)
-                if config.delete_commands:
-                    await ctx.message.delete()
-                return
-        data = await ctx.bot.esi_data.market_data(item, location)
+            system = self.hub_id[lookup]
+        data = await ctx.bot.esi_data.market_data(item, system)
         self.logger.info('Price - {} requested price information for a {}'.format(ctx.author, item))
         if data == 0:
             self.logger.info('Price - {} could not be found'.format(item))
@@ -61,7 +43,6 @@ class Price:
                 await ctx.channel.send(msg)
             if config.delete_commands:
                 await ctx.message.delete()
-            return
         else:
             typeid = await ctx.bot.esi_data.item_id(item)
             buymax = '{0:,.2f}'.format(float(data['buy']['max']))
