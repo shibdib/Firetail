@@ -1,8 +1,10 @@
 import datetime
 import logging
 import traceback
+import aiohttp
 
 from discord.ext import commands
+from firetail import config
 
 import firetail
 
@@ -36,6 +38,15 @@ def init_events(bot, launcher=None):
             print("I'm not in any server yet, so be sure to invite me!")
         if bot.invite_url:
             print("\nInvite URL: {}\n".format(bot.invite_url))
+        try:
+            db_token = config.db_token
+            url = "https://discordbots.org/api/bots/" + bot.user.id + "/stats"
+            headers = {"Authorization": db_token}
+            payload = {"server_count": len(bot.servers)}
+            async with aiohttp.ClientSession() as client:
+                await client.post(url, data=payload, headers=headers)
+        except:
+            return
 
     @bot.event
     async def on_command_error(ctx, error):
@@ -102,10 +113,28 @@ def init_events(bot, launcher=None):
     @bot.event
     async def on_guild_join(guild):
         log.info("Connected to a new guild. Guild ID/Name: {}/{}".format(str(guild.id), guild.name))
+        try:
+            db_token = config.db_token
+            url = "https://discordbots.org/api/bots/" + bot.user.id + "/stats"
+            headers = {"Authorization": db_token}
+            payload = {"server_count": len(bot.servers)}
+            async with aiohttp.ClientSession() as client:
+                await client.post(url, data=payload, headers=headers)
+        except:
+            return
 
     @bot.event
     async def on_guild_remove(guild):
         log.info("Leaving guild. Guild ID/Name: {}/{}".format(str(guild.id), guild.name))
+        try:
+            db_token = config.db_token
+            url = "https://discordbots.org/api/bots/" + bot.user.id + "/stats"
+            headers = {"Authorization": db_token}
+            payload = {"server_count": len(bot.servers)}
+            async with aiohttp.ClientSession() as client:
+                await client.post(url, data=payload, headers=headers)
+        except:
+            return
 
     @bot.event
     async def on_member_ban(guild, user):

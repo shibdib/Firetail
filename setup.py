@@ -30,7 +30,8 @@ setup(
         'python-dateutil>=2.6',
         'asyncpg>=0.13',
         'pytz',
-        'youtube_dl'
+        'youtube_dl',
+        'aiohttp'
     ],
 
     dependency_links=[
