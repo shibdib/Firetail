@@ -1,6 +1,5 @@
 # Firetail
-[![Discord Bots](https://discordbots.org/api/widget/servers/389952638327717928.svg)](https://discordbots.org/bot/389952638327717928)[![Discord Bots](https://discordbots.org/api/widget/status/389952638327717928.svg)](https://discordbots.org/bot/389952638327717928)[![Discord Bots](https://discordbots.org/api/widget/upvotes/389952638327717928.svg)](https://discordbots.org/bot/389952638327717928)[![Discord Bots](https://discordbots.org/api/widget/owner/389952638327717928.svg)](https://discordbots.org/bot/389952638327717928)
-
+[![Discord Bots](https://discordbots.org/api/widget/389952638327717928.svg)](https://discordbots.org/bot/389952638327717928)
 
 An EVE Online Discord Bot (Continuation of Dramiel)
 
