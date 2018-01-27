@@ -48,18 +48,22 @@ class Price:
             buymax = '{0:,.2f}'.format(float(data['buy']['max']))
             buymin = '{0:,.2f}'.format(float(data['buy']['min']))
             buyavg = '{0:,.2f}'.format(float(data['buy']['weightedAverage']))
+            buy_volume = '{0:,.0f}'.format(float(data['buy']['volume']))
+            buy_orders = '{0:,.0f}'.format(float(data['buy']['orderCount']))
             sellmax = '{0:,.2f}'.format(float(data['sell']['max']))
             sellmin = '{0:,.2f}'.format(float(data['sell']['min']))
             sellavg = '{0:,.2f}'.format(float(data['sell']['weightedAverage']))
+            sell_volume = '{0:,.0f}'.format(float(data['sell']['volume']))
+            sell_orders = '{0:,.0f}'.format(float(data['sell']['orderCount']))
             em = make_embed(msg_type='info', title=item.title(),
                             title_url="https://market.fuzzwork.co.uk/type/{}/".format(typeid),
                             content="Price information from " + lookup.title())
             em.set_footer(icon_url=ctx.bot.user.avatar_url,
                           text="Provided Via firetail Bot + Fuzzwork Market")
             em.set_thumbnail(url="https://image.eveonline.com/Type/{}_64.png".format(typeid))
-            em.add_field(name="Buy", value="Low: {}\nAvg: {}\nHigh: {}".format(buymin, buyavg, buymax),
+            em.add_field(name="Buy", value="Low: {}\nAvg: {}\nHigh: {}\nNumber of Orders: {}\nVolume: {}".format(buymin, buyavg, buymax, buy_orders, buy_volume),
                          inline=True)
-            em.add_field(name="Sell", value="Low: {}\nAvg: {}\nHigh: {}".format(sellmin, sellavg, sellmax),
+            em.add_field(name="Sell", value="Low: {}\nAvg: {}\nHigh: {}\nNumber of Orders: {}\nVolume: {}".format(sellmin, sellavg, sellmax, sell_orders, sell_volume),
                          inline=True)
             if config.dm_only:
                 await ctx.author.send(embed=em)

@@ -110,6 +110,14 @@ class ESI:
                 data = json.loads(data)
                 return data
 
+    async def get_active_sov_battles(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                    '{}/sovereignty/campaigns/?datasource=tranquility'.format(ESI_URL)) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data
+
     # Character Stuff
 
     async def character_info(self, character_id):
@@ -179,11 +187,3 @@ class ESI:
                     data = await resp.text()
                 data = json.loads(data)
                 return data[str(itemid)]
-
-    async def get_active_sov_battles(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                    '{}/sovereignty/campaigns/?datasource=tranquility'.format(ESI_URL)) as resp:
-                data = await resp.text()
-                data = json.loads(data)
-                return data
