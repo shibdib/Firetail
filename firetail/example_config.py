@@ -7,7 +7,7 @@ bot_master = 174764205927432192
 bot_coowners = [114428861990699012]
 
 # minimum required permissions for bot
-# bot_permissions = 268822608
+bot_permissions = 1571904
 
 # 'killmails' - Killmail posting extension
 # 'eveTime' - Get the time in eve and around the world
