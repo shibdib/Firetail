@@ -38,15 +38,15 @@ def init_events(bot, launcher=None):
             print("I'm not in any server yet, so be sure to invite me!")
         if bot.invite_url:
             print("\nInvite URL: {}\n".format(bot.invite_url))
-        try:
-            db_token = config.db_token
-            url = "https://discordbots.org/api/bots/" + bot.user.id + "/stats"
-            headers = {"Authorization": db_token}
-            payload = {"server_count": len(bot.servers)}
-            async with aiohttp.ClientSession() as client:
-                await client.post(url, data=payload, headers=headers)
-        except:
-            return
+            try:
+                db_token = config.db_token
+                url = "https://discordbots.org/api/bots/{}/stats".format(bot.user.id)
+                headers = {"Authorization": db_token}
+                payload = {"server_count": len(bot.guilds)}
+                async with aiohttp.ClientSession() as client:
+                    await client.post(url, data=payload, headers=headers)
+            except:
+                return
 
     @bot.event
     async def on_command_error(ctx, error):
@@ -115,9 +115,9 @@ def init_events(bot, launcher=None):
         log.info("Connected to a new guild. Guild ID/Name: {}/{}".format(str(guild.id), guild.name))
         try:
             db_token = config.db_token
-            url = "https://discordbots.org/api/bots/" + bot.user.id + "/stats"
+            url = "https://discordbots.org/api/bots/{}/stats".format(bot.user.id)
             headers = {"Authorization": db_token}
-            payload = {"server_count": len(bot.servers)}
+            payload = {"server_count": len(bot.guilds)}
             async with aiohttp.ClientSession() as client:
                 await client.post(url, data=payload, headers=headers)
         except:
@@ -128,9 +128,9 @@ def init_events(bot, launcher=None):
         log.info("Leaving guild. Guild ID/Name: {}/{}".format(str(guild.id), guild.name))
         try:
             db_token = config.db_token
-            url = "https://discordbots.org/api/bots/" + bot.user.id + "/stats"
+            url = "https://discordbots.org/api/bots/{}/stats".format(bot.user.id)
             headers = {"Authorization": db_token}
-            payload = {"server_count": len(bot.servers)}
+            payload = {"server_count": len(bot.guilds)}
             async with aiohttp.ClientSession() as client:
                 await client.post(url, data=payload, headers=headers)
         except:
