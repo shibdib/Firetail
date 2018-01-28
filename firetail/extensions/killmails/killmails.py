@@ -238,8 +238,8 @@ class Killmails:
         except Exception:
             self.logger.exception('Killmail - Bad Channel Attempted {} removing'.format(channel_id))
             return await self.remove_bad_channel(channel_id)
-        self.logger.info(('Killmail - Kill # {} has been posted to {}'
-                          '').format(kill_id, channel_name))
+        # self.logger.info(('Killmail - Kill # {} has been posted to {}'
+        #                  '').format(kill_id, channel_name))
         try:
             return await channel.send(embed=em)
         except Exception:
