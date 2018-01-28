@@ -86,18 +86,19 @@ class LocationScout:
             if security_status < 0.1:
                 sov_corp, sov_alliance, sov_alliance_id = await self.get_sov_info(data['system_id'])
                 for fights in sov_battles:
-                    if fights['constellation_id'] == constellation_id and fights['defender_score'] != 0.6:
-                        active_sov = True
-                        target_system_id = fights['solar_system_id']
-                        target_system_info = await self.bot.esi_data.system_info(target_system_id)
-                        target_system_name = target_system_info['name']
-                        fight_type_raw = fights['event_type']
-                        fight_type = fight_type_raw.replace('_', ' ').title()
-                        defender_id = fights['defender_id']
-                        defender_name = await self.group_name(defender_id)
-                        defender_score = fights['defender_score']
-                        attacker_score = fights['attackers_score']
-                        break
+                    if fights['solar_system_id'] == data['system_id']:
+                        if 'defender_score' in fights:
+                            active_sov = True
+                            target_system_id = fights['solar_system_id']
+                            target_system_info = await self.bot.esi_data.system_info(target_system_id)
+                            target_system_name = target_system_info['name']
+                            fight_type_raw = fights['event_type']
+                            fight_type = fight_type_raw.replace('_', ' ').title()
+                            defender_id = fights['defender_id']
+                            defender_name = await self.group_name(defender_id)
+                            defender_score = fights['defender_score']
+                            attacker_score = fights['attackers_score']
+                            break
             ship_jumps = await self.bot.esi_data.get_jump_info(data['system_id'])
             logo_link = 'https://imageserver.eveonline.com/Alliance/{}_64.png'.format(sov_alliance_id)
             zkill_link = "https://zkillboard.com/system/{}".format(data['system_id'])
