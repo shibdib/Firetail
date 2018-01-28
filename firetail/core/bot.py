@@ -29,6 +29,7 @@ class Firetail(commands.Bot):
         self.co_owners = config.bot_coowners
         self.preload_ext = config.preload_extensions
         kwargs["command_prefix"] = "!"
+        kwargs["pm_help"] = True
         # kwargs["command_prefix"] = self.db.prefix_manager
         kwargs["owner_id"] = self.owner
         super().__init__(**kwargs)
