@@ -27,28 +27,55 @@ class GroupLookup:
         group_name = ctx.message.content.split(' ', 1)[1]
         self.logger.info('GroupLookup - {} requested group info for the group {}'.format(str(ctx.message.author),
                                                                                          group_name))
-        try:
-            group = 'corporation'
-            group_id = await ctx.bot.esi_data.esi_search(group_name, group)
-            if len(group_id['corporation']) > 1:
-                for corporation_id in group_id['corporation']:
+        corp_data = None
+        alliance_data = None
+        corp_id = None
+        alliance_id = None
+        corp = 'corporation'
+        corp_ids = await ctx.bot.esi_data.esi_search(group_name, corp)
+        if corp_ids is not None and 'corporation' in corp_ids:
+            if len(corp_ids['corporation']) > 1:
+                for corporation_id in corp_ids['corporation']:
                     group_data = await ctx.bot.esi_data.corporation_info(corporation_id)
                     if group_data['name'].lower().strip() == group_name.lower().strip():
-                        group_id = corporation_id
-                        group_data = await ctx.bot.esi_data.corporation_info(group_id)
+                        corp_id = corporation_id
+                        corp_data = await ctx.bot.esi_data.corporation_info(corp_id)
                         break
+            elif len(corp_ids['corporation']) == 1:
+                corp_id = corp_ids['corporation'][0]
+                corp_data = await ctx.bot.esi_data.corporation_info(corp_id)
+        alliance = 'alliance'
+        alliance_ids = await ctx.bot.esi_data.esi_search(group_name, alliance)
+        if alliance_ids is not None and 'alliance' in alliance_ids:
+            if len(alliance_ids['alliance']) > 1:
+                for ally_id in alliance_ids['alliance']:
+                    group_data = await ctx.bot.esi_data.alliance_info(ally_id)
+                    if group_data['name'].lower().strip() == group_name.lower().strip():
+                        alliance_id = ally_id
+                        alliance_data = await ctx.bot.esi_data.alliance_info(alliance_id)
+                        break
+            elif len(alliance_ids['alliance']) == 1:
+                alliance_id = alliance_ids['alliance'][0]
+                alliance_data = await ctx.bot.esi_data.alliance_info(alliance_id)
+        # Check if a corp and alliance were both found
+        if corp_data is not None and alliance_data is not None:
+            if corp_data['name'].lower().strip() == group_name.lower().strip():
+                alliance_data = None
+            elif alliance_data['name'].lower().strip() == group_name.lower().strip():
+                corp_data = None
             else:
-                group_id = group_id['corporation'][0]
-                group_data = await ctx.bot.esi_data.corporation_info(group_id)
+                dest = ctx.author if ctx.bot.config.dm_only else ctx
+                self.logger.info('GroupLookup ERROR - {} could not be found'.format(group_name))
+                return await dest.send('**ERROR:** Multiple Groups Found With Names Similiar To {}'.format(group_name))
+        if corp_data is not None:
+            group = 'corporation'
+            group_id = corp_id
+            group_data = corp_data
             zkill_stats = await self.zkill_stats(group_id, 'corporationID')
             raw_corp_description = group_data['description']
             new_lines = re.sub('<br\s*?>', '\n', raw_corp_description)
             tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
             corp_description = tag_re.sub('', new_lines)
-            zkill_link = 'https://zkillboard.com/corporation/{}/'.format(group_id)
-            eve_who = 'https://evewho.com/corp/{}'.format(urllib.parse.quote(group_name))
-            dotlan = 'http://evemaps.dotlan.net/corporation/{}'.format(urllib.parse.quote(group_name))
-            logo = 'https://imageserver.eveonline.com/Corporation/{}_64.png'.format(group_id)
             try:
                 alliance_id = group_data['alliance_id']
                 alliance_info = await ctx.bot.esi_data.alliance_info(alliance_id)
@@ -56,29 +83,23 @@ class GroupLookup:
                 alliance = True
             except Exception:
                 alliance = False
-        except Exception:
-            try:
-                group = 'alliance'
-                group_id = await ctx.bot.esi_data.esi_search(group_name, group)
-                if len(group_id['alliance']) > 1:
-                    for ally_id in group_id['alliance']:
-                        group_data = await ctx.bot.esi_data.alliance_info(ally_id)
-                        if group_data['name'].lower().strip() == group_name.lower().strip():
-                            group_id = ally_id
-                            group_data = await ctx.bot.esi_data.alliance_info(group_id)
-                            break
-                else:
-                    group_id = group_id['alliance'][0]
-                    group_data = await ctx.bot.esi_data.alliance_info(group_id)
-                zkill_stats = await self.zkill_stats(group_id, 'allianceID')
-                zkill_link = 'https://zkillboard.com/alliance/{}/'.format(group_id)
-                eve_who = 'https://evewho.com/alli/{}'.format(urllib.parse.quote(group_name))
-                dotlan = 'http://evemaps.dotlan.net/alliance/{}'.format(urllib.parse.quote(group_name))
-                logo = 'https://imageserver.eveonline.com/Alliance/{}_64.png'.format(group_id)
-            except Exception:
-                dest = ctx.author if ctx.bot.config.dm_only else ctx
-                self.logger.info('GroupLookup ERROR - {} could not be found'.format(group_name))
-                return await dest.send('**ERROR:** No Group Found With The Name {}'.format(group_name))
+            zkill_link = 'https://zkillboard.com/corporation/{}/'.format(group_id)
+            eve_who = 'https://evewho.com/corp/{}'.format(urllib.parse.quote(group_name))
+            dotlan = 'http://evemaps.dotlan.net/corporation/{}'.format(urllib.parse.quote(group_name))
+            logo = 'https://imageserver.eveonline.com/Corporation/{}_64.png'.format(group_id)
+        elif alliance_data is not None:
+            group = 'alliance'
+            group_id = alliance_id
+            group_data = alliance_data
+            zkill_stats = await self.zkill_stats(group_id, 'allianceID')
+            zkill_link = 'https://zkillboard.com/alliance/{}/'.format(group_id)
+            eve_who = 'https://evewho.com/alli/{}'.format(urllib.parse.quote(group_name))
+            dotlan = 'http://evemaps.dotlan.net/alliance/{}'.format(urllib.parse.quote(group_name))
+            logo = 'https://imageserver.eveonline.com/Alliance/{}_64.png'.format(group_id)
+        else:
+            dest = ctx.author if ctx.bot.config.dm_only else ctx
+            self.logger.info('GroupLookup ERROR - {} could not be found'.format(group_name))
+            return await dest.send('**ERROR:** No Group Found With The Name {}'.format(group_name))
         if zkill_stats:
             total_kills = '{0:}'.format(zkill_stats['allTimeSum'])
             danger_ratio = zkill_stats['dangerRatio']
