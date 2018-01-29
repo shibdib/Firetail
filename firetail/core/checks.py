@@ -24,6 +24,8 @@ async def check_is_mod(ctx):
 async def check_spam(ctx):
     if '!help' in ctx.message.content:
         return True
+    if ctx.message.channel.recipient:
+        return True
     spam_list = ctx.bot.bot_users
     spam_list_length = len(spam_list)
     spam_list.append(ctx.author.id)
