@@ -1,24 +1,37 @@
 # bot token from discord developers
+# go to https://discordapp.com/developers/applications/me and create an application
+# make it a bot user
+# put the bot user token below
 bot_token = ''
 
 # default bot settings
 bot_prefix = ['!']
-bot_master = 174764205927432192
-bot_coowners = [114428861990699012]
+bot_master = 174764205927432192  # The discord ID of the owner
+bot_coowners = [114428861990699012]  # The discord ID's of co-owners
 
-# minimum required permissions for bot
+# minimum required permissions for bot (Only really needed if you're inviting it to other servers, probably safe to
+# not touch this)
 bot_permissions = 1571904
 
-# 'killmails' - Killmail posting extension
-# 'eveTime' - Get the time in eve and around the world
-# 'price' - Price check extension
-# 'eve_status' - Get TQ Status
-# 'group_lookup' - Get corp/alliance info
-# 'char_lookup' - Get character info
+# Add any extensions to the below preload_extentions array to always load them on restart. Note that extensions can be
+# loaded on demand using the !ext load command.
+preload_extensions = [
+    # 'killmails',  # Killmail posting extension
+    # 'add_kills',  # Enables the addkills command
+    'eve_time',  # Get the time in eve and around the world
+    'eve_status',  # Get the status of the server and the player count
+    'price',  # Price check extension
+    'group_lookup',  # Get corp/alliance info
+    'char_lookup',  # Get character info
+    'jump_planner',  # Provides the shortcut for dotlan jump planning
+    'jump_range',  # Provides the shortcut for dotlan jump range
+    'location_scout',  # Provides intel on systems/constellations/regions
+    # 'sov_tracker',  # Provides real time info on sov fights
+    # The following plugins are still in testing, use at your own risk
+    # 'stream_player',  # Play youtube and other streams in a voice channel
+    # 'jabber_relay'  # Completely broken, dont use me yet
+]
 
-preload_extensions = ['eve_time', 'price', 'eve_status', 'group_lookup', 'char_lookup']
-
-game = '!help for more info'
 dm_only = False  # bot responses always sent via direct message
 delete_commands = False  # user commands are deleted automatically
 
@@ -27,7 +40,6 @@ enable_welcome = False
 welcome_string = ('**Welcome to the server!**\n \nTo get roles type !auth to '
                   'get a link to the authing system.\nIf you want more '
                   'information regarding other plugins type !help')
-
 
 # Auto Responses - Add more with the format 'trigger': 'Auto response'
 auto_responses = {
