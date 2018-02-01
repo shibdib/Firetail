@@ -61,11 +61,13 @@ class Killmails:
                     sql = "SELECT * FROM add_kills"
                     other_channels = await db.select(sql)
                     for add_kills in other_channels:
-                        if add_kills[3] in attacker_group_ids:
+                        if add_kills[3] in attacker_group_ids and float(kill_data['zkb']['totalValue']) >= \
+                                float(add_kills[6]):
                             await self.process_kill(add_kills[1], kill_data)
-                        if add_kills[3] in loss_group_ids and add_kills[5].lower() == 'true':
+                        if add_kills[3] in loss_group_ids and add_kills[5].lower() == 'true' \
+                                and float(kill_data['zkb']['totalValue']) >= float(add_kills[6]):
                             await self.process_kill(add_kills[1], kill_data, False, True)
-                        if add_kills[3] == 9 and kill_data['zkb']['totalValue'] >= add_kills[6]:
+                        if add_kills[3] == 9 and float(kill_data['zkb']['totalValue']) >= float(add_kills[6]):
                             await self.process_kill(add_kills[1], kill_data, True)
             if kill_data['zkb']['totalValue'] >= big_kills_value and big_kills:
                 channel_id = config.killmail['bigKillsChannel']
