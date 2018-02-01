@@ -1,4 +1,7 @@
 # bot token from discord developers
+# go to https://discordapp.com/developers/applications/me and create an application
+# make it a bot user
+# put the bot user token below
 bot_token = ''
 
 # default bot settings
