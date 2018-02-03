@@ -108,6 +108,8 @@ def init_events(bot, launcher=None):
 
     @bot.event
     async def on_command(command):
+        if 'help' in command.message.content.lower() and command.guild is not None:
+            await command.send("{.author.mention} check your DM's for the help info.".format(command))
         bot.counter["processed_commands"] += 1
 
     @bot.event
