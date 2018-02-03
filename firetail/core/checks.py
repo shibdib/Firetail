@@ -22,7 +22,7 @@ async def check_is_mod(ctx):
 
 
 async def check_spam(ctx):
-    if '!help' in ctx.message.content:
+    if '!help' in ctx.message.content or ctx.guild is None:
         return True
     spam_list = ctx.bot.bot_users
     spam_list_length = len(spam_list)
