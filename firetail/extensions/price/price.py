@@ -27,6 +27,14 @@ class Price:
             return await dest.send('**ERROR:** Use **!help price** for more info.')
         config = self.config
         item = ctx.message.content.split(' ', 1)[1]
+        if item.lower() == 'fanfest ticket' or item.lower() == 'fanfest':
+            msg = "Looking to go to Fanfest?\n\nWhen: April 12th-14th\n\nEvent Info: https://fanfest.eveonline.com/\n" \
+                  "Buy Tickets: " \
+                  "https://www.eventbrite.com/e/eve-fanfest-2018-tickets-38384202182?aff=website"
+            if config.dm_only:
+                return await ctx.author.send(msg)
+            else:
+                return await ctx.channel.send(msg)
         system = 60003760
         lookup = 'Jita'
         if ctx.message.content.split()[0][len(config.bot_prefix):].lower() != 'price':
@@ -38,11 +46,9 @@ class Price:
             self.logger.info('Price - {} could not be found'.format(item))
             msg = "{} was not found, are you sure it's an item?".format(item)
             if config.dm_only:
-                await ctx.author.send(msg)
+                return await ctx.author.send(msg)
             else:
-                await ctx.channel.send(msg)
-            if config.delete_commands:
-                await ctx.message.delete()
+                return await ctx.channel.send(msg)
         else:
             typeid = await ctx.bot.esi_data.item_id(item)
             buymax = '{0:,.2f}'.format(float(data['buy']['max']))

@@ -36,10 +36,10 @@ async def create_tables(db):
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                                         channelid INTEGER NOT NULL,
                                         serverid INTEGER NOT NULL,
-                                        losses TEXT NOT NULL,
-                                        threshold INTEGER NOT NULL,
                                         groupid	INTEGER NOT NULL,
-                                        ownerid INTEGER NOT NULL
+                                        ownerid INTEGER NOT NULL,
+                                        losses TEXT NOT NULL,
+                                        threshold INTEGER NOT NULL
                                     ); """
         await create_table(db, zkill_table)
         # create sov_tracker table
