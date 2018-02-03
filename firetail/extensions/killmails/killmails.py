@@ -28,6 +28,7 @@ class Killmails:
                 await asyncio.sleep(5)
 
     async def process_data(self, kill_data):
+        sent_channels = []
         config = self.config
         km_groups = config.killmail['killmailGroups']
         big_kills = config.killmail['bigKills']
@@ -52,9 +53,11 @@ class Killmails:
                     attacker_group_ids.append(int(attacker['corporation_id']))
                 if 'alliance_id' in attacker:
                     attacker_group_ids.append(int(attacker['alliance_id']))
-            if loss and killmail_group_id in attacker_group_ids:
+            if loss and killmail_group_id in attacker_group_ids and channel_id not in sent_channels:
+                sent_channels.append(channel_id)
                 await self.process_kill(channel_id, kill_data)
-            if killmail_group_id in loss_group_ids:
+            if killmail_group_id in loss_group_ids and channel_id not in sent_channels:
+                sent_channels.append(channel_id)
                 await self.process_kill(channel_id, kill_data, False, True)
             for ext in self.bot.extensions:
                 if 'add_kills' in ext:
@@ -62,12 +65,17 @@ class Killmails:
                     other_channels = await db.select(sql)
                     for add_kills in other_channels:
                         if add_kills[3] in attacker_group_ids and float(kill_data['zkb']['totalValue']) >= \
-                                float(add_kills[6]):
+                                float(add_kills[6]) and add_kills[1] not in sent_channels:
+                            sent_channels.append(add_kills[1])
                             await self.process_kill(add_kills[1], kill_data)
                         if add_kills[3] in loss_group_ids and add_kills[5].lower() == 'true' \
-                                and float(kill_data['zkb']['totalValue']) >= float(add_kills[6]):
+                                and float(kill_data['zkb']['totalValue']) >= float(add_kills[6]) \
+                                and add_kills[1] not in sent_channels:
+                            sent_channels.append(add_kills[1])
                             await self.process_kill(add_kills[1], kill_data, False, True)
-                        if add_kills[3] == 9 and float(kill_data['zkb']['totalValue']) >= float(add_kills[6]):
+                        if add_kills[3] == 9 and float(kill_data['zkb']['totalValue']) >= float(add_kills[6]) \
+                                and add_kills[1] not in sent_channels:
+                            sent_channels.append(add_kills[1])
                             await self.process_kill(add_kills[1], kill_data, True)
             if kill_data['zkb']['totalValue'] >= big_kills_value and big_kills:
                 channel_id = config.killmail['bigKillsChannel']
