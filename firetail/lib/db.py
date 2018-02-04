@@ -31,6 +31,14 @@ async def create_table(conn, create_table_sql):
 
 async def create_tables(db):
     if db is not None:
+        # create general table
+        firetail_table = """ CREATE TABLE IF NOT EXISTS firetail (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        entry TEXT NOT NULL UNIQUE,
+                                        value TEXT NOT NULL,
+                                        additional_value TEXT DEFAULT NULL
+                                    ); """
+        await create_table(db, firetail_table)
         # create zkill table
         zkill_table = """ CREATE TABLE IF NOT EXISTS add_kills (
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
