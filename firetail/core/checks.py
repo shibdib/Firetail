@@ -51,11 +51,11 @@ async def check_spam(ctx):
         if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.message.delete()
             await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
-                                  ' Try again in {} seconds'.
+                                  ' Try again in {} seconds or DM me the commands.'.
                                   format(wait_time))
         else:
             await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
-                                  ' Try again in {} seconds'.
+                                  ' Try again in {} seconds or DM me the commands.'.
                                   format(wait_time))
         ctx.bot.repeat_offender.append(ctx.author.id)
         return False
@@ -67,11 +67,11 @@ async def check_spam(ctx):
         if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.message.delete()
             await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
-                                  ' Try again in {} seconds'.
+                                  ' Try again in {} seconds or DM me the commands.'.
                                   format(wait_time))
         else:
             await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
-                                  ' Try again in {} seconds'.
+                                  ' Try again in {} seconds or DM me the commands.'.
                                   format(wait_time))
         ctx.bot.repeat_offender.append(ctx.author.id)
         return False

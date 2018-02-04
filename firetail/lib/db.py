@@ -52,6 +52,14 @@ async def create_tables(db):
                                         attackers_score INTEGER NOT NULL
                                     ); """
         await create_table(db, sov_tracker_table)
+        # create tokens table
+        tokens_table = """ CREATE TABLE IF NOT EXISTS tokens (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        character_id INTEGER NOT NULL,
+                                        discord_id INTEGER NOT NULL,
+                                        token TEXT NOT NULL
+                                    ); """
+        await create_table(db, tokens_table)
     else:
         print('Database: Unable to connect to the database at ' + db_file)
 
