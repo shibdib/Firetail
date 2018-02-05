@@ -27,6 +27,7 @@ preload_extensions = [
     'jump_range',  # Provides the shortcut for dotlan jump range
     'location_scout',  # Provides intel on systems/constellations/regions
     # 'sov_tracker',  # Provides real time info on sov fights
+    # 'fleet_up',  # Shares upcoming fleet-up operations
     # The following plugins are still in testing, use at your own risk
     # 'stream_player',  # Play youtube and other streams in a voice channel
     # 'jabber_relay'  # Completely broken, dont use me yet
@@ -59,3 +60,13 @@ killmail = {  # add or remove groups as needed, groups must have unique names.
         }
     }
 }
+
+# Fleet-Up Plugin Settings
+fleetUp = {  # add or remove groups as needed, groups must have unique names.
+    'group_id': 12345,  # Fleet-up group ID
+    'user_id': 12345,  # User ID from your fleet-up api-key
+    'api_code': '',  # API Code from your fleet-up api-key
+    'auto_posting': True,  # Change to False if you don't want the bot to automatically post new and upcoming fleets
+    'channel_id': 12345,  # Channel to post fleet-up operations
+}
+
