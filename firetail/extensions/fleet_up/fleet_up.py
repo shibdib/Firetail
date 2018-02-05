@@ -66,6 +66,8 @@ class FleetUp:
     async def process_data(self, data):
         sql = "SELECT value FROM firetail WHERE entry='newest_fleet_up'"
         stored_newest = await db.select(sql, True)
+        if stored_newest is None:
+            stored_newest = 0
         for operation in data:
             if int(stored_newest) < operation['Id']:
                 sql = ''' REPLACE INTO firetail(entry,value) VALUES(?,?) '''
