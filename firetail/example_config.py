@@ -66,6 +66,7 @@ fleetUp = {  # add or remove groups as needed, groups must have unique names.
     'group_id': 12345,  # Fleet-up group ID
     'user_id': 12345,  # User ID from your fleet-up api-key
     'api_code': '',  # API Code from your fleet-up api-key
+    'auto_posting': True,  # Change to False if you don't want the bot to automatically post new and upcoming fleets
     'channel_id': 12345,  # Channel to post fleet-up operations
 }
 

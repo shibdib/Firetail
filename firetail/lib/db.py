@@ -72,12 +72,15 @@ async def create_tables(db):
         print('Database: Unable to connect to the database at ' + db_file)
 
 
-async def select(sql):
+async def select(sql, single = False):
     db = sqlite3.connect('firetail.sqlite')
     await create_tables(db)
     cursor = db.cursor()
     cursor.execute(sql)
-    data = cursor.fetchall()
+    if single:
+        data = cursor.fetchone()[0]
+    else:
+        data = cursor.fetchall()
     db.close()
     return data
 
