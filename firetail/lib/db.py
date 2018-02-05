@@ -77,10 +77,13 @@ async def select(sql, single = False):
     await create_tables(db)
     cursor = db.cursor()
     cursor.execute(sql)
-    if single:
-        data = cursor.fetchone()[0]
-    else:
-        data = cursor.fetchall()
+    try:
+        if single:
+            data = cursor.fetchone()[0]
+        else:
+            data = cursor.fetchall()
+    except:
+        data = None
     db.close()
     return data
 
