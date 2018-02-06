@@ -18,7 +18,7 @@ class Token:
     @commands.command(name='token')
     @checks.spam_check()
     async def _token(self, ctx):
-        token = ctx.message.content.split(' ', 1)
+        token = ctx.message.content.split(' ', 1)[1]
         auth = base64.b64encode(bytes(':'.join([self.config.tokens['client_id'], self.config.tokens['secret']]),
                                       'utf-8'))
         access_token = await self.bot.esi_data.refresh_access_token(token, auth)
