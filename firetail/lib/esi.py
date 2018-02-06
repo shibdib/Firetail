@@ -187,3 +187,23 @@ class ESI:
                     data = await resp.text()
                 data = json.loads(data)
                 return data[str(itemid)]
+
+    # Token Handling
+
+    async def refresh_access_token(self, refresh_token):
+        async with aiohttp.ClientSession() as session:
+            params = {'grant_type': 'refresh_token', 'refresh_token': refresh_token}
+            url = 'https://login.eveonline.com/oauth/token'
+            async with session.get(url, params=params) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data
+
+    async def verify_token(self, access_token):
+        async with aiohttp.ClientSession() as session:
+            params = {'Authorization': 'Bearer {}'.format(access_token)}
+            url = 'https://login.eveonline.com/oauth/verify'
+            async with session.get(url, params=params) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data

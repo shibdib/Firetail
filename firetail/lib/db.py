@@ -60,12 +60,14 @@ async def create_tables(db):
                                         attackers_score INTEGER NOT NULL
                                     ); """
         await create_table(db, sov_tracker_table)
-        # create tokens table
-        tokens_table = """ CREATE TABLE IF NOT EXISTS tokens (
+        # create access_tokens table
+        tokens_table = """ CREATE TABLE IF NOT EXISTS access_tokens (
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                                         character_id INTEGER NOT NULL,
                                         discord_id INTEGER NOT NULL,
-                                        token TEXT NOT NULL
+                                        refresh_token TEXT NOT NULL UNIQUE,
+                                        access_token TEXT DEFAULT NULL,
+                                        expires INTEGER DEFAULT NULL
                                     ); """
         await create_table(db, tokens_table)
     else:
@@ -73,6 +75,22 @@ async def create_tables(db):
 
 
 async def select(sql, single = False):
+    db = sqlite3.connect('firetail.sqlite')
+    await create_tables(db)
+    cursor = db.cursor()
+    cursor.execute(sql)
+    try:
+        if single:
+            data = cursor.fetchone()[0]
+        else:
+            data = cursor.fetchall()
+    except:
+        data = None
+    db.close()
+    return data
+
+
+async def get_token(sql, single = False):
     db = sqlite3.connect('firetail.sqlite')
     await create_tables(db)
     cursor = db.cursor()
