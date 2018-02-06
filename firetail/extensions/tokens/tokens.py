@@ -3,6 +3,7 @@ from firetail.lib import db
 from firetail.core import checks
 import time
 import asyncio
+import base64
 
 
 class Token:
@@ -18,7 +19,9 @@ class Token:
     @checks.spam_check()
     async def _token(self, ctx):
         token = ctx.message.content.split(' ', 1)
-        access_token = await self.bot.esi_data.refresh_access_token(token)
+        auth = base64.b64encode(bytes(':'.join([self.config.tokens['client_id'], self.config.tokens['secret']]),
+                                      'utf-8'))
+        access_token = await self.bot.esi_data.refresh_access_token(token, auth)
         try:
             verify = await self.bot.esi_data.verify_token(access_token['access_token'])
             character_id = verify['CharacterID']
@@ -50,10 +53,12 @@ class Token:
                 await asyncio.sleep(1260)
 
     async def refresh(self):
+        auth = base64.b64encode(bytes(':'.join([self.config.tokens['client_id'], self.config.tokens['secret']]),
+                                      'utf-8'))
         sql = "SELECT * FROM access_tokens"
         tokens = await db.select(sql)
         for token in tokens:
-            access_token = await self.bot.esi_data.refresh_access_token(token[3])
+            access_token = await self.bot.esi_data.refresh_access_token(token[3], auth)
             try:
                 verify = await self.bot.esi_data.verify_token(access_token['access_token'])
                 character_id = verify['CharacterID']

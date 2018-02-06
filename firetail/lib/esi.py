@@ -190,20 +190,33 @@ class ESI:
 
     # Token Handling
 
-    async def refresh_access_token(self, refresh_token):
+    async def refresh_access_token(self, refresh_token, auth):
         async with aiohttp.ClientSession() as session:
+            header = {'Authorization': 'Basic {}'.format(auth)}
             params = {'grant_type': 'refresh_token', 'refresh_token': refresh_token}
             url = 'https://login.eveonline.com/oauth/token'
-            async with session.get(url, params=params) as resp:
+            async with session.get(url, params=params, headers=header) as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 return data
 
     async def verify_token(self, access_token):
         async with aiohttp.ClientSession() as session:
-            params = {'Authorization': 'Bearer {}'.format(access_token)}
+            header = {'Authorization': 'Bearer {}'.format(access_token)}
             url = 'https://login.eveonline.com/oauth/verify'
-            async with session.get(url, params=params) as resp:
+            async with session.get(url, headers=header) as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 return data
+
+    # Token Restricted
+
+    async def notifications(self, alliance_id):
+        async with aiohttp.ClientSession() as session:
+            url = '{}/alliances/{}/'.format(ESI_URL, alliance_id)
+            async with session.get(url) as resp:
+                data = await resp.text()
+                data = json.loads(data)
+                return data
+
+
