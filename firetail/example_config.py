@@ -29,6 +29,10 @@ preload_extensions = [
     # 'sov_tracker',  # Provides real time info on sov fights
     # 'fleet_up',  # Shares upcoming fleet-up operations
     # The following plugins are still in testing, use at your own risk
+    # The following plugins require access tokens, please read the wiki for more information
+    # 'tokens',  # This extension is required if using any plugins that require tokens
+    # 'eve_notifications',  # Shares notifications
+    # 'eve_mail',  # Shares mail
     # 'stream_player',  # Play youtube and other streams in a voice channel
     # 'jabber_relay'  # Completely broken, dont use me yet
 ]
@@ -47,7 +51,7 @@ auto_responses = {
     'auth': 'To get roles on this server visit: '
 }
 
-# Killmail Plugin Settings
+# Killmail Plugin Settings - Recommend using the !addkills command if possible instead of this
 killmail = {  # add or remove groups as needed, groups must have unique names.
     'bigKills': True,  # Enable the sharing of eve wide big kills
     'bigKillsValue': 1000000000,  # Big kill ISK threshold
