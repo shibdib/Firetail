@@ -28,11 +28,11 @@ preload_extensions = [
     'location_scout',  # Provides intel on systems/constellations/regions
     # 'sov_tracker',  # Provides real time info on sov fights
     # 'fleet_up',  # Shares upcoming fleet-up operations
+    # The following plugins are still in testing, use at your own risk
     # The following plugins require access tokens, please read the wiki for more information
     # 'tokens',  # This extension is required if using any plugins that require tokens
     # 'eve_notifications',  # Shares notifications
     # 'eve_mail',  # Shares mail
-    # The following plugins are still in testing, use at your own risk
     # 'stream_player',  # Play youtube and other streams in a voice channel
     # 'jabber_relay'  # Completely broken, dont use me yet
 ]
