@@ -2,8 +2,9 @@ from discord.ext import commands
 from firetail.lib import db
 from firetail.utils import make_embed
 from firetail.core import checks
-import time
-import datetime
+from datetime import datetime
+import pytz
+import re
 import asyncio
 import json
 
@@ -31,9 +32,9 @@ class FleetUp:
                              text="Provided Via Firetail Bot & Fleet-Up")
             embed.set_thumbnail(url="https://fleet-up.com/Content/Images/logo_title.png")
             for operation in data:
-                timestamp = time.mktime(datetime.datetime.strptime(
-                    operation['StartString'], "%Y-%m-%d %H:%M:%S").timetuple()) - 18000
-                seconds_from_now = float(timestamp) - time.time()
+                current_eve = int(datetime.now(pytz.timezone('UTC')).timestamp())
+                fleet_time = int(re.findall(r'\d+', operation['Start'])[0][:-3])
+                seconds_from_now = fleet_time - current_eve
                 if seconds_from_now > 0:
                     upcoming = True
                     doctrine = 'N/A'
@@ -75,9 +76,9 @@ class FleetUp:
                 await db.execute_sql(sql, values)
                 await self.post_operation(operation, None)
                 continue
-            timestamp = time.mktime(datetime.datetime.strptime(
-                operation['StartString'], "%Y-%m-%d %H:%M:%S").timetuple()) - 18000
-            seconds_from_now = float(timestamp) - time.time()
+            current_eve = int(datetime.now(pytz.timezone('UTC')).timestamp())
+            fleet_time = int(re.findall(r'\d+', operation['Start'])[0][:-3])
+            seconds_from_now = fleet_time - current_eve
             if 1800 > seconds_from_now > 0 and operation['Id'] not in self.soon_operations:
                 self.soon_operations.append(operation['Id'])
                 await self.post_operation(operation, False)
