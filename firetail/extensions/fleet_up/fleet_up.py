@@ -43,10 +43,9 @@ class FleetUp:
                         horizontal_rule = '\n\n-------'
                     if len(operation['Doctrines']) > 0:
                         doctrine = operation['Doctrines']
-                    embed.add_field(name=":grey_exclamation:Fleet Information",
-                                    value='Fleet Name: {}\nFleet Time: {} EVE\n'
-                                          'Planned Doctrines: {}\nForm-Up Location: {} {}\n'
-                                          'Organizer: {}\n\nDetails: {}{}'.
+                    embed.add_field(name="Fleet Information", value='Fleet Name: {}\nFleet Time: {} EVE\n'
+                                                                    'Planned Doctrines: {}\nForm-Up Location: {} {}\n'
+                                                                    'Organizer: {}\n\nDetails: {}{}'.
                                     format(operation['Subject'], operation['StartString'], doctrine,
                                            operation['Location'], operation['LocationInfo'], operation['Organizer'],
                                            operation['Details'], horizontal_rule),
@@ -107,9 +106,8 @@ class FleetUp:
         embed.set_footer(icon_url=self.bot.user.avatar_url,
                          text="Provided Via Firetail Bot & Fleet-Up")
         embed.set_thumbnail(url="https://fleet-up.com/Content/Images/logo_title.png")
-        embed.add_field(name=":grey_exclamation:Fleet Information",
-                        value='Fleet Name: {}\nFleet Time: {} EVE\nPlanned Doctrines: {}\n'
-                              'Form-Up Location: {} {}\nOrganizer: {}\n\nDetails: {}'.
+        embed.add_field(name="Fleet Information", value='Fleet Name: {}\nFleet Time: {} EVE\nPlanned Doctrines: {}\n'
+                                                        'Form-Up Location: {} {}\nOrganizer: {}\n\nDetails: {}'.
                         format(operation['Subject'], operation['StartString'], doctrine,
                                operation['Location'], operation['LocationInfo'], operation['Organizer'],
                                operation['Details']))
