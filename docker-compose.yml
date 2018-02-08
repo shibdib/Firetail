@@ -1,0 +1,14 @@
+version: "3.0"
+
+services:
+  firetail:
+    image: library/python
+    restart: always
+    volumes:
+      - ./:/opt/firetail
+    working_dir: /opt/firetail
+    command: >
+                /bin/bash -c "
+                  pip3 install --process-dependency-links -e /opt/firetail &&
+                  /usr/local/bin/python3 /opt/firetail/firetail -d
+                "
