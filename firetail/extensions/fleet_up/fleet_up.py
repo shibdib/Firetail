@@ -42,10 +42,11 @@ class FleetUp:
                         doctrine = operation['Doctrines']
                     embed.add_field(name="Fleet Information", value='Fleet Name: {}\nFleet Time: {} EVE\n'
                                                                     'Planned Doctrines: {}\nForm-Up Location: {} {}\n'
-                                                                    'Organizer: {}\n\nDetails: {}'.
+                                                                    'Organizer: {}\n\nDetails: {}\n\n\n\n'.
                                     format(operation['Subject'], operation['StartString'], doctrine,
                                            operation['Location'], operation['LocationInfo'], operation['Organizer'],
-                                           operation['Details']))
+                                           operation['Details']),
+                                    inline=False)
             if upcoming:
                 await ctx.send(embed=embed)
 
