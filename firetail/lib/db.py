@@ -29,7 +29,8 @@ async def create_table(conn, create_table_sql):
     c.execute(create_table_sql)
 
 
-async def create_tables(db):
+async def create_tables():
+    db = sqlite3.connect('firetail.sqlite')
     if db is not None:
         # create general table
         firetail_table = """ CREATE TABLE IF NOT EXISTS firetail (
@@ -65,7 +66,7 @@ async def create_tables(db):
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                                         character_id INTEGER NOT NULL,
                                         discord_id INTEGER NOT NULL,
-                                        refresh_token TEXT NOT NULL UNIQUE,
+                                        refresh_token TEXT NOT NULL,
                                         access_token TEXT DEFAULT NULL,
                                         expires INTEGER DEFAULT NULL
                                     ); """
@@ -76,7 +77,6 @@ async def create_tables(db):
 
 async def select(sql, single = False):
     db = sqlite3.connect('firetail.sqlite')
-    await create_tables(db)
     cursor = db.cursor()
     cursor.execute(sql)
     try:
@@ -92,7 +92,6 @@ async def select(sql, single = False):
 
 async def get_token(sql, single = False):
     db = sqlite3.connect('firetail.sqlite')
-    await create_tables(db)
     cursor = db.cursor()
     cursor.execute(sql)
     try:
@@ -108,7 +107,6 @@ async def get_token(sql, single = False):
 
 async def execute_sql(sql, var=None):
     db = sqlite3.connect('firetail.sqlite')
-    await create_tables(db)
     cursor = db.cursor()
     cursor.execute(sql, var)
     db.commit()
