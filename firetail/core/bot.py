@@ -9,7 +9,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 if os.environ.get('FTCONFIG') is not None:
-    print("CUSTOM CONFIG DIR: " + os.environ['FTCONFIG'])
     sys.path.insert(0, os.environ['FTCONFIG'])
     import config
 else:
