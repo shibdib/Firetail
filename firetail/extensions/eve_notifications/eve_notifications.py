@@ -1,57 +1,19 @@
-from discord.ext import commands
 from firetail.lib import db
 from firetail.utils import make_embed
-from firetail.core import checks
-from datetime import datetime
-import pytz
-import re
+import time
+import datetime
 import asyncio
 import json
 
 
-class FleetUp:
+class Notifications:
     def __init__(self, bot):
         self.bot = bot
         self.session = bot.session
         self.config = bot.config
         self.logger = bot.logger
-        if self.config.fleetUp['auto_posting']:
-            self.soon_operations = []
-            self.very_soon_operations = []
-            self.loop = asyncio.get_event_loop()
-            self.loop.create_task(self.tick_loop())
-
-    @commands.command(name='fleets', aliases=["fleetup"])
-    @checks.spam_check()
-    async def _fleets(self, ctx):
-        data = await self.request_data(self.config)
-        if data is not None:
-            upcoming = False
-            embed = make_embed(title='Upcoming Fleets', title_url='https://fleet-up.com/')
-            embed.set_footer(icon_url=self.bot.user.avatar_url,
-                             text="Provided Via Firetail Bot & Fleet-Up")
-            embed.set_thumbnail(url="https://fleet-up.com/Content/Images/logo_title.png")
-            for operation in data:
-                current_eve = int(datetime.now(pytz.timezone('UTC')).timestamp())
-                fleet_time = int(re.findall(r'\d+', operation['Start'])[0][:-3])
-                seconds_from_now = fleet_time - current_eve
-                if seconds_from_now > 0:
-                    upcoming = True
-                    doctrine = 'N/A'
-                    horizontal_rule = ''
-                    if len(data) > 1:
-                        horizontal_rule = '\n\n-------'
-                    if len(operation['Doctrines']) > 0:
-                        doctrine = operation['Doctrines']
-                    embed.add_field(name="Fleet Information", value='Fleet Name: {}\nFleet Time: {} EVE\n'
-                                                                    'Planned Doctrines: {}\nForm-Up Location: {} {}\n'
-                                                                    'Organizer: {}\n\nDetails: {}{}'.
-                                    format(operation['Subject'], operation['StartString'], doctrine,
-                                           operation['Location'], operation['LocationInfo'], operation['Organizer'],
-                                           operation['Details'], horizontal_rule),
-                                    inline=False)
-            if upcoming:
-                await ctx.send(embed=embed)
+        self.loop = asyncio.get_event_loop()
+        self.loop.create_task(self.tick_loop())
 
     async def tick_loop(self):
         await self.bot.wait_until_ready()
@@ -80,9 +42,9 @@ class FleetUp:
                 await db.execute_sql(sql, values)
                 await self.post_operation(operation, None)
                 continue
-            current_eve = int(datetime.now(pytz.timezone('UTC')).timestamp())
-            fleet_time = int(re.findall(r'\d+', operation['Start'])[0][:-3])
-            seconds_from_now = fleet_time - current_eve
+            timestamp = time.mktime(datetime.datetime.strptime(
+                operation['StartString'], "%Y-%m-%d %H:%M:%S").timetuple()) - 18000
+            seconds_from_now = float(timestamp) - time.time()
             if 1800 > seconds_from_now > 0 and operation['Id'] not in self.soon_operations:
                 self.soon_operations.append(operation['Id'])
                 await self.post_operation(operation, False)
