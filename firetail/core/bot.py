@@ -36,7 +36,10 @@ class Firetail(commands.Bot):
         super().__init__(**kwargs)
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.esi_data = ESI(self.session)
-        db.create_tables()
+        self.start_up_tasks()
+        
+    async def start_up_tasks(self):
+        await db.create_tables()
 
     async def send_cmd_help(self, ctx):
         if ctx.invoked_subcommand:
