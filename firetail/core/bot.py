@@ -9,7 +9,6 @@ from dateutil.relativedelta import relativedelta
 
 from firetail import config
 from firetail.lib import ESI
-from firetail.lib import db
 from firetail.utils import ExitCodes
 
 
@@ -36,10 +35,6 @@ class Firetail(commands.Bot):
         super().__init__(**kwargs)
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.esi_data = ESI(self.session)
-        self.start_up_tasks()
-        
-    async def start_up_tasks(self):
-        await db.create_tables()
 
     async def send_cmd_help(self, ctx):
         if ctx.invoked_subcommand:
