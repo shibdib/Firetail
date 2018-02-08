@@ -57,3 +57,17 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Config ignore
+firetail/config.py
+
+# Distribution / packaging
+develop-eggs/
+eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+.vscode/
