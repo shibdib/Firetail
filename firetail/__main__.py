@@ -17,8 +17,8 @@ if discord.version_info.major < 1:
     sys.exit(1)
 
 
-def run_firetail(debug=None, launcher=None, config=None):
-    firetail = bot.Firetail(config)
+def run_firetail(debug=None, launcher=None):
+    firetail = bot.Firetail()
     events.init_events(firetail, launcher=launcher)
     firetail.logger = logger.init_logger(debug_flag=debug)
     firetail.load_extension('firetail.core.commands')
@@ -55,14 +55,12 @@ def parse_cli_args():
         "--debug", "-d", help="Enabled debug mode.", action="store_true")
     parser.add_argument(
         "--launcher", "-l", help=argparse.SUPPRESS, action="store_true")
-    parser.add_argument(
-        "--config", "-c", help="Custom Config Location.", action="store", dest='simple_value')
     return parser.parse_args()
 
 
 def main():
     args = parse_cli_args()
-    run_firetail(debug=args.debug, launcher=args.launcher, config=args.config)
+    run_firetail(debug=args.debug, launcher=args.launcher)
 
 
 if __name__ == '__main__':

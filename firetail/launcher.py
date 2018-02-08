@@ -11,8 +11,6 @@ def parse_cli_args():
         help="Disables auto-restart.", action="store_true")
     parser.add_argument(
         "--debug", "-d", help="Enabled debug mode.", action="store_true")
-    parser.add_argument(
-        "--config", "-c", help="Custom Config Location.", action="store", dest='simple_value')
     return parser.parse_known_args()
 
 

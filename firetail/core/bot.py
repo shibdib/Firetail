@@ -14,17 +14,13 @@ from firetail.utils import ExitCodes
 
 class Firetail(commands.Bot):
 
-    def __init__(self, custom_config=False, **kwargs):
+    def __init__(self, **kwargs):
         self.default_prefix = config.bot_prefix
         self.owner = config.bot_master
         self._shutdown_mode = ExitCodes.CRITICAL
         self.counter = Counter()
         self.core_dir = os.path.dirname(os.path.realpath(__file__))
-        if custom_config:
-            import custom_config
-            self.config = custom_config
-        else:
-            self.config = config
+        self.config = config
         self.bot_users = []
         self.repeat_offender = []
         self.last_command = None
