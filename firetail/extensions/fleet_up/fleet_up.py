@@ -51,7 +51,10 @@ class FleetUp:
                                            operation['Details'], horizontal_rule),
                                     inline=False)
             if upcoming:
-                await ctx.send(embed=embed)
+                dest = ctx.author if ctx.bot.config.dm_only else ctx
+                await dest.send(embed=embed)
+                if ctx.bot.config.delete_commands:
+                    await ctx.message.delete()
 
     async def tick_loop(self):
         await self.bot.wait_until_ready()
