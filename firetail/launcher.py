@@ -24,9 +24,8 @@ def parse_cli_args():
         "--debug", "-d", help="Enabled debug mode.", action="store_true")
     parser.add_argument_with_dir_check(
         "--config", help="Directory with config.py file.")
-    parser.add_argument(
+    parser.add_argument_with_dir_check(
         "--logpath", help="Path to where the logfile should be located.")
-    )
     return parser.parse_known_args()
 
 
@@ -59,7 +58,6 @@ def main():
         env = dict(os.environ, FTLOGPATH=launch_args.logpath)
     else:
         env = os.environ
-
 
     ft_args.append('-l')
 
