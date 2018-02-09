@@ -8,8 +8,8 @@ from collections import Counter
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-if os.environ.get('FTCONFIG') is not None:
-    sys.path.insert(0, os.environ['FTCONFIG'])
+if os.getenv("CONFIG") is not None:
+    sys.path.insert(0, os.getenv("CONFIG"))
     import config
 else:
     from firetail import config

@@ -26,8 +26,8 @@ def init_logger(debug_flag=False):
     stdout_handler.setFormatter(firetail_format)
     logger.setLevel(log_level)
 
-    if os.environ.get("FTLOGPATH") is not None:
-        logfile_path = os.environ["FTLOGPATH"]
+    if os.getenv("LOG") is not None:
+        logfile_path = os.getenv("LOG")
     else:
         logfile_path = os.getcwd() + '/firetail/logs/firetail.log'
 
