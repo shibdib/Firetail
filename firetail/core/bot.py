@@ -9,13 +9,12 @@ from collections import Counter
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-print("WAT")
 # Lets check the config file exists before we continue..
 if os.getenv("CONFIG") is not None:
     if not os.path.exists(os.getenv("CONFIG") + "/config.py"):
         print("Copying example_config.py to " + os.getenv("CONFIG") + "/config.py")
         copyfile(os.getcwd() + "/firetail/example_config.py", "/config/config.py")
-        sys.exit()
+        sys.exit(1)
 
 
 if os.getenv("CONFIG") is not None:
