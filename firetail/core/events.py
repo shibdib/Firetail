@@ -4,7 +4,6 @@ import traceback
 import aiohttp
 
 from discord.ext import commands
-from firetail import config
 from firetail.lib import db
 
 import firetail
@@ -41,7 +40,7 @@ def init_events(bot, launcher=None):
         if bot.invite_url:
             print("\nInvite URL: {}\n".format(bot.invite_url))
             try:
-                db_token = config.db_token
+                db_token = bot.config.db_token
                 url = "https://discordbots.org/api/bots/{}/stats".format(bot.user.id)
                 headers = {"Authorization": db_token}
                 payload = {"server_count": len(bot.guilds)}
@@ -118,7 +117,7 @@ def init_events(bot, launcher=None):
     async def on_guild_join(guild):
         log.info("Connected to a new guild. Guild ID/Name: {}/{}".format(str(guild.id), guild.name))
         try:
-            db_token = config.db_token
+            db_token = bot.config.db_token
             url = "https://discordbots.org/api/bots/{}/stats".format(bot.user.id)
             headers = {"Authorization": db_token}
             payload = {"server_count": len(bot.guilds)}
@@ -131,7 +130,7 @@ def init_events(bot, launcher=None):
     async def on_guild_remove(guild):
         log.info("Leaving guild. Guild ID/Name: {}/{}".format(str(guild.id), guild.name))
         try:
-            db_token = config.db_token
+            db_token = bot.config.db_token
             url = "https://discordbots.org/api/bots/{}/stats".format(bot.user.id)
             headers = {"Authorization": db_token}
             payload = {"server_count": len(bot.guilds)}

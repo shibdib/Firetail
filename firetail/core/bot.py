@@ -2,12 +2,18 @@ import discord
 from discord.ext import commands
 
 import os
+import sys
 import aiohttp
 from collections import Counter
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from firetail import config
+if os.environ.get('FTCONFIG') is not None:
+    sys.path.insert(0, os.environ['FTCONFIG'])
+    import config
+else:
+    from firetail import config
+
 from firetail.lib import ESI
 from firetail.utils import ExitCodes
 
