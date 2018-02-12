@@ -1,7 +1,7 @@
 FROM library/python
 
 RUN \
-    git clone https://github.com/karbowiak/Firetail.git /firetail && \
+    git clone https://github.com/shibdib/Firetail.git /firetail && \
     pip3 install --process-dependency-links -e /firetail && \
     mkdir /config
 
