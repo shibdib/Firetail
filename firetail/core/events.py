@@ -142,3 +142,8 @@ def init_events(bot, launcher=None):
     async def on_member_ban(guild, user):
         log.info("New Ban Reported. Guild ID/Name: {}/{} -- Member ID/Name: {}/{}".format(str(guild.id), guild.name,
                                                                                           str(user.id), user.name))
+
+    @bot.event
+    async def on_member_join(member):
+        if config.enable_welcome is True:
+            member.send(config.welcome_string)
