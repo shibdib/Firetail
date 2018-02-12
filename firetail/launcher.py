@@ -22,8 +22,6 @@ def parse_cli_args():
         help="Disables auto-restart.", action="store_true")
     parser.add_argument(
         "--debug", "-d", help="Enabled debug mode.", action="store_true")
-    parser.add_argument_with_dir_check(
-        "--config", help="Directory with config.py file.")
     return parser.parse_known_args()
 
 
@@ -49,10 +47,8 @@ def main():
     if launch_args.debug:
         ft_args.append('-d')
 
-    if launch_args.config:
-        env = dict(os.environ, FTCONFIG=launch_args.config)
-    else:
-        env = os.environ
+    # Get environment
+    env = os.environ
 
     ft_args.append('-l')
 
