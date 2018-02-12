@@ -103,9 +103,9 @@ def init_events(bot, launcher=None):
     @bot.event
     async def on_message(message):
         bot.counter["messages_read"] += 1
-        for trigger, response in config.auto_responses:
-            if trigger in re.sub('[^A-Za-z0-9]+', '', message.content.split(' ', 1)[0]):
-                message.send("{.author.mention} {}".format(message, response))
+        for trigger, response in config.auto_responses.items():
+            if trigger == re.sub('[^A-Za-z0-9]+', '', message.content.split(' ', 1)[0]):
+                await message.channel.send("{.author.mention} {}".format(message, response))
         await bot.process_commands(message)
 
     @bot.event
@@ -152,4 +152,4 @@ def init_events(bot, launcher=None):
     @bot.event
     async def on_member_join(member):
         if config.enable_welcome is True:
-            member.send(config.welcome_string)
+            await member.send(config.welcome_string)
