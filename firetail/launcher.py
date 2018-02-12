@@ -1,10 +1,21 @@
 import sys
+import os
 import argparse
 import subprocess
 
+class ArgumentParser(argparse.ArgumentParser):
+    def __is_valid_directory(self, parser, arg):
+        if not os.path.isdir(arg):
+            parser.error('Directory {} not found.'.format(arg))
+        else:
+            return arg
+
+    def add_argument_with_dir_check(self, *args, **kwargs):
+        kwargs['type'] = lambda x: self.__is_valid_directory(self, x)
+        self.add_argument(*args, **kwargs)
 
 def parse_cli_args():
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         description="Firetail - An EVE Online Discord Bot")
     parser.add_argument(
         "--no-restart", "-r",
@@ -36,10 +47,13 @@ def main():
     if launch_args.debug:
         ft_args.append('-d')
 
+    # Get environment
+    env = os.environ
+
     ft_args.append('-l')
 
     while True:
-        code = subprocess.call(["firetail-bot", *ft_args])
+        code = subprocess.call(["firetail-bot", *ft_args], env=env)
         if code == 0:
             print("Goodbye!")
             break
@@ -52,3 +66,6 @@ def main():
             print("I crashed! Trying to restart...\n")
     print("Exit code: {exit_code}".format(exit_code=code))
     sys.exit(code)
+
+if __name__ == '__main__':
+    main()

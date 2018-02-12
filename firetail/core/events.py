@@ -5,7 +5,6 @@ import aiohttp
 import re
 
 from discord.ext import commands
-from firetail import config
 from firetail.lib import db
 
 import firetail

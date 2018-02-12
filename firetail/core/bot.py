@@ -2,18 +2,31 @@ import discord
 from discord.ext import commands
 
 import os
+import sys
 import aiohttp
+from shutil import copyfile
 from collections import Counter
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from firetail import config
+# Lets check the config file exists before we continue..
+if os.getenv("CONFIG") is not None:
+    if not os.path.exists(os.getenv("CONFIG") + "/config.py"):
+        print("Copying example_config.py to " + os.getenv("CONFIG") + "/config.py")
+        copyfile("/firetail/firetail/example_config.py", "/config/config.py") # for some reason os.getcwd() doesn't work inside a container ??
+        sys.exit(1)
+
+if os.getenv("CONFIG") is not None:
+    sys.path.insert(0, os.getenv("CONFIG"))
+    import config
+else:
+    from firetail import config
+
 from firetail.lib import ESI
 from firetail.utils import ExitCodes
 
 
 class Firetail(commands.Bot):
-
     def __init__(self, **kwargs):
         self.default_prefix = config.bot_prefix
         self.owner = config.bot_master
