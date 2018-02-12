@@ -38,16 +38,23 @@ class FleetUp:
                 if seconds_from_now > 0:
                     upcoming = True
                     doctrine = 'N/A'
+                    horizontal_rule = ''
+                    if len(data) > 1:
+                        horizontal_rule = '\n\n-------'
                     if len(operation['Doctrines']) > 0:
                         doctrine = operation['Doctrines']
                     embed.add_field(name="Fleet Information", value='Fleet Name: {}\nFleet Time: {} EVE\n'
                                                                     'Planned Doctrines: {}\nForm-Up Location: {} {}\n'
-                                                                    'Organizer: {}\n\nDetails: {}'.
+                                                                    'Organizer: {}\n\nDetails: {}{}'.
                                     format(operation['Subject'], operation['StartString'], doctrine,
                                            operation['Location'], operation['LocationInfo'], operation['Organizer'],
-                                           operation['Details']))
+                                           operation['Details'], horizontal_rule),
+                                    inline=False)
             if upcoming:
-                await ctx.send(embed=embed)
+                dest = ctx.author if ctx.bot.config.dm_only else ctx
+                await dest.send(embed=embed)
+                if ctx.bot.config.delete_commands:
+                    await ctx.message.delete()
 
     async def tick_loop(self):
         await self.bot.wait_until_ready()
