@@ -62,6 +62,7 @@ class LocationScout:
                     return None, None
 
     async def format_system(self, ctx, data):
+        global attacker_score, defender_score, fight_type, target_system_name, defender_name
         async with ctx.channel.typing():
             sov_alliance_id = 1
             sov_corp = 'N/A'

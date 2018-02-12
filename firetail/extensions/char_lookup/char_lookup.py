@@ -1,8 +1,8 @@
-from discord.ext import commands
-from statistics import mode
-import aiohttp
 import json
 import urllib
+
+import aiohttp
+from discord.ext import commands
 
 from firetail.utils import make_embed
 
@@ -19,6 +19,7 @@ class CharLookup:
     async def _char(self, ctx):
         """Shows character information.
         Do '!char name'"""
+        global character_data
         if len(ctx.message.content.split()) == 1:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Use **!help char** for more info.')
@@ -31,12 +32,11 @@ class CharLookup:
         character_id = await ctx.bot.esi_data.esi_search(character_name, 'character')
         try:
             if len(character_id['character']) > 1:
-                for id in character_id['character']:
-                    character_data = await ctx.bot.esi_data.character_info(id)
-                    if character_data['name'].lower().strip().replace("'",
-                                                                      '1') == character_name.lower().strip().replace(
-                            "'", '1'):
-                        character_id = id
+                for eve_id in character_id['character']:
+                    character_data = await ctx.bot.esi_data.character_info(eve_id)
+                    if character_data['name'].lower().strip().replace("'", '1') == \
+                            character_name.lower().strip().replace("'", '1'):
+                        character_id = eve_id
                         character_data = await ctx.bot.esi_data.character_info(character_id)
                         character_name = character_data['name']
                         break
@@ -176,8 +176,8 @@ class CharLookup:
                         return data[0]['victim'], data[0]['solar_system_id']
                     else:
                         for attacker in data[0]['attackers']:
-                                if attacker['character_id'] == character_id:
-                                    return attacker, data[0]['solar_system_id']
+                            if attacker['character_id'] == character_id:
+                                return attacker, data[0]['solar_system_id']
                 except Exception:
                     return None, None
 
@@ -194,6 +194,7 @@ class CharLookup:
                     return None
 
     async def firetail_intel(self, character_id, character_name, zkill_stats):
+        global top_system
         try:
             solo = 100 - zkill_stats['gangRatio']
             threat = zkill_stats['dangerRatio']
@@ -211,9 +212,6 @@ class CharLookup:
                                                                        top_system, solo)
             return intel
         except Exception:
-            loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
-                character_id)
-            kill_url = 'https://zkillboard.com/api/kills/characterID/{}/kills/limit/1/no-items/'.format(character_id)
             solo = 0
             threat = 0
             character_type, special = await self.character_type(character_id, solo, threat)
@@ -272,12 +270,12 @@ class CharLookup:
                         if 'corporation_id' in attacker:
                             corporation_ids.append(attacker['corporation_id'])
                     try:
-                        dominant_alliance = max(set(alliance_ids),key=alliance_ids.count)
+                        dominant_alliance = max(set(alliance_ids), key=alliance_ids.count)
                         alliance_raw = await self.bot.esi_data.alliance_info(dominant_alliance)
                         alliance = alliance_raw['name']
                         return '**BLOPS Hotdropper for {}**'.format(alliance), special
                     except Exception:
-                        dominant_corp = max(set(corporation_ids),key=corporation_ids.count)
+                        dominant_corp = max(set(corporation_ids), key=corporation_ids.count)
                         corp_raw = await self.bot.esi_data.corporation_info(dominant_corp)
                         corp = corp_raw['name']
                         return '**BLOPS Hotdropper for {}**'.format(corp), special

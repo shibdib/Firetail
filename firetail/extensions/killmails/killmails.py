@@ -82,6 +82,7 @@ class Killmails:
                 await self.process_kill(channel_id, kill_data, True)
 
     async def process_kill(self, channel_id, kill_data, big=False, loss=False):
+        global final_blow_corp_zkill, final_blow_ship_zkill, final_blow_alliance_zkill, final_blow_corp_zkill, final_blow_ship_zkill, final_blow_corp_zkill, final_blow_ship_zkill, final_blow_zkill, final_blow_alliance_zkill, final_blow_corp_zkill, final_blow_ship_zkill, final_blow_zkill, victim_alliance_zkill, victim_zkill, victim_alliance_zkill, victim_zkill
         bot = self.bot
         final_blow_name, final_blow_ship, final_blow_corp, final_blow_alliance = None, None, None, None
         kill_id = kill_data['killID']
@@ -111,7 +112,7 @@ class Killmails:
         attacker_count = 0
         for attacker in kill_data['killmail']['attackers']:
             attacker_count = attacker_count + 1
-            if attacker['final_blow'] == True:
+            if attacker['final_blow']:
                 try:
                     final_blow_id = attacker['character_id']
                     final_blow_name = await self.bot.esi_data.character_name(final_blow_id)

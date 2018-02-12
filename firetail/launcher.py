@@ -3,6 +3,7 @@ import os
 import argparse
 import subprocess
 
+
 class ArgumentParser(argparse.ArgumentParser):
     def __is_valid_directory(self, parser, arg):
         if not os.path.isdir(arg):
@@ -13,6 +14,7 @@ class ArgumentParser(argparse.ArgumentParser):
     def add_argument_with_dir_check(self, *args, **kwargs):
         kwargs['type'] = lambda x: self.__is_valid_directory(self, x)
         self.add_argument(*args, **kwargs)
+
 
 def parse_cli_args():
     parser = ArgumentParser(
@@ -66,6 +68,7 @@ def main():
             print("I crashed! Trying to restart...\n")
     print("Exit code: {exit_code}".format(exit_code=code))
     sys.exit(code)
+
 
 if __name__ == '__main__':
     main()

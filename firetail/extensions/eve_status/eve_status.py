@@ -18,6 +18,7 @@ class EveStatus:
         """Shows the current status of TQ."""
         # Spam Check
 
+        global status, player_count
         self.logger.info('EveStatus - {} requested server info.'.format(str(ctx.message.author)))
         data = await ctx.bot.esi_data.server_info()
         try:
