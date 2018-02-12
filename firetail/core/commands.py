@@ -162,7 +162,7 @@ class Core:
                 content=("I'm missing permissions to change my nickname. "
                          "Use **{}get guildperms** to check permissions."
                          "").format(ctx.prefix))
-            await ctx.send()
+            await ctx.send(embed=embed)
         else:
             embed = utils.make_embed(
                 msg_type='success',
@@ -280,7 +280,6 @@ class Core:
         if len(guild_list) > 1023:
             embed.add_field(name="Servers Continued", value=guild_list[1024:], inline=False)
 
-
         try:
             await ctx.send(embed=embed)
         except discord.HTTPException:
@@ -397,7 +396,6 @@ class Core:
             await ctx.send(embed=embed)
             return
         deleted = await ctx.channel.purge(limit=msg_number)
-        embed = utils.make_embed()
         result_msg = await ctx.send('Deleted {} message{}'.format(
             len(deleted), "s" if len(deleted) > 1 else ""))
         await asyncio.sleep(3)

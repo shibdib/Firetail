@@ -137,7 +137,7 @@ class SovTracker:
                    dotlan_link,
                    constellation_name,
                    constellation_dotlan)
-        type = 'info'
+        embed_type = 'info'
         if winning == 1:
             defender_score = '{} :arrow_up:'.format(defender_score)
             attacker_score = '{}'.format(attacker_score)
@@ -148,7 +148,7 @@ class SovTracker:
                        dotlan_link,
                        constellation_name,
                        constellation_dotlan)
-            type = 'success'
+            embed_type = 'success'
         elif winning == 2:
             defender_score = '{}'.format(defender_score)
             attacker_score = '{} :arrow_up:'.format(attacker_score)
@@ -159,8 +159,8 @@ class SovTracker:
                        dotlan_link,
                        constellation_name,
                        constellation_dotlan)
-            type = 'error'
-        embed = make_embed(msg_type=type, title=title,
+            embed_type = 'error'
+        embed = make_embed(msg_type=embed_type, title=title,
                            title_url=dotlan_link,
                            content=content)
         embed.set_footer(icon_url=self.bot.user.avatar_url,

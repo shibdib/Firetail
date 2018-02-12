@@ -76,6 +76,7 @@ class StreamPlayer:
         `!stop` to stop the current song and remove the bot from the voice channel.
         `!volume 0-100` to set the volume percentage."""
 
+        global dest
         if ctx.author.id in self.skipped_user:
             return await dest.send('You just got skipped, let someone else pick something')
 

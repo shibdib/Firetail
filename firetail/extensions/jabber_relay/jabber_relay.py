@@ -7,7 +7,7 @@ from sleekxmpp.exceptions import IqError, IqTimeout
 
 # logging
 logging.basicConfig(level=logging.INFO,
-    format='%(asctime)s - %(threadName)s - %(name)s - %(levelname)s - %(message)s')
+                    format='%(asctime)s - %(threadName)s - %(name)s - %(levelname)s - %(message)s')
 
 # your xmpp user
 XMPP_JID = "your@jabberuser.com"
@@ -46,7 +46,7 @@ class EchoBot(ClientXMPP):
         self.send_presence()
         # start a scheduler to check the queue
         self.scheduler.add("asyncio_queue", 2, self.from_main_thread_nonblocking,
-            repeat=True, qpointer=self.event_queue)
+                           repeat=True, qpointer=self.event_queue)
 
     def message(self, msg):
         if msg['type'] in ('chat', 'normal'):
@@ -57,7 +57,7 @@ class EchoBot(ClientXMPP):
 def start_sleekxmpp(xmpp_jid, xmpp_pwd, loop, msg_callback, xmpp_queue):
     xmpp = EchoBot(xmpp_jid, xmpp_pwd, loop, msg_callback, xmpp_queue)
     xmpp.connect()
-    xmpp.process() # non-blocking!
+    xmpp.process()  # non-blocking!
 
 
 @asyncio.coroutine
@@ -72,7 +72,6 @@ def xmpp_callback(msg):
 
 
 if __name__ == '__main__':
-
     loop = asyncio.get_event_loop()
 
     # call the method to start the EchoBot, use xmpp_callback

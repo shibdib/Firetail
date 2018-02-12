@@ -21,6 +21,7 @@ class GroupLookup:
     async def _group(self, ctx):
         """Shows corp and alliance information.
         Do '!group name'"""
+        global alliance_name, most_active_system, corp_description, most_active_system, corp_description, most_active_system
         if len(ctx.message.content.split()) == 1:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Use **!help group** for more info.')

@@ -75,7 +75,7 @@ async def create_tables():
         print('Database: Unable to connect to the database at ' + db_file)
 
 
-async def select(sql, single = False):
+async def select(sql, single=False):
     db = sqlite3.connect('firetail.sqlite')
     cursor = db.cursor()
     cursor.execute(sql)
@@ -90,7 +90,7 @@ async def select(sql, single = False):
     return data
 
 
-async def get_token(sql, single = False):
+async def get_token(sql, single=False):
     db = sqlite3.connect('firetail.sqlite')
     cursor = db.cursor()
     cursor.execute(sql)
