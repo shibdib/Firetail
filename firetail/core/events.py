@@ -2,6 +2,7 @@ import datetime
 import logging
 import traceback
 import aiohttp
+import re
 
 from discord.ext import commands
 from firetail import config
@@ -100,6 +101,9 @@ def init_events(bot, launcher=None):
     @bot.event
     async def on_message(message):
         bot.counter["messages_read"] += 1
+        for trigger, response in config.auto_responses:
+            if trigger in re.sub('[^A-Za-z0-9]+', '', message.content.split(' ', 1)[0]):
+                message.send("{.author.mention} {}".format(message, response))
         await bot.process_commands(message)
 
     @bot.event
