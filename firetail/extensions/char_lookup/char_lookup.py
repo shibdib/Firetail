@@ -267,18 +267,17 @@ class CharLookup:
                     alliance_ids = []
                     corporation_ids = []
                     for attacker in last_kill['attackers']:
-                        try:
+                        if 'alliance_id' in attacker:
                             alliance_ids.append(attacker['alliance_id'])
-                            corporation_ids.append(attacker['corporation_id'])
-                        except Exception:
+                        if 'corporation_id' in attacker:
                             corporation_ids.append(attacker['corporation_id'])
                     try:
-                        dominant_alliance = mode(alliance_ids)
+                        dominant_alliance = max(set(alliance_ids),key=alliance_ids.count)
                         alliance_raw = await self.bot.esi_data.alliance_info(dominant_alliance)
                         alliance = alliance_raw['name']
                         return '**BLOPS Hotdropper for {}**'.format(alliance), special
                     except Exception:
-                        dominant_corp = mode(corporation_ids)
+                        dominant_corp = max(set(corporation_ids),key=corporation_ids.count)
                         corp_raw = await self.bot.esi_data.corporation_info(dominant_corp)
                         corp = corp_raw['name']
                         return '**BLOPS Hotdropper for {}**'.format(corp), special
@@ -311,3 +310,6 @@ class CharLookup:
                     return data[0]
                 except Exception:
                     return None
+
+    def most_common(self, lst):
+        return max(set(lst), key=lst.count)
