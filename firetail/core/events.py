@@ -92,7 +92,7 @@ def init_events(bot, launcher=None):
                 type(error), error, error.__traceback__))
             bot._last_exception = exception_log
             if "Missing Permissions" in exception_log:
-                await ctx.author.send("**ERROR:** The Bot Does Not Have All Required Permissions In That Channel.")
+                await ctx.send("**ERROR:** The Bot Does Not Have All Required Permissions In That Channel.")
             else:
                 await ctx.send(message)
 
