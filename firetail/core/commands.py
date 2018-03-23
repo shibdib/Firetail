@@ -387,6 +387,8 @@ class Core:
     async def purge(self, ctx, msg_number: int = 10):
         """Delete a number of messages from the channel.
         Default is 10. Max 100."""
+        if ctx.guild.id == 202724765218242560:
+            return
         if msg_number > 100:
             embed = utils.make_embed(
                 msg_type='info',
