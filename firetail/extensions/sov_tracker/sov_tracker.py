@@ -96,8 +96,8 @@ class SovTracker:
                 start_time = datetime.strptime(fights['start_time'], '%Y-%m-%dT%H:%M:%SZ')
                 time = datetime.now(pytz.timezone('UTC')).strftime('%Y-%m-%dT%H:%M:%SZ')
                 current_time = datetime.strptime(time, '%Y-%m-%dT%H:%M:%SZ')
-                defender_id = fights['defender_id']
-                defender_name = await self.group_name(defender_id)
+                defender_id = fights.get('defender_id', 'Freeport')
+                defender_name = await self.group_name(defender_id) if defender_id is not 'Freeport' else 'Freeport'
                 if current_time > start_time:
                     defender_score = fights['defender_score']
                     attacker_score = fights['attackers_score']

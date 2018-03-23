@@ -254,6 +254,7 @@ class Killmails:
         try:
             return await channel.send(embed=em)
         except Exception:
+            await self.remove_bad_channel(channel_id)
             return self.logger.exception(
                 'Killmail - Killmail ID {} failed to send to channel {} due to..'.format(kill_id, channel_id))
 
