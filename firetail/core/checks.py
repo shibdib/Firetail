@@ -1,6 +1,7 @@
 import discord
 import time
 from discord.ext import commands
+from firetail.lib import db
 
 
 async def check_is_owner(ctx):
@@ -80,6 +81,19 @@ async def check_spam(ctx):
     return True
 
 
+async def check_whitelist(ctx):
+    sql = ''' SELECT * FROM whitelist WHERE `location_id` = {} OR `location_id` = {} '''.format(
+        ctx.guild.id, ctx.channel.id)
+    result = await db.select(sql)
+    if result is None:
+        return True
+    for role in result:
+        if role in ctx.author.roles:
+            return True
+        else:
+            return False
+        
+
 def is_owner():
     return commands.check(check_is_owner)
 
@@ -98,6 +112,10 @@ def is_mod():
 
 def spam_check():
     return commands.check(check_spam)
+
+
+def is_whitelist():
+    return commands.check(check_whitelist)
 
 
 async def check_permissions(ctx, perms):

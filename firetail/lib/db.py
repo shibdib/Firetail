@@ -40,6 +40,13 @@ async def create_tables():
                                         additional_value TEXT DEFAULT NULL
                                     ); """
         await create_table(db, firetail_table)
+        # create whitelist table
+        whitelist_table = """ CREATE TABLE IF NOT EXISTS whitelist (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        location_id INTEGER,
+                                        role_id INTEGER NOT NULL
+                                    ); """
+        await create_table(db, whitelist_table)
         # create zkill table
         zkill_table = """ CREATE TABLE IF NOT EXISTS add_kills (
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from firetail.core import checks
 from firetail import utils
+from firetail.lib import db
 
 
 class Core:
@@ -456,6 +457,31 @@ class Core:
             embed = utils.make_embed(
                 msg_type='info', title="Prefix is {}".format(prefix))
             await ctx.send(embed=embed)
+
+    @_get.command(name="whitelist")
+    @checks.is_admin()
+    async def whitelist(self, ctx):
+        """Whitelist a role to allow server/channel access to the bot. Use '!whitelist server/channel role_name'"""
+        scope = ctx.message.content.split(' ')[1]
+        if scope.lower() is not 'server' and scope.lower() is not 'channel':
+            return ctx.send('Incorrect scope. You must designate this whitelist as either server or channel.')
+        if scope.lower() is 'server':
+            scope = ctx.guild.id
+        if scope.lower() is 'channel':
+            scope = ctx.channel.id
+        whitelist_role = ctx.message.content.split(' ')[2]
+        whitelist_id = 0
+        for role in ctx.guild.roles:
+            if role.name is whitelist_role:
+                whitelist_id = role.id
+        if whitelist_id is 0:
+            return ctx.send('Incorrect role. Could not find a role matching {}.'.format(whitelist_role))
+        sql = ''' REPLACE INTO whitelist(location_id,role_id)
+                  VALUES(?,?,?) '''
+        values = (scope, whitelist_id)
+        await db.execute_sql(sql, values)
+        return ctx.send('{} has been whitelisted.'.format(whitelist_role))
+
 
 
 def memory_usage():
