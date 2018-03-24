@@ -463,7 +463,8 @@ class Core:
     @checks.is_admin()
     async def _whitelist(self, ctx):
         """Whitelist a role to allow server/channel access to the bot.
-        Use '!whitelist server/channel role_name'"""
+        Use '!whitelist server/channel role_name' to add roles.
+        Use '!whitelist remove role_name' to remove roles."""
         scope = ctx.message.content.split(' ')[1]
         if scope.lower() != 'server' and scope.lower() != 'channel' and scope.lower() != 'remove':
             return await ctx.send('Incorrect scope. You must designate this whitelist as either server or channel.')
