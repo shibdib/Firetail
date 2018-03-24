@@ -11,7 +11,7 @@ bot_coowners = [114428861990699012]  # The discord ID's of co-owners
 
 # minimum required permissions for bot (Only really needed if you're inviting it to other servers, probably safe to
 # not touch this)
-bot_permissions = 1571904
+bot_permissions = 224256
 
 # Add any extensions to the below preload_extentions array to always load them on restart. Note that extensions can be
 # loaded on demand using the !ext load command.

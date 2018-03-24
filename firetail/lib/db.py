@@ -40,6 +40,13 @@ async def create_tables():
                                         additional_value TEXT DEFAULT NULL
                                     ); """
         await create_table(db, firetail_table)
+        # create whitelist table
+        whitelist_table = """ CREATE TABLE IF NOT EXISTS whitelist (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        location_id INTEGER,
+                                        role_id INTEGER NOT NULL
+                                    ); """
+        await create_table(db, whitelist_table)
         # create zkill table
         zkill_table = """ CREATE TABLE IF NOT EXISTS add_kills (
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,6 +86,21 @@ async def select(sql, single=False):
     db = sqlite3.connect('firetail.sqlite')
     cursor = db.cursor()
     cursor.execute(sql)
+    try:
+        if single:
+            data = cursor.fetchone()[0]
+        else:
+            data = cursor.fetchall()
+    except:
+        data = None
+    db.close()
+    return data
+
+
+async def select_var(sql, var, single=False):
+    db = sqlite3.connect('firetail.sqlite')
+    cursor = db.cursor()
+    cursor.execute(sql, var)
     try:
         if single:
             data = cursor.fetchone()[0]

@@ -245,7 +245,6 @@ class Killmails:
                      inline=False)
         try:
             channel = bot.get_channel(int(channel_id))
-            channel_name = channel.name
         except Exception:
             self.logger.exception('Killmail - Bad Channel Attempted {} removing'.format(channel_id))
             return await self.remove_bad_channel(channel_id)

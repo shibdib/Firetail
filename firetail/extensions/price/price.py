@@ -17,7 +17,7 @@ class Price:
               'rens': 60004588,
               'hek': 60005686}
 
-    @commands.command(name='price', aliases=["jita", "amarr", "dodixie", "rens", "hek", ])
+    @commands.command(name='price', aliases=["pc", "jita", "amarr", "dodixie", "rens", "hek", ])
     @checks.spam_check()
     async def _price(self, ctx):
         """Gets you price information from the top trade hubs.
@@ -37,7 +37,8 @@ class Price:
                 return await ctx.channel.send(msg)
         system = 60003760
         lookup = 'Jita'
-        if ctx.message.content.split()[0][len(config.bot_prefix):].lower() != 'price':
+        if ctx.message.content.split()[0][len(config.bot_prefix):].lower() != 'price' and \
+                ctx.message.content.split()[0][len(config.bot_prefix):].lower() != 'pc':
             lookup = ctx.message.content.split()[0][len(config.bot_prefix):].lower()
             system = self.hub_id[lookup]
         data = await ctx.bot.esi_data.market_data(item, system)
