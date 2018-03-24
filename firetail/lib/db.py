@@ -97,6 +97,21 @@ async def select(sql, single=False):
     return data
 
 
+async def select_var(sql, var, single=False):
+    db = sqlite3.connect('firetail.sqlite')
+    cursor = db.cursor()
+    cursor.execute(sql, var)
+    try:
+        if single:
+            data = cursor.fetchone()[0]
+        else:
+            data = cursor.fetchall()
+    except:
+        data = None
+    db.close()
+    return data
+
+
 async def get_token(sql, single=False):
     db = sqlite3.connect('firetail.sqlite')
     cursor = db.cursor()

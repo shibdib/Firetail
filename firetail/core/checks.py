@@ -82,17 +82,19 @@ async def check_spam(ctx):
 
 
 async def check_whitelist(ctx):
-    sql = ''' SELECT * FROM whitelist WHERE `location_id` = {} OR `location_id` = {} '''.format(
-        ctx.guild.id, ctx.channel.id)
-    result = await db.select(sql)
-    if result is None:
+    if ctx.guild is None:
+        return True
+    sql = ''' SELECT * FROM whitelist WHERE `location_id` = (?) OR `location_id` = (?) '''
+    values = (ctx.guild.id, ctx.channel.id)
+    result = await db.select_var(sql, values)
+    if result is None or len(result) is 0:
         return True
     for role in result:
-        if role in ctx.author.roles:
-            return True
-        else:
-            return False
-        
+        for user_role in ctx.author.roles:
+            if role[2] == user_role.id:
+                return True
+    return False
+
 
 def is_owner():
     return commands.check(check_is_owner)

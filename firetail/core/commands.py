@@ -16,6 +16,7 @@ class Core:
 
     def __init__(self, bot):
         self.bot = bot
+        self.logger = bot.logger
 
     @commands.command(name="shutdown", aliases=["exit"])
     @checks.is_owner()
@@ -458,30 +459,38 @@ class Core:
                 msg_type='info', title="Prefix is {}".format(prefix))
             await ctx.send(embed=embed)
 
-    @_get.command(name="whitelist")
+    @commands.command(name="whitelist")
     @checks.is_admin()
-    async def whitelist(self, ctx):
-        """Whitelist a role to allow server/channel access to the bot. Use '!whitelist server/channel role_name'"""
+    async def _whitelist(self, ctx):
+        """Whitelist a role to allow server/channel access to the bot.
+        Use '!whitelist server/channel role_name'"""
         scope = ctx.message.content.split(' ')[1]
-        if scope.lower() is not 'server' and scope.lower() is not 'channel':
-            return ctx.send('Incorrect scope. You must designate this whitelist as either server or channel.')
-        if scope.lower() is 'server':
+        if scope.lower() != 'server' and scope.lower() != 'channel' and scope.lower() != 'remove':
+            return await ctx.send('Incorrect scope. You must designate this whitelist as either server or channel.')
+        if scope.lower() == 'server':
             scope = ctx.guild.id
-        if scope.lower() is 'channel':
+        elif scope.lower() == 'channel':
             scope = ctx.channel.id
-        whitelist_role = ctx.message.content.split(' ')[2]
+        elif scope.lower() == 'remove':
+            scope = 'remove'
+        whitelist_role = ctx.message.content.split(' ', 2)[2]
         whitelist_id = 0
         for role in ctx.guild.roles:
-            if role.name is whitelist_role:
+            if role.name.lower() == whitelist_role.lower():
                 whitelist_id = role.id
-        if whitelist_id is 0:
-            return ctx.send('Incorrect role. Could not find a role matching {}.'.format(whitelist_role))
-        sql = ''' REPLACE INTO whitelist(location_id,role_id)
-                  VALUES(?,?,?) '''
-        values = (scope, whitelist_id)
+        if whitelist_id == 0:
+            return await ctx.send('Incorrect role. Could not find a role matching {}.'.format(whitelist_role))
+        if scope == 'remove':
+            sql = ''' DELETE FROM whitelist WHERE `role_id` = (?) '''
+            values = whitelist_id
+            await db.execute_sql(sql, values)
+            return await ctx.send('{} has been removed from all whitelists.'.format(whitelist_role))
+        else:
+            sql = ''' REPLACE INTO whitelist(location_id,role_id)
+                      VALUES(?,?) '''
+            values = (scope, whitelist_id)
         await db.execute_sql(sql, values)
-        return ctx.send('{} has been whitelisted.'.format(whitelist_role))
-
+        return await ctx.send('{} has been whitelisted.'.format(whitelist_role))
 
 
 def memory_usage():
