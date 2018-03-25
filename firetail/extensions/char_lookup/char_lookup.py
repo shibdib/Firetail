@@ -5,6 +5,7 @@ import aiohttp
 from discord.ext import commands
 
 from firetail.utils import make_embed
+from firetail.core import checks
 
 
 class CharLookup:
@@ -16,6 +17,8 @@ class CharLookup:
         self.logger = bot.logger
 
     @commands.command(name='char')
+    @checks.spam_check()
+    @checks.is_whitelist()
     async def _char(self, ctx):
         """Shows character information.
         Do '!char name'"""
