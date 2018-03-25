@@ -17,6 +17,7 @@ class LocationScout:
 
     @commands.command(name='scout', aliases=["recon", "system", "wormhole"])
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _scout(self, ctx):
         """Gets you location info
         Supports systems/wormholes/constellations/regions.

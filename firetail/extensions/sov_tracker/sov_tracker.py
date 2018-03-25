@@ -69,6 +69,7 @@ class SovTracker:
 
     @commands.command(name='sov', aliases=["wand", "cancer"])
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _sov_tracker(self, ctx):
         """Sets the bot to track a sov fight
         `!sov system` to have the bot report every minute (if it's changed) the latest sov fight scores.

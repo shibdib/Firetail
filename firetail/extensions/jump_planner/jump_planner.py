@@ -14,6 +14,7 @@ class JumpPlanner:
 
     @commands.command(name='jump')
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _jump(self, ctx):
         """Provides a Jump route.
         '!jump system:system' Gives you the JDC 5 Carrier/Super/Fax route by default.

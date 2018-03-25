@@ -14,6 +14,7 @@ class JumpRange:
 
     @commands.command(name='range')
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _range(self, ctx):
         """Provides Jump Range.
         '!range system SHIP' Gives you the JDC/JF 5 range for a ship by default.

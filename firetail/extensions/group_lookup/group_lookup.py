@@ -18,6 +18,7 @@ class GroupLookup:
 
     @commands.command(name='group', aliases=["corp", "alliance"])
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _group(self, ctx):
         """Shows corp and alliance information.
         Do '!group name'"""

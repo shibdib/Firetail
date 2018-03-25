@@ -173,6 +173,7 @@ class Core:
 
     @commands.command(name="uptime")
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _uptime(self, ctx):
         """Shows bot uptime"""
         uptime_str = ctx.bot.uptime_str
@@ -207,6 +208,7 @@ class Core:
 
     @commands.command(name="about")
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _about(self, ctx):
         """Shows info about Firetail"""
         memory = memory_usage()
@@ -366,6 +368,7 @@ class Core:
 
     @_get.command(name="sessions_resumed")
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _sessions_resumed(self, ctx):
         """Gets the number of websocket reconnections."""
         r_c = ctx.bot.resumed_count
@@ -376,6 +379,7 @@ class Core:
 
     @commands.command(name="ping")
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _ping(self, ctx):
         """Gets the discord server response time."""
         msg = "{0:.2f} ms".format(ctx.bot.ws.latency * 1000)

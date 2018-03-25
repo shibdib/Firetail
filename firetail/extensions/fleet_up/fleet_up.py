@@ -23,6 +23,7 @@ class FleetUp:
 
     @commands.command(name='fleets', aliases=["fleetup"])
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _fleets(self, ctx):
         data = await self.request_data(self.config)
         if data is not None:
