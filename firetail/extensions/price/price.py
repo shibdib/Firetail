@@ -19,6 +19,7 @@ class Price:
 
     @commands.command(name='price', aliases=["pc", "jita", "amarr", "dodixie", "rens", "hek", ])
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _price(self, ctx):
         """Gets you price information from the top trade hubs.
         Use **!price item** or **!amarr item** (Works for Jita, Amarr, Dodixie, Rens, Hek)"""

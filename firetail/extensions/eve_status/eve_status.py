@@ -14,6 +14,7 @@ class EveStatus:
 
     @commands.command(name='status', aliases=["tq", "eve"])
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _status(self, ctx):
         """Shows the current status of TQ."""
         # Spam Check

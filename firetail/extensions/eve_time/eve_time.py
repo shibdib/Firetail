@@ -25,6 +25,7 @@ class EveTime:
 
     @commands.command(name='time')
     @checks.spam_check()
+    @checks.is_whitelist()
     async def _time(self, ctx):
         """Shows the time in a range of timezones."""
         self.logger.info('EveTime - {} requested time info.'.format(str(ctx.message.author)))
