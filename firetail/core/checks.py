@@ -93,7 +93,15 @@ async def check_whitelist(ctx):
         for user_role in ctx.author.roles:
             if role[2] == user_role.id:
                 return True
-    return False
+    if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+        await ctx.message.delete()
+        await ctx.author.send('WARNING: You do not have the required roles to use commands in this channel. Feel free'
+                              'to PM me directly any commands you would like to use.')
+        return False
+    else:
+        await ctx.author.send('WARNING: You do not have the required roles to use commands in this channel. Feel free'
+                              'to PM me directly any commands you would like to use.')
+        return False
 
 
 def is_owner():

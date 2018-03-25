@@ -173,7 +173,6 @@ class Core:
 
     @commands.command(name="uptime")
     @checks.spam_check()
-    @checks.is_whitelist()
     async def _uptime(self, ctx):
         """Shows bot uptime"""
         uptime_str = ctx.bot.uptime_str
@@ -208,7 +207,6 @@ class Core:
 
     @commands.command(name="about")
     @checks.spam_check()
-    @checks.is_whitelist()
     async def _about(self, ctx):
         """Shows info about Firetail"""
         memory = memory_usage()
@@ -368,7 +366,6 @@ class Core:
 
     @_get.command(name="sessions_resumed")
     @checks.spam_check()
-    @checks.is_whitelist()
     async def _sessions_resumed(self, ctx):
         """Gets the number of websocket reconnections."""
         r_c = ctx.bot.resumed_count
@@ -379,7 +376,6 @@ class Core:
 
     @commands.command(name="ping")
     @checks.spam_check()
-    @checks.is_whitelist()
     async def _ping(self, ctx):
         """Gets the discord server response time."""
         msg = "{0:.2f} ms".format(ctx.bot.ws.latency * 1000)
@@ -467,8 +463,7 @@ class Core:
     @checks.is_admin()
     async def _whitelist(self, ctx):
         """Whitelist a role to allow server/channel access to the bot.
-        Use '!whitelist server/channel role_name' to add roles.
-        Use '!whitelist remove role_name' to remove roles."""
+        Use '!whitelist server/channel role_name'"""
         scope = ctx.message.content.split(' ')[1]
         if scope.lower() != 'server' and scope.lower() != 'channel' and scope.lower() != 'remove':
             return await ctx.send('Incorrect scope. You must designate this whitelist as either server or channel.')
@@ -487,7 +482,7 @@ class Core:
             return await ctx.send('Incorrect role. Could not find a role matching {}.'.format(whitelist_role))
         if scope == 'remove':
             sql = ''' DELETE FROM whitelist WHERE `role_id` = (?) '''
-            values = whitelist_id
+            values = (whitelist_id,)
             await db.execute_sql(sql, values)
             return await ctx.send('{} has been removed from all whitelists.'.format(whitelist_role))
         else:

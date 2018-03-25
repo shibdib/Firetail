@@ -16,6 +16,8 @@ class CharLookup:
         self.logger = bot.logger
 
     @commands.command(name='char')
+    @checks.spam_check()
+    @checks.is_whitelist()
     async def _char(self, ctx):
         """Shows character information.
         Do '!char name'"""
