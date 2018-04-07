@@ -68,7 +68,7 @@ def init_events(bot, launcher=None):
             await ctx.send("This command is on cooldown. "
                            "Try again in {:.2f}s"
                            "".format(error.retry_after))
-        elif isinstance(error, commands.CommandInvokeError):
+        elif isinstance(error, commands.CommandInvokeError) and ctx.author.id is bot.config.bot_master:
             # Need to test if the following still works
             """
             no_dms = "Cannot send messages to this user"
