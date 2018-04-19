@@ -84,8 +84,8 @@ async def check_spam(ctx):
 async def check_whitelist(ctx):
     if ctx.guild is None:
         return True
-    sql = ''' SELECT * FROM whitelist WHERE `location_id` = (?) OR `location_id` = (?) '''
-    values = (ctx.guild.id, ctx.channel.id)
+    sql = ''' SELECT * FROM whitelist WHERE `location_id` = (?) '''
+    values = (ctx.channel.id,)
     result = await db.select_var(sql, values)
     if result is None or len(result) is 0:
         return True
