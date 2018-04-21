@@ -166,7 +166,7 @@ class CharLookup:
 
     async def zkill_last_mail(self, character_id):
         async with aiohttp.ClientSession() as session:
-            url = 'https://zkillboard.com/api/no-items/limit/1/characterID/{}/'.format(character_id)
+            url = 'https://zkillboard.com/api/no-items/characterID/{}/'.format(character_id)
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
@@ -227,9 +227,9 @@ class CharLookup:
         titans = [11567, 3764, 671, 23773, 42126, 42241, 45649]
         supers = [23919, 23917, 23913, 22852, 3514, 42125]
         probe_launchers = [4258, 4260, 17901, 17938, 28756, 28758]
-        loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/limit/20/no-attackers/'.format(
+        loss_url = 'https://zkillboard.com/api/kills/characterID/{}/losses/no-attackers/'.format(
             character_id)
-        kill_url = 'https://zkillboard.com/api/kills/characterID/{}/kills/limit/1/no-items/'.format(character_id)
+        kill_url = 'https://zkillboard.com/api/kills/characterID/{}/kills/no-items/'.format(character_id)
         covert_cyno = 0
         cyno = 0
         probes = 0
@@ -237,7 +237,7 @@ class CharLookup:
         special = ' '
         last_kill = await self.last_kill(kill_url)
         try:
-            for attacker in last_kill['attackers']:
+            for attacker in last_kill[0]['attackers']:
                 if attacker['character_id'] == character_id:
                     if attacker['ship_type_id'] in titans:
                         special = '**This pilot has been seen in a Titan\n**'
@@ -251,7 +251,11 @@ class CharLookup:
             async with session.get(loss_url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
+                i = 0
                 for loss in data:
+                    i = i + 1
+                    if i >= 50:
+                        break
                     for item in loss['victim']['items']:
                         if item['item_type_id'] == 28646:
                             covert_cyno = covert_cyno + 1
