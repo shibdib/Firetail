@@ -33,6 +33,11 @@ class Killmails:
         km_groups = config.killmail['killmailGroups']
         big_kills = config.killmail['bigKills']
         big_kills_value = config.killmail['bigKillsValue']
+        solar_system_id = kill_data['killmail']['solar_system_id']
+        data = await self.bot.esi_data.system_info(solar_system_id)
+        constellation_id = data['constellation_id']
+        constellation_data = await self.bot.esi_data.constellation_info(constellation_id)
+        region_id = constellation_data['region_id']
         #  Foreach thru all provided groups
         for group in km_groups:
             killmail_group_id = int(config.killmail['killmailGroups'][group]['id'])
@@ -64,6 +69,14 @@ class Killmails:
                     sql = "SELECT * FROM add_kills"
                     other_channels = await db.select(sql)
                     for add_kills in other_channels:
+                        if add_kills[3] == region_id and float(kill_data['zkb']['totalValue']) >= \
+                                float(add_kills[6]) and add_kills[1] not in sent_channels:
+                            sent_channels.append(add_kills[1])
+                            await self.process_kill(add_kills[1], kill_data)
+                        if add_kills[3] == solar_system_id and float(kill_data['zkb']['totalValue']) >= \
+                                float(add_kills[6]) and add_kills[1] not in sent_channels:
+                            sent_channels.append(add_kills[1])
+                            await self.process_kill(add_kills[1], kill_data)
                         if add_kills[3] in attacker_group_ids and float(kill_data['zkb']['totalValue']) >= \
                                 float(add_kills[6]) and add_kills[1] not in sent_channels:
                             sent_channels.append(add_kills[1])
