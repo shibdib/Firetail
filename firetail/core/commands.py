@@ -506,6 +506,8 @@ def memory_usage():
             key = parts[0][2:-1].lower()
             if key in result:
                 result[key] = int(parts[1])
+    except:
+        pass
     finally:
         if status is not None:
             status.close()
