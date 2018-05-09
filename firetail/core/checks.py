@@ -27,7 +27,7 @@ async def check_spam(ctx):
         return ctx.author.send('WARNING: You are being rate limited from using bot commands.'
                           ' Try again in {} seconds or DM me the commands.'.
                           format(wait_time))
-    if ctx.bot.default_prefix[0]+'help' in ctx.message.content or ctx.guild is None:
+    if 'help' in ctx.message.content or ctx.guild is None:
         return True
     spam_list = ctx.bot.bot_users
     spam_list_length = len(spam_list)
