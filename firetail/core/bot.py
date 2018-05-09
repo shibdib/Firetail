@@ -41,7 +41,7 @@ class Firetail(commands.Bot):
         self.req_perms = discord.Permissions(config.bot_permissions)
         self.co_owners = config.bot_coowners
         self.preload_ext = config.preload_extensions
-        kwargs["command_prefix"] = "!"
+        kwargs["command_prefix"] = commands.when_mentioned_or(config.bot_prefix[0])
         kwargs["pm_help"] = True
         # kwargs["command_prefix"] = self.db.prefix_manager
         kwargs["owner_id"] = self.owner
