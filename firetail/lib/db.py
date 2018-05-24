@@ -78,6 +78,13 @@ async def create_tables():
                                         expires INTEGER DEFAULT NULL
                                     ); """
         await create_table(db, tokens_table)
+        # create rss table
+        rss_table = """ CREATE TABLE IF NOT EXISTS rss (
+                                       id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                       entry_id TEXT NOT NULL,
+                                       channel_id INTEGER NOT NULL
+                                    ); """
+        await create_table(db, rss_table)
     else:
         print('Database: Unable to connect to the database at ' + db_file)
 
