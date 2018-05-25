@@ -3,6 +3,7 @@ from firetail.utils import make_embed
 import asyncio
 import feedparser
 import discord
+from datetime import datetime
 
 class Rss:
     # Number of minutes between feed checks
@@ -83,17 +84,13 @@ class Rss:
         return sendable_feeds
 
     def format_message(self, feed_title, entry):
-        message = {
-            "content": "New post by {}".format(feed_title),
-            "embed": {
-                "title": entry['title'],
-                "author": {
-                    "name": entry['author']
-                },
-                "url": entry['link'],
-            }
-        }
-        return message
+        timestamp = datetime.strptime(entry['published'],
+                                      '%a, %d %b %Y %H:%M:%S %Z')
+        embed = discord.Embed(title=entry['title'],
+                              timestamp=timestamp,
+                              url=entry['link'])
+        embed.set_author(name=entry.get('author', ''))
+        return ("New post by {}".format(feed_title), embed)
 
     async def send_and_record(self, feeds):
         """ Send feed entries messages to the required channels, and record
@@ -116,10 +113,9 @@ class Rss:
                 break
             # Start sending entries
             for entry in feed['entries']:
-                message = self.format_message(feed['feed']['title'], entry)
+                content, embed = self.format_message(feed['feed']['title'], entry)
                 try:
-                    await channel.send(content=message['content'],
-                                       embed=discord.Embed.from_data(message['embed']))
+                    await channel.send(content, embed=embed)
                 except Exception:
                     self.logger.exception("Failed to send {} to channel {} for feed {}".format(
                         entry['id'], channel_id, feed_name))
