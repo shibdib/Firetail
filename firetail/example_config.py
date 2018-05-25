@@ -35,6 +35,7 @@ preload_extensions = [
     # 'eve_mail',  # Shares mail
     # 'stream_player',  # Play youtube and other streams in a voice channel
     # 'jabber_relay'  # Completely broken, dont use me yet
+    'rss', # RSS feed aggregator
 ]
 
 dm_only = False  # bot responses always sent via direct message
@@ -73,4 +74,20 @@ fleetUp = {  # add or remove groups as needed, groups must have unique names.
     'auto_posting': True,  # Change to False if you don't want the bot to automatically post new and upcoming fleets
     'channel_id': 12345,  # Channel to post fleet-up operations
 }
+
+# RSS Extension Settings
+rss = {
+    'channelId': 12345,      # Default channel to which entries are sent
+    'updateInterval': 15,    # Time in minutes to wait between checks for new RSS content
+    'feeds': {
+        'eveNews': {
+            'uri': 'https://www.eveonline.com/rss/news',    # RSS feed URL
+            'channelId': 12345, # Channel to which feed should be sent. Override rss.channelId
+        },
+        'bbc': {
+            'uri': 'https://feeds.bbci.co.uk/news/world/rss.xml?edition=uk'
+        },
+    },
+}
+
 
