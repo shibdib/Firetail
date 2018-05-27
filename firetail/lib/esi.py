@@ -176,10 +176,11 @@ class ESI:
                 return data
 
     async def market_data(self, item_name, station):
-        itemid = await self.item_id(item_name)
-        if itemid == 0:
+        itemid = await self.esi_search(item_name, 'inventory_type')
+        if itemid is None or itemid is False:
             return itemid
         else:
+            itemid = itemid['inventory_type'][0]
             async with aiohttp.ClientSession() as session:
                 baseurl = 'https://market.fuzzwork.co.uk/aggregates'
                 url = '{}/?station={}&types={}'.format(baseurl, station, itemid)
