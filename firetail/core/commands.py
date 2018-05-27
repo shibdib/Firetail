@@ -273,19 +273,15 @@ class Core:
             server_count += 1
             guilds.append(guild.name)
         guild_list = '\n'.join(guilds)
-
-        embed = utils.make_embed(
-            msg_type='info', title="Firetail Server Info")
-        embed.set_thumbnail(url=bot.user.avatar_url_as(format='png'))
-        embed.add_field(name="Server Count", value=server_count)
-        embed.add_field(name="Servers", value=guild_list[:1023], inline=False)
-        if len(guild_list) > 1023:
-            embed.add_field(name="Servers Continued", value=guild_list[1024:], inline=False)
-
-        try:
+        split_string = lambda x, n: [x[i:i + n] for i in range(0, len(x), n)]
+        guild_list = split_string(guild_list, 1024)
+        for split_list in guild_list:
+            embed = utils.make_embed(
+                msg_type='info', title="Firetail Server Info")
+            embed.set_thumbnail(url=bot.user.avatar_url_as(format='png'))
+            embed.add_field(name="Server Count", value=server_count)
+            embed.add_field(name="Servers", value=split_list, inline=False)
             await ctx.send(embed=embed)
-        except discord.HTTPException:
-            await ctx.send("I need the `Embed links` permission to send this")
 
     @_get.command(name="guildperms")
     @checks.is_admin()
