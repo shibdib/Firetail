@@ -69,6 +69,12 @@ class Killmails:
                     sql = "SELECT * FROM add_kills"
                     other_channels = await db.select(sql)
                     for add_kills in other_channels:
+                        #  Check if channels are still good and remove if not
+                        channel = self.bot.get_channel(int(add_kills[1]))
+                        if channel is None:
+                            self.logger.exception('Killmail - Bad Channel Attempted removing....')
+                            await self.remove_bad_channel(add_kills[1])
+                        #  Process added channels and process them if they match
                         if add_kills[3] == region_id and float(kill_data['zkb']['totalValue']) >= \
                                 float(add_kills[6]) and add_kills[1] not in sent_channels:
                             sent_channels.append(add_kills[1])
@@ -256,13 +262,7 @@ class Killmails:
                              location_name,
                              killmail_zkill),
                      inline=False)
-        try:
-            channel = bot.get_channel(int(channel_id))
-        except Exception:
-            self.logger.exception('Killmail - Bad Channel Attempted {} removing'.format(channel_id))
-            return await self.remove_bad_channel(channel_id)
-        # self.logger.info(('Killmail - Kill # {} has been posted to {}'
-        #                  '').format(kill_id, channel_name))
+        channel = bot.get_channel(int(channel_id))
         try:
             return await channel.send(embed=em)
         except Exception:
