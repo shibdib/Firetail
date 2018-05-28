@@ -1,7 +1,9 @@
 from discord.ext import commands
 from firetail.lib import db
 from firetail.core import checks
+from firetail.utils import make_embed
 import asyncio
+import random
 
 
 class EveRpg:
@@ -14,8 +16,7 @@ class EveRpg:
         self.loop.create_task(self.tick_loop())
 
     @commands.command(name='setRpg')
-    @checks.is_admin()
-    async def _rpg(self, ctx):
+    async def _set_rpg(self, ctx):
         """Sets a channel as an RPG channel.
         Do **!setRpg** to have a channel relay all RPG events.
         The RPG includes players from all servers this instance of the bot is on."""
@@ -34,7 +35,8 @@ class EveRpg:
     @checks.is_whitelist()
     async def _rpg(self, ctx):
         """Sign up for the RPG.
-        If your server doesn't have an RPG channel have an admin do **!setRpg** to receive the game events."""
+        If your server doesn't have an RPG channel have an admin do **!setRpg** to receive the game events.
+        If you've already registered this will reset your account."""
         sql = ''' REPLACE INTO eve_rpg_players(server_id,player_id)
                   VALUES(?,?) '''
         author = ctx.message.author.id
@@ -44,24 +46,209 @@ class EveRpg:
         self.logger.info('eve_rpg - ' + str(ctx.message.author) + ' added to the game.')
         return await ctx.author.send('**Success** - Welcome to the game.')
 
+    @commands.command(name='rpgStats', aliases=["rpgstats"])
+    @checks.spam_check()
+    @checks.is_whitelist()
+    async def _rpg_stats(self, ctx):
+        """Get your RPG Stats"""
+        sql = ''' SELECT * FROM eve_rpg_players WHERE `player_id` = (?) '''
+        values = (ctx.message.author.id,)
+        result = await db.select_var(sql, values)
+        if result is None:
+            return await ctx.author.send('**Error** - No player found.')
+        else:
+            ship_attack, ship_defense, ship_maneuverability, ship_tracking = await self.ship_attributes(result)
+            item_attack, item_defense, item_maneuverability, item_tracking = await self.item_attributes(result)
+            ship_stats = ' {}/{}/{}/{}'.format(ship_attack, ship_defense, ship_maneuverability, ship_tracking)
+            item_stats = ' {}/{}/{}/{}'.format(item_attack, item_defense, item_maneuverability, item_tracking)
+            embed = make_embed(guild=ctx.guild)
+            embed.set_footer(icon_url=ctx.bot.user.avatar_url,
+                             text="Provided Via Firetail Bot")
+            embed.add_field(name="Stats", value='\n Level: {}\nXP: {}/100\nShip : {}\nAttack/Defense/Maneuverability/Tracking: {}\nItems: {}\nItem Bonuses (Already applied to ship): {}\nKills: {}\nLosses: {}'.format(
+                result[0][5], result[0][6], result[0][7], ship_stats, result[0][8], item_stats, result[0][3], result[0][4]))
+            await ctx.channel.send(embed=embed)
+
     async def tick_loop(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
             try:
                 await self.process_turn()
-                await asyncio.sleep(25)
+                await asyncio.sleep(12)
             except Exception:
                 self.logger.exception('ERROR:')
                 await asyncio.sleep(5)
 
     async def process_turn(self):
-        sql = ''' SELECT * FROM eve_rpg_players ORDER BY RAND() LIMIT 1 '''
+        sql = ''' SELECT * FROM eve_rpg_players ORDER BY RANDOM() LIMIT 1 '''
         player = await db.select(sql)
-        user = self.bot.get_user(int(player[2]))
+        player_two = await db.select(sql)
+        user = self.bot.get_user(int(player[0][2]))
+        user_two = self.bot.get_user(int(player_two[0][2]))
         if user is None:
             self.logger.exception('eve_rpg - Bad player attempted removing....')
-            return await self.remove_bad_user(player[2])
+            return await self.remove_bad_user(player[0][2])
+        if user_two is None:
+            self.logger.exception('eve_rpg - Bad player attempted removing....')
+            return await self.remove_bad_user(player_two[0][2])
+        #  Get ship, set ibis if null
+        ship = player[0][7]
+        if ship is None:
+            sql = ''' UPDATE eve_rpg_players
+                    SET ship = (?)
+                    WHERE
+                        player_id = (?); '''
+            values = ('Ibis', player[0][2],)
+            await db.execute_sql(sql, values)
+            ship = 'Ibis'
+        ship_two = player_two[0][7]
+        if ship_two is None:
+            sql = ''' UPDATE eve_rpg_players
+                    SET ship = (?)
+                    WHERE
+                        player_id = (?); '''
+            values = ('Ibis', player_two[0][2],)
+            await db.execute_sql(sql, values)
         #  Share turn
+        #  PVP?
+        pvp = await self.weighted_choice([(True, 13), (False, 45)])
+        if user.id is user_two.id or pvp is False:
+            ship_attack, ship_defense, ship_maneuverability, ship_tracking = await self.ship_attributes(player)
+            #  PVE Rolls
+            death = await self.weighted_choice([(True, 11), (False, 75 + ((ship_defense * 1.5) + (ship_maneuverability * 1.2)))])
+            flee = await self.weighted_choice([(True, 13 + (ship_defense + (ship_maneuverability * 2))), (False, 80 - (ship_maneuverability * 2))])
+            escalation = await self.weighted_choice([(True, 4), (False, 96)])
+            if death is True and flee is False:
+                message = await self.weighted_choice([('**{}** flying in a {} died to gate guns.'.format(user.display_name, ship), 10),
+                                                      ('**{}** flying in a {} forgot to turn on their reps and died to rats.'.format(user.display_name, ship), 45),
+                                                      ('**{}** flying in a {} went afk in an anomaly and died.'.format(user.display_name, ship), 45)])
+                sql = ''' UPDATE eve_rpg_players
+                        SET ship = (?)
+                        WHERE
+                            player_id = (?); '''
+                values = ('Ibis', player[0][2],)
+                await db.execute_sql(sql, values)
+                await self.add_loss(player)
+                return await self.send_turn(message)
+            elif flee is True:
+                message = await self.weighted_choice([('**{}** flying in a {} had to take a bio break mid anomaly and docked up.'.format(user.display_name, ship), 10),
+                                                      ('**{}** flying in a {} overestimated their tank and fled the anomaly.'.format(user.display_name, ship), 45),
+                                                      ('**{}** flying in a {} almost died to gankers but was aligned and got away.'.format(user.display_name, ship), 45)])
+                return await self.send_turn(message)
+            else:
+                if escalation is True:
+                    message = await self.weighted_choice([('**{}** flying in a {} had their anomaly escalate and is enroute to the next system.'.format(user.display_name, ship), 50),
+                                                          ('**{}** flying in a {} got an escalation.'.format(user.display_name, ship), 50)])
+                    await self.send_turn(message)
+                    death = await self.weighted_choice([(True, 15), (False, 89 - ((ship_defense * 1.5) + (ship_maneuverability * 2)))])
+                    flee = await self.weighted_choice([(True, 13 + (ship_defense + (ship_maneuverability * 2))), (False, 87)])
+                    if death is True and flee is False:
+                        message = await self.weighted_choice([('**{}** flying in a {} died on their way to the escalation.'.format(user.display_name, ship), 10),
+                                                              ('**{}** flying in a {} forgot to turn on their reps and died to escalation rats.'.format(user.display_name, ship), 45),
+                                                              ('**{}** flying in a {} went afk in the escalation and died.'.format(user.display_name, ship), 45)])
+                        sql = ''' UPDATE eve_rpg_players
+                                SET ship = (?)
+                                    item = NULL
+                                WHERE
+                                    player_id = (?); '''
+                        values = ('Ibis', player[0][2],)
+                        await db.execute_sql(sql, values)
+                        await self.add_loss(player)
+                        return await self.send_turn(message)
+                    elif flee is True:
+                        message = await self.weighted_choice([('**{}** flying in a {} ran into a camp on the way and ran away.'.format(user.display_name, ship), 10),
+                                                              ('**{}** flying in a {} overestimated their tank and fled the escalation.'.format(user.display_name, ship), 45),
+                                                              ('**{}** flying in a {} almost died to gankers but was aligned and got away.'.format(user.display_name, ship), 45)])
+                        return await self.send_turn(message)
+                xp_gained = await self.weighted_choice([(3, 45), (5, 15), (7, 5)])
+                await self.add_xp(player, xp_gained)
+                message = await self.weighted_choice([('**{}** flying in a {} completed an anomaly in PL staging.'.format(user.display_name, ship), 10),
+                                                          ('**{}** flying in a {} successfully completed an anomaly.'.format(user.display_name, ship), 45),
+                                                          ('**{}** flying in a {} AFK ratted their way thru an anomaly.'.format(user.display_name, ship), 45)])
+                await self.send_turn(message)
+                # Award ship
+                weight = 14
+                if ship is 'Ibis':
+                    weight = 30
+                ship_drop = await self.weighted_choice([(True, weight), (False, 76)])
+                if ship_drop is True:
+                    new_ship = await self.new_ship(player)
+                    if new_ship is not None:
+                        message = await self.weighted_choice([('**{}** swapped their {} for a **{}** that they found abandoned next to an old POS.'.format(user.display_name, ship, new_ship), 10),
+                                                              ('**{}** wanted to fly something new so they traded in their {} for a **{}**.'.format(user.display_name, ship, new_ship), 45),
+                                                              ('**{}** sold some salvage and swapped their {} for a **{}**.'.format(user.display_name, ship, new_ship), 45)])
+                        await self.send_turn(message)
+                new_item = await self.new_item(player)
+                if new_item is not None:
+                    message = await self.weighted_choice([('**{}** salvaged a **{}**.'.format(user.display_name, new_item), 45),
+                                                          ('**{}** sold the loot from their last fight and decided to buy a **{}**.'.format(user.display_name, new_item), 45)])
+                    await self.send_turn(message)
+        else:
+            #  PVP Rolls
+            #  PVP Type
+            combat_type = await self.weighted_choice([('Gank', 8), ('Camp', 23), ('Solo', 14)])
+            #  PVP Winner/Loser
+            ship_attack, ship_defense, ship_maneuverability, ship_tracking = await self.ship_attributes(player)
+            ship_attack_two, ship_defense_two, ship_maneuverability_two, ship_tracking_two = await self.ship_attributes(player_two)
+            tracking_one = 1
+            if ship_tracking < ship_maneuverability_two:
+                tracking_one = 0.8
+            tracking_two = 1
+            if ship_tracking_two < ship_maneuverability:
+                tracking_two = 0.8
+            winner = await self.weighted_choice([(player, ((player[0][5] + 1) + (ship_attack - (ship_defense_two / 2))) * tracking_one), (player_two, ((player_two[0][5] + 1) + (ship_attack_two - (ship_defense / 2))) * tracking_two)])
+            loser = player
+            if winner is player:
+                loser = player_two
+            winner_name = self.bot.get_user(int(winner[0][2])).display_name
+            loser_name = self.bot.get_user(int(loser[0][2])).display_name
+            winner_ship = winner[0][7]
+            loser_ship = loser[0][7]
+            xp_gained = await self.weighted_choice([(5, 45), (7, 15), (10, 5)])
+            if combat_type is 'Gank':
+                message = await self.weighted_choice([('**PVP** - **{}** flying in a {} got a dank tick when **{}** flying in a {} tried to gank him and failed.'.format(winner_name, winner_ship, loser_name, loser_ship), 10),
+                                                      ('**PVP** - **{}** flying in a {} went AFK and got killed by **{}** in a {}.'.format(loser_name, loser_ship, winner_name, winner_ship), 45),
+                                                      ('**PVP** - **{}** flying in a {} was trying to Krab but **{}** in a {} had other ideas and killed him.'.format(loser_name, loser_ship, winner_name, winner_ship), 45)])
+                await self.send_turn(message)
+            elif combat_type is 'Camp':
+                message = await self.weighted_choice([('**PVP** - **{}** flying in a {} ran into **{}** in a {} on a gate and was killed as soon as he de-cloaked.'.format(loser_name, loser_ship, winner_name, winner_ship), 10),
+                                                      ('**PVP** - **{}** flying in a {} had their auto-pilot turned on and was killed by **{}** in a {} at a gate.'.format(loser_name, loser_ship, winner_name, winner_ship), 45),
+                                                      ('**PVP** - **{}** flying in a {} tried to warp away from a gate but **{}** in a {} was able to get point and kill them.'.format(loser_name, loser_ship, winner_name, winner_ship), 45)])
+                await self.send_turn(message)
+            elif combat_type is 'Solo':
+                message = await self.weighted_choice([('**PVP** - **{}** flying in a {} ran into a **{}** while roaming for content. Honorable PVP occurred and {} was victorious.'.format(loser_name, loser_ship, winner_ship, winner_name), 10),
+                                                      ('**PVP** - **{}** flying in a {} encountered **{}** on a gate and was defeated by their superior {}.'.format(loser_name, loser_ship, winner_name, winner_ship), 45),
+                                                      ('**PVP** - **{}** flying in a {} tried desperately to defeat **{}** but was unable to escape the scram of the enemies {}.'.format(loser_name, loser_ship, winner_name, winner_ship), 45)])
+                await self.send_turn(message)
+            sql = ''' UPDATE eve_rpg_players
+                    SET ship = (?),
+                        item = NULL
+                    WHERE
+                        player_id = (?); '''
+            values = ('Ibis', loser[0][2],)
+            await db.execute_sql(sql, values)
+            await self.add_loss(loser)
+            await self.add_kill(winner)
+            await self.add_xp(winner, xp_gained)
+            # Award ship
+            weight = 14
+            if winner_ship is 'Ibis':
+                weight = 30
+            ship_drop = await self.weighted_choice([(True, weight), (False, 76)])
+            if ship_drop is True:
+                new_ship = await self.new_ship(winner)
+                if new_ship is not None:
+                    message = await self.weighted_choice([('**{}** swapped their {} for a **{}** that they found abandoned next to an old POS.'.format(winner_name, winner_ship, new_ship), 10),
+                                                          ('**{}** wanted to fly something new so they traded in their {} for a **{}**.'.format(winner_name, winner_ship, new_ship), 45),
+                                                          ('**{}** sold the loot from their last fight and decided to swap their {} for a **{}**.'.format(winner_name, winner_ship, new_ship), 45)])
+                    await self.send_turn(message)
+            new_item = await self.new_item(winner)
+            if new_item is not None:
+                message = await self.weighted_choice([('**{}** salvaged a **{}**.'.format(winner_name, new_item), 45),
+                                                      ('**{}** sold the loot from their last fight and decided to buy a **{}**.'.format(winner_name, new_item), 45)])
+                await self.send_turn(message)
+
+
+    async def send_turn(self, message):
         sql = "SELECT * FROM eve_rpg_channels"
         game_channels = await db.select(sql)
         for channels in game_channels:
@@ -69,11 +256,11 @@ class EveRpg:
             if channel is None:
                 self.logger.exception('eve_rpg - Bad Channel Attempted removing....')
                 await self.remove_bad_channel(channels[2])
-            channel.send('Testing RPG **{}** died to rats'.format(user['display_name']))
+            await channel.send(message)
 
-    async def remove_bad_user(self, channel_id):
+    async def remove_bad_user(self, player_id):
         sql = ''' DELETE FROM eve_rpg_players WHERE `player_id` = (?) '''
-        values = (channel_id,)
+        values = (player_id,)
         await db.execute_sql(sql, values)
         return self.logger.info('eve_rpg - Bad player removed successfully')
 
@@ -82,3 +269,125 @@ class EveRpg:
         values = (channel_id,)
         await db.execute_sql(sql, values)
         return self.logger.info('eve_rpg - Bad Channel removed successfully')
+
+    async def add_xp(self, player, xp_gained):
+        if player[0][6] + xp_gained < 100:
+            sql = ''' UPDATE eve_rpg_players
+                    SET xp = (?)
+                    WHERE
+                        player_id = (?); '''
+            values = (player[0][6] + xp_gained, player[0][2],)
+        else:
+            sql = ''' UPDATE eve_rpg_players
+                    SET level = (?),
+                        xp = (?)
+                    WHERE
+                        player_id = (?); '''
+            values = (player[0][5] + 1, 0, player[0][2],)
+        await db.execute_sql(sql, values)
+
+    async def add_kill(self, player):
+        sql = ''' UPDATE eve_rpg_players
+                SET kills = (?)
+                WHERE
+                    player_id = (?); '''
+        values = (int(player[0][3]) + 1, player[0][2],)
+        await db.execute_sql(sql, values)
+
+    async def add_loss(self, player):
+        sql = ''' UPDATE eve_rpg_players
+                SET losses = (?)
+                WHERE
+                    player_id = (?); '''
+        values = (int(player[0][4]) + 1, player[0][2],)
+        await db.execute_sql(sql, values)
+
+    async def new_ship(self, player):
+        ship_tier = await self.weighted_choice([(player[0][5], 25), (player[0][5] + 1, 8), (player[0][5] + 2, 3)])
+        if ship_tier is 1:
+            ship = await self.weighted_choice([('Rifter', 25), ('Slicer', 25), ('Firetail', 3), ('Dramiel', 3)])
+        elif ship_tier is 2:
+            ship = await self.weighted_choice([('Firetail', 15), ('Dramiel', 15), ('Thrasher', 15), ('Catalyst', 15)])
+        elif ship_tier is 3:
+            ship = await self.weighted_choice([('Thrasher', 15), ('Svipul', 15), ('Jackdaw', 15), ('Rupture', 5)])
+        elif ship_tier is 4:
+            ship = await self.weighted_choice([('Rupture', 15), ('Vexor', 15), ('Moa', 15), ('Vexor Navy Issue', 5)])
+        else:
+            ship = await self.weighted_choice([('Eagle', 15), ('Ferox', 15), ('Hurricane', 15), ('Drake', 5)])
+        sql = ''' UPDATE eve_rpg_players
+                SET ship = (?)
+                WHERE
+                    player_id = (?); '''
+        values = (ship, player[0][2],)
+        await db.execute_sql(sql, values)
+        return ship
+
+    async def new_item(self, player):
+        items = player[0][8]
+        item = await self.weighted_choice([('Armor Plate', 10), ('Shield Extender', 5), ('Gyrostabilizer', 8), ('MWD', 8), ('AB', 10), (None, 35)])
+        if item is None:
+            return None
+        if items is not None and item in items:
+            return None
+        else:
+            sql = ''' UPDATE eve_rpg_players
+                    SET item = (?)
+                    WHERE
+                        player_id = (?); '''
+            values = ('{}, {}'.format(items, item), player[0][2],)
+            await db.execute_sql(sql, values)
+            return item
+
+    async def ship_attributes(self, player):
+        ship = player[0][7]
+        item_attack, item_defense, item_maneuverability, item_tracking = await self.item_attributes(player)
+        if ship == 'Ibis':
+            return 1 + item_attack, 1 + item_defense, 3 + item_maneuverability, 1 + item_tracking
+        if ship == 'Rifter' or ship == 'Slicer':
+            return 2 + item_attack, 1 + item_defense, 4 + item_maneuverability, 3 + item_tracking
+        if ship == 'Dramiel' or ship == 'Firetail':
+            return 3 + item_attack, 1 + item_defense, 5 + item_maneuverability, 3 + item_tracking
+        if ship == 'Catalyst' or ship == 'Thrasher':
+            return 4 + item_attack, 1 + item_defense, 3 + item_maneuverability, 4 + item_tracking
+        if ship == 'Svipul' or ship == 'Jackdaw':
+            return 3 + item_attack, 2 + item_defense, 3 + item_maneuverability, 4 + item_tracking
+        if ship == 'Rupture' or ship == 'Moa' or ship == 'Vexor':
+            return 4 + item_attack, 3 + item_defense, 2 + item_maneuverability, 2 + item_tracking
+        if ship == 'Vexor':
+            return 4 + item_attack, 3 + item_defense, 2 + item_maneuverability, 5 + item_tracking
+        if ship == 'Vexor Navy Issue':
+            return 5 + item_attack, 3 + item_defense, 2 + item_maneuverability, 5 + item_tracking
+        if ship == 'Hurricane' or ship == 'Ferox' or ship == 'Eagle':
+            return 5 + item_attack, 3 + item_defense, 2 + item_maneuverability, 3 + item_tracking
+        if ship == 'Drake':
+            return 3 + item_attack, 5 + item_defense, 2 + item_maneuverability, 4 + item_tracking
+
+    async def item_attributes(self, player):
+        item_attack, item_defense, item_maneuverability, item_tracking = 0, 0, 0, 0
+        items = player[0][8]
+        if items is None:
+            return 0, 0, 0, 0
+        if 'Armor Plate' in items:
+            item_defense = item_defense + 1
+            item_maneuverability = item_maneuverability - 1
+        if 'Shield Extender' in items:
+            item_defense = item_defense + 1
+        if 'Gyrostabilizer' in items:
+            item_attack = item_attack + 1
+            item_tracking = item_tracking + 1
+        if 'MWD' in items:
+            item_maneuverability = item_maneuverability + 2
+            item_tracking = item_tracking - 1
+        if 'AB' in items:
+            item_maneuverability = item_maneuverability + 1
+        return item_attack, item_defense, item_maneuverability, item_tracking
+
+    async def weighted_choice(self, items):
+        """items is a list of tuples in the form (item, weight)"""
+        weight_total = sum((item[1] for item in items))
+        n = random.uniform(0, weight_total)
+        for item, weight in items:
+            if n < weight:
+                return item
+            n = n - weight
+        return item
