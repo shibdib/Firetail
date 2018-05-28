@@ -199,7 +199,7 @@ class EveRpg:
                             user.display_name, ship), 50)])
                     await self.send_turn(message)
                     death = await self.weighted_choice(
-                        [(True, 15), (False, 89 - ((ship_defense * 1.5) + (ship_maneuverability * 2)))])
+                        [(True, 11), (False, 75 + ((ship_defense * 1.5) + (ship_maneuverability * 1.2)))])
                     flee = await self.weighted_choice(
                         [(True, 13 + (ship_defense + (ship_maneuverability * 2))), (False, 87)])
                     if death is True and flee is False:
@@ -292,8 +292,8 @@ class EveRpg:
             tracking_two = 1
             if ship_tracking_two < ship_maneuverability:
                 tracking_two = 0.8
-            player_one_weight = ((player[0][5] + 1) + (ship_attack - (ship_defense_two / 2))) * tracking_one
-            player_two_weight = ((player_two[0][5] + 1) + (ship_attack_two - (ship_defense / 2))) * tracking_two
+            player_one_weight = (((player[0][5] + 1) * 0.5) + (ship_attack - (ship_defense_two / 2))) * tracking_one
+            player_two_weight = (((player_two[0][5] + 1) * 0.5) + (ship_attack_two - (ship_defense / 2))) * tracking_two
             weight = '\n\n_Debug: Battle Weights (Higher is better) {} - {} | {} - {}_'.format(
                 self.bot.get_user(int(player[0][2])).display_name, player_one_weight,
                 self.bot.get_user(int(player_two[0][2])).display_name, player_two_weight)
