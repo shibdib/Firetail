@@ -4,6 +4,7 @@ import asyncio
 import feedparser
 import discord
 from datetime import datetime
+import dateparser
 
 class Rss:
     # Number of minutes between feed checks
@@ -84,8 +85,7 @@ class Rss:
         return sendable_feeds
 
     def format_message(self, feed_title, entry):
-        timestamp = datetime.strptime(entry['published'],
-                                      '%a, %d %b %Y %H:%M:%S %Z')
+        timestamp = dateparser.parse(entry['published'])
         embed = discord.Embed(title=entry['title'],
                               timestamp=timestamp,
                               url=entry['link'])
