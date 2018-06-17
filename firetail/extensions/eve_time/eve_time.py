@@ -9,19 +9,15 @@ from firetail.core import checks
 class EveTime:
     """This extension handles the time commands."""
 
+    DEFAULT_TIMEZONES = {
+        'Eve Time': 'UTC'
+    }
+
     def __init__(self, bot):
         self.bot = bot
         self.config = bot.config
         self.logger = bot.logger
 
-    TIMEZONES = {
-        'EVE Time': 'UTC',
-        'PST/California': 'America/Los_Angeles',
-        'EST/New York': 'America/New_York',
-        'CET/Copenhagen': 'Europe/Copenhagen',
-        'MSK/Moscow': 'Europe/Moscow',
-        'AEST/Sydney': 'Australia/Sydney',
-    }
 
     @commands.command(name='time')
     @checks.spam_check()
@@ -29,9 +25,15 @@ class EveTime:
     async def _time(self, ctx):
         """Shows the time in a range of timezones."""
         self.logger.info('EveTime - {} requested time info.'.format(str(ctx.message.author)))
+        dest = ctx.author if ctx.bot.config.dm_only else ctx
+        try:
+            timezones = self.config.timezones
+        except AttributeError:
+            timezones = DEFAULT_TIMEZONES
+
         tz_field = []
         time_field = []
-        for display, zone in self.TIMEZONES.items():
+        for display, zone in timezones.items():
             tz_field.append("**{}**".format(display))
             time_field.append(datetime.now(pytz.timezone(zone)).strftime('%H:%M'))
 
@@ -40,7 +42,7 @@ class EveTime:
                          text="Provided Via Firetail Bot")
         embed.add_field(name="Time Zones", value='\n'.join(tz_field), inline=True)
         embed.add_field(name="Time", value='\n'.join(time_field), inline=True)
-        dest = ctx.author if ctx.bot.config.dm_only else ctx
         await dest.send(embed=embed)
-        if ctx.bot.config.delete_commands:
+        # Delete the user's command message if configred to
+        if self.config.delete_commands:
             await ctx.message.delete()
