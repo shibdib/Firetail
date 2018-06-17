@@ -1,6 +1,6 @@
-from discord.ext import commands
 import pytz
 from datetime import datetime
+from discord.ext import commands
 
 from firetail.utils import make_embed
 from firetail.core import checks
@@ -29,7 +29,7 @@ class EveTime:
         try:
             timezones = self.config.timezones
         except AttributeError:
-            timezones = DEFAULT_TIMEZONES
+            timezones = self.DEFAULT_TIMEZONES
 
         tz_field = []
         time_field = []
