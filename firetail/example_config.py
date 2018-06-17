@@ -90,4 +90,13 @@ rss = {
     },
 }
 
-
+# Eve Time (!time) extension settings
+timezones = {
+    'EVE Time': 'UTC',
+    'BST/London': 'Europe/London'
+    'PST/California': 'America/Los_Angeles',
+    'EST/New York': 'America/New_York',
+    'CET/Copenhagen': 'Europe/Copenhagen',
+    'MSK/Moscow': 'Europe/Moscow',
+    'AEST/Sydney': 'Australia/Sydney',
+}

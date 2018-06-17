@@ -1,0 +1,5 @@
+languages:
+  - python
+
+exclude:
+  - firetail/example_config.py
