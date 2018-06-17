@@ -31,6 +31,7 @@ setup(
         'asyncpg>=0.13',
         'pytz',
         'youtube_dl',
+        'dateparser'
         'aiohttp>=3.2.0',
         'feedparser'
     ],
