@@ -1,10 +1,8 @@
-from firetail.lib import db
-from firetail.utils import make_embed
 import asyncio
-import feedparser
 import discord
-from datetime import datetime
+import feedparser
 import dateparser
+from firetail.lib import db
 
 class Rss:
     # Number of minutes between feed checks
@@ -17,7 +15,7 @@ class Rss:
         self.logger = bot.logger
         self.logger.info(self.session)
         self.loop = asyncio.get_event_loop()
-        self.updateInterval = self.config.rss.get(
+        self.update_interval = self.config.rss.get(
             'updateInterval',
             self.DEFAULT_UPDATE_INTERVAL)
         self.loop.create_task(self.tick_loop())
@@ -34,7 +32,7 @@ class Rss:
             except Exception:
                 self.logger.exception('ERROR:')
             finally:
-                await asyncio.sleep(self.updateInterval*60)
+                await asyncio.sleep(self.update_interval*60)
 
     async def poll_feeds(self):
         """ Poll a list of RSS feeds from self.config, looking for
@@ -70,18 +68,17 @@ class Rss:
             sendable_entries = []
             for entry in feed['entries']:
                 posted = await db.select_var(
-                        'SELECT channel_id FROM rss where entry_id = ?',
-                        (entry['id'],))  # one-entry tuple
+                    'SELECT channel_id FROM rss where entry_id = ?',
+                    (entry['id'],))  # one-entry tuple
                 if posted != None and not posted:
                     sendable_entries.append(entry)
                 else:
                     self.logger.debug("Entry {} already processed".format(entry['id']))
-            else:
-                self.logger.info("Found {} new entries for feed {}".format(
-                    len(sendable_entries), feed_name))
-                sendable_feed = feed
-                sendable_feed['entries'] = sendable_entries
-                sendable_feeds[feed_name] = sendable_feed
+            self.logger.info("Found {} new entries for feed {}".format(
+                len(sendable_entries), feed_name))
+            sendable_feed = feed
+            sendable_feed['entries'] = sendable_entries
+            sendable_feeds[feed_name] = sendable_feed
         return sendable_feeds
 
     def format_message(self, feed_title, entry):
@@ -107,7 +104,7 @@ class Rss:
                 channel = self.bot.get_channel(int(channel_id))
                 self.logger.debug("Sending to channel {} for feed {}".format(
                     channel_id, feed_name))
-            except Exception:
+            except AttributeError:
                 self.logger.exception("Bad channel {} for feed {}".format(
                     channel_id, feed_name))
                 break
@@ -116,7 +113,7 @@ class Rss:
                 content, embed = self.format_message(feed['feed']['title'], entry)
                 try:
                     await channel.send(content, embed=embed)
-                except Exception:
+                except discord.DiscordException:
                     self.logger.exception("Failed to send {} to channel {} for feed {}".format(
                         entry['id'], channel_id, feed_name))
                 else:
@@ -125,4 +122,5 @@ class Rss:
                     try:
                         await db.execute_sql(sql, values)
                     except Exception:
-                        self.logger.exception("Failed to store sending of entry {}".format(entry['id']))
+                        self.logger.exception(
+                            "Failed to store sending of entry {}".format(entry['id']))
