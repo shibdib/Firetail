@@ -34,6 +34,7 @@ class Killmails:
         big_kills = config.killmail['bigKills']
         big_kills_value = config.killmail['bigKillsValue']
         solar_system_id = kill_data['killmail']['solar_system_id']
+        self.logger.info(solar_system_id)
         data = await self.bot.esi_data.system_info(solar_system_id)
         constellation_id = data['constellation_id']
         constellation_data = await self.bot.esi_data.constellation_info(constellation_id)
@@ -266,9 +267,9 @@ class Killmails:
         try:
             return await channel.send(embed=em)
         except Exception:
-            await self.remove_bad_channel(channel_id)
-            return self.logger.exception(
+            self.logger.exception(
                 'Killmail - Killmail ID {} failed to send to channel {} due to..'.format(kill_id, channel_id))
+            await self.remove_bad_channel(channel_id)
 
     async def request_data(self):
         base_url = "https://redisq.zkillboard.com"
@@ -286,4 +287,4 @@ class Killmails:
         sql = ''' DELETE FROM add_kills WHERE `channelid` = (?) '''
         values = (channel_id,)
         await db.execute_sql(sql, values)
-        return self.logger.info('Killmail - Bad Channel removed successfully')
+        return self.logger.info('Killmail - Bad Channel {} removed successfully'.format(channel_id))
