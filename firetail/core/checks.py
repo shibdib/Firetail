@@ -23,7 +23,11 @@ async def check_is_mod(ctx):
 
 
 async def check_spam(ctx):
-    if '!help' in ctx.message.content or ctx.guild is None:
+    def send_warning():
+        return ctx.author.send('WARNING: You are being rate limited from using bot commands.'
+                          ' Try again in {} seconds or DM me the commands.'.
+                          format(wait_time))
+    if 'help' in ctx.message.content or ctx.guild is None:
         return True
     spam_list = ctx.bot.bot_users
     spam_list_length = len(spam_list)
@@ -51,13 +55,7 @@ async def check_spam(ctx):
         wait_time = int((repeat - 2) * 30)
         if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.message.delete()
-            await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
-                                  ' Try again in {} seconds or DM me the commands.'.
-                                  format(wait_time))
-        else:
-            await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
-                                  ' Try again in {} seconds or DM me the commands.'.
-                                  format(wait_time))
+        await send_warning()
         ctx.bot.repeat_offender.append(ctx.author.id)
         return False
     spam_count = spam_list.count(ctx.author.id)
@@ -67,13 +65,7 @@ async def check_spam(ctx):
         wait_time = int((spam_count - threshold) * 5)
         if ctx.guild is not None and ctx.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.message.delete()
-            await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
-                                  ' Try again in {} seconds or DM me the commands.'.
-                                  format(wait_time))
-        else:
-            await ctx.author.send('WARNING: You are being rate limited from using bot commands.'
-                                  ' Try again in {} seconds or DM me the commands.'.
-                                  format(wait_time))
+        await send_warning()
         ctx.bot.repeat_offender.append(ctx.author.id)
         return False
     if spam_list_length >= 40:
