@@ -31,8 +31,7 @@ setup(
         'asyncpg>=0.13',
         'pytz',
         'youtube_dl',
-        'aiohttp>=3.2.0',
-        'feedparser'
+        'aiohttp>=3.3.0,<3.4.0'
     ],
 
     dependency_links=[
