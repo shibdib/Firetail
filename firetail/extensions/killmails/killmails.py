@@ -73,8 +73,9 @@ class Killmails:
                         #  Check if channels are still good and remove if not
                         channel = self.bot.get_channel(int(add_kills[1]))
                         if channel is None:
-                            self.logger.exception('Killmail - Bad Channel Attempted removing....')
-                            await self.remove_bad_channel(add_kills[1])
+                            continue
+                            #  self.logger.exception('Killmail - Bad Channel Attempted removing....')
+                            #  await self.remove_bad_channel(add_kills[1])
                         #  Process added channels and process them if they match
                         if add_kills[3] == region_id and float(kill_data['zkb']['totalValue']) >= \
                                 float(add_kills[6]) and add_kills[1] not in sent_channels:
@@ -269,7 +270,7 @@ class Killmails:
         except Exception:
             self.logger.exception(
                 'Killmail - Killmail ID {} failed to send to channel {} due to..'.format(kill_id, channel_id))
-            await self.remove_bad_channel(channel_id)
+            #  await self.remove_bad_channel(channel_id)
 
     async def request_data(self):
         base_url = "https://redisq.zkillboard.com"
