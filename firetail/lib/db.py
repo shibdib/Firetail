@@ -68,6 +68,26 @@ async def create_tables():
                                         attackers_score INTEGER NOT NULL
                                     ); """
         await create_table(db, sov_tracker_table)
+        # create eve_rpg tables
+        eve_rpg_channels_table = """ CREATE TABLE IF NOT EXISTS eve_rpg_channels (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        server_id INTEGER NOT NULL UNIQUE,
+                                        channel_id STRING NOT NULL,
+                                        owner_id INTEGER NOT NULL
+                                    ); """
+        await create_table(db, eve_rpg_channels_table)
+        eve_rpg_players_table = """ CREATE TABLE IF NOT EXISTS eve_rpg_players (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        server_id INTEGER NOT NULL,
+                                        player_id INTEGER NOT NULL UNIQUE,
+                                        kills INTEGER DEFAULT 0,
+                                        losses INTEGER DEFAULT 0,
+                                        level INTEGER DEFAULT 0,
+                                        xp INTEGER DEFAULT 0,
+                                        ship TEXT DEFAULT NULL,
+                                        item TEXT DEFAULT NULL
+                                    ); """
+        await create_table(db, eve_rpg_players_table)
         # create access_tokens table
         tokens_table = """ CREATE TABLE IF NOT EXISTS access_tokens (
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -86,7 +106,7 @@ async def create_tables():
                                     ); """
         await create_table(db, rss_table)
     else:
-        print('Database: Unable to connect to the database at ' + db_file)
+        print('Database: Unable to connect to the database')
 
 
 async def select(sql, single=False):

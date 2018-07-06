@@ -34,6 +34,7 @@ class Killmails:
         big_kills = config.killmail['bigKills']
         big_kills_value = config.killmail['bigKillsValue']
         solar_system_id = kill_data['killmail']['solar_system_id']
+        self.logger.info(solar_system_id)
         data = await self.bot.esi_data.system_info(solar_system_id)
         constellation_id = data['constellation_id']
         constellation_data = await self.bot.esi_data.constellation_info(constellation_id)
@@ -72,8 +73,9 @@ class Killmails:
                         #  Check if channels are still good and remove if not
                         channel = self.bot.get_channel(int(add_kills[1]))
                         if channel is None:
-                            self.logger.exception('Killmail - Bad Channel Attempted removing....')
-                            await self.remove_bad_channel(add_kills[1])
+                            continue
+                            #  self.logger.exception('Killmail - Bad Channel Attempted removing....')
+                            #  await self.remove_bad_channel(add_kills[1])
                         #  Process added channels and process them if they match
                         if add_kills[3] == region_id and float(kill_data['zkb']['totalValue']) >= \
                                 float(add_kills[6]) and add_kills[1] not in sent_channels:
@@ -266,9 +268,9 @@ class Killmails:
         try:
             return await channel.send(embed=em)
         except Exception:
-            await self.remove_bad_channel(channel_id)
-            return self.logger.exception(
+            self.logger.exception(
                 'Killmail - Killmail ID {} failed to send to channel {} due to..'.format(kill_id, channel_id))
+            #  await self.remove_bad_channel(channel_id)
 
     async def request_data(self):
         base_url = "https://redisq.zkillboard.com"
@@ -286,4 +288,4 @@ class Killmails:
         sql = ''' DELETE FROM add_kills WHERE `channelid` = (?) '''
         values = (channel_id,)
         await db.execute_sql(sql, values)
-        return self.logger.info('Killmail - Bad Channel removed successfully')
+        return self.logger.info('Killmail - Bad Channel {} removed successfully'.format(channel_id))
