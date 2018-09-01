@@ -50,15 +50,21 @@ class Killmails:
             #  Get all group id's from the mail
             attacker_group_ids = []
             loss_group_ids = []
+            #  Get all character id's
+            character_ids = []
             if loss:
                 loss_group_ids.append(int(kill_data['killmail']['victim']['corporation_id']))
                 if 'alliance_id' in kill_data['killmail']['victim']:
                     loss_group_ids.append(int(kill_data['killmail']['victim']['alliance_id']))
+                if 'character_id' in kill_data['killmail']['victim']:
+                    character_ids.append(int(kill_data['killmail']['victim']['character_id']))
             for attacker in kill_data['killmail']['attackers']:
                 if 'corporation_id' in attacker:
                     attacker_group_ids.append(int(attacker['corporation_id']))
                 if 'alliance_id' in attacker:
                     attacker_group_ids.append(int(attacker['alliance_id']))
+                if 'character_id' in attacker:
+                    character_ids.append(int(attacker['character_id']))
             if loss and killmail_group_id in attacker_group_ids and channel_id not in sent_channels:
                 sent_channels.append(channel_id)
                 await self.process_kill(channel_id, kill_data)
@@ -86,6 +92,10 @@ class Killmails:
                             sent_channels.append(add_kills[1])
                             await self.process_kill(add_kills[1], kill_data)
                         if add_kills[3] in attacker_group_ids and float(kill_data['zkb']['totalValue']) >= \
+                                float(add_kills[6]) and add_kills[1] not in sent_channels:
+                            sent_channels.append(add_kills[1])
+                            await self.process_kill(add_kills[1], kill_data)
+                        if add_kills[3] in character_ids and float(kill_data['zkb']['totalValue']) >= \
                                 float(add_kills[6]) and add_kills[1] not in sent_channels:
                             sent_channels.append(add_kills[1])
                             await self.process_kill(add_kills[1], kill_data)

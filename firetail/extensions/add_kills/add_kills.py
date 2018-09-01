@@ -63,6 +63,7 @@ class AddKills:
         group_alliance = await self.bot.esi_data.alliance_info(group)
         solar_system = await self.bot.esi_data.system_info(group)
         region = await self.bot.esi_data.region_info(group)
+        character = await self.bot.esi_data.character_info(group)
         loss = ''
         if losses == 'true':
             loss = ' and lossmails'
@@ -71,7 +72,7 @@ class AddKills:
             return await self.remove_server(ctx)
         # Verify group exists
         if 'error' in group_corp and 'error' in group_alliance and 'error' in solar_system and 'error'\
-                in region and group != 9:
+                in region and 'error' in character and group != 9:
             return await ctx.channel.send('Not a valid ID. Please use **!help addkills** '
                                           'for more info.')
         name = '**Unable to get name**'
@@ -83,6 +84,8 @@ class AddKills:
             name = solar_system['name']
         elif 'error' not in region:
             name = region['name']
+        elif 'error' not in character:
+            name = character['name']
         if group == 9:
             name = 'EVE Wide {}+ Kills'.format(clean)
         sql = ''' REPLACE INTO add_kills(channelid,serverid,losses,threshold,groupid,ownerid)
