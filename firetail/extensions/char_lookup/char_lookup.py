@@ -26,7 +26,8 @@ class CharLookup:
         if len(ctx.message.content.split()) == 1:
             dest = ctx.author if ctx.bot.config.dm_only else ctx
             return await dest.send('**ERROR:** Use **!help char** for more info.')
-        character_name = ctx.message.content.split(' ', 1)[1]
+        """ split and take everything after the initial char command """
+        character_name = ctx.message.content.split(' ')[1:]
         if '@' in character_name:
             member = ctx.guild.get_member(int(character_name.replace('<@', '').replace('>', '').replace('!', '')))
             character_name = member.display_name
