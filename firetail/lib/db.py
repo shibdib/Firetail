@@ -105,6 +105,11 @@ async def create_tables():
                                        channel_id INTEGER NOT NULL
                                     ); """
         await create_table(db, rss_table)
+        # create prefix table
+        prefix_table = ("CREATE TABLE IF NOT EXISTS prefixes ("
+                        "  guild_id INTEGER PRIMARY KEY,"
+                        "  prefix TEXT NOT NULL);")
+        await create_table(db, prefix_table)
     else:
         print('Database: Unable to connect to the database')
 
