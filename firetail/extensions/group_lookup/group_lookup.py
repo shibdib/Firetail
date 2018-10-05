@@ -156,7 +156,8 @@ class GroupLookup:
                                                                         total_kills, super_count, titan_count,
                                                                         most_active_system),
                             inline=True)
-            embed.add_field(name="Description", value=corp_description[:1023])
+            if len(corp_description) > 1:
+                embed.add_field(name="Description", value=corp_description[:1023])
         elif group == 'corporation' and not alliance:
             embed.add_field(name="General Info", value='Name:\nTicker:\nMember Count:',
                             inline=True)
@@ -172,7 +173,8 @@ class GroupLookup:
                                                                         total_kills, super_count, titan_count,
                                                                         most_active_system),
                             inline=True)
-            embed.add_field(name="Description", value=corp_description[:1023])
+            if len(corp_description) > 1:
+                embed.add_field(name="Description", value=corp_description[:1023])
         elif group == 'alliance':
             embed.add_field(name="General Info", value='Name:\nTicker:',
                             inline=True)
