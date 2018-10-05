@@ -6,7 +6,6 @@ setup(
     description='firetail - An EVE Online Discord Bot',
     url='https://github.com/shibdib/firetail',
     author='shibdib',
-    author_email='',
     license='GNU General Public License v3.0',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -31,16 +30,13 @@ setup(
         'asyncpg>=0.13',
         'pytz',
         'youtube_dl',
-        'aiohttp==3.3.2'
+        'aiohttp==3.3.2',
+        'feedparser'
     ],
 
     dependency_links=[
-        'git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py-1'
+        'git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py[voice]'
     ],
-
-    package_data={
-        'firetail': ['data/*.json'],
-    },
 
     entry_points={
         'console_scripts': [
