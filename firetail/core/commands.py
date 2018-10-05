@@ -426,34 +426,33 @@ class Core:
         """Get and set server prefix.
         Use the argument 'reset' to reset the guild prefix to default.
         """
-        bot = ctx.bot
-        default_prefix = bot.default_prefix
-        if ctx.guild:
+        if not ctx.guild:
             if new_prefix:
-                await bot.data.guild(ctx.guild.id).prefix(new_prefix)
-                if new_prefix.lower() == 'reset':
-                    new_prefix = bot.default_prefix
                 embed = utils.make_embed(
-                    msg_type='success', title="Prefix set to {}".format(new_prefix))
-                await ctx.send(embed=embed)
-            else:
-                guild_prefix = await bot.data.guild(ctx.guild).prefix()
-                prefix = guild_prefix if guild_prefix else default_prefix
-                if len(prefix) > 1:
-                    prefix = ', '.join(default_prefix)
-                else:
-                    prefix = prefix[0]
-                embed = utils.make_embed(
-                    msg_type='info', title="Prefix is {}".format(prefix))
-                await ctx.send(embed=embed)
-        else:
-            if len(default_prefix) > 1:
-                prefix = ', '.join(default_prefix)
-            else:
-                prefix = default_prefix[0]
+                    msg_type='error',
+                    title="Prefix cannot be set in DMs.")
+                return await ctx.send(embed=embed)
             embed = utils.make_embed(
                 msg_type='info', title="Prefix is {}".format(prefix))
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
+
+        if not new_prefix:
+            guild_prefix = ctx.bot.prefixes.get(ctx.guild.id)
+            prefix = guild_prefix or ctx.bot.default_prefix
+            embed = utils.make_embed(
+                msg_type='info', title="Prefix is {}".format(prefix))
+            return await ctx.send(embed=embed)
+
+        await db.execute_sql(
+            "INSERT OR REPLACE INTO prefixes(guild_id, prefix)"
+            "VALUES(?, ?)", (ctx.guild.id, new_prefix))
+
+        ctx.bot.prefixes[ctx.guild.id] = new_prefix
+
+        embed = utils.make_embed(
+            msg_type='info', title="Prefix set to {}".format(new_prefix))
+        return await ctx.send(embed=embed)
+
 
     @commands.command(name="whitelist")
     @checks.is_admin()
