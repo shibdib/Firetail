@@ -172,16 +172,10 @@ class CharLookup:
                 data = json.loads(data)
                 kill_esi_url = 'https://esi.tech.ccp.is/latest/killmails/{}/{}/'.format(
                     data[0]['killmail_id'], data[0]['zkb']['hash'])
-                self.logger.info(
-                    'CharLookup - {} '.format(str(kill_esi_url)))
                 async with session.get(kill_esi_url) as kill_resp:
                     data = await kill_resp.text()
                     data = json.loads(data)
-                    self.logger.info(
-                        'CharLookup - {} '.format(str(data)))
                     try:
-                        self.logger.info(
-                            'CharLookup - {} '.format(str(data['victim']['character_id'])))
                         victim_id = data['victim']['character_id']
                     except Exception:
                         victim_id = 0
