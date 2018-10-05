@@ -1,13 +1,16 @@
-import discord
-from discord.ext import commands
-
 import os
 import sys
-import aiohttp
-from shutil import copyfile
 from collections import Counter
 from datetime import datetime
+from shutil import copyfile
+
+import aiohttp
+import discord
 from dateutil.relativedelta import relativedelta
+from discord.ext import commands
+
+from firetail.lib import ESI, db
+from firetail.utils import ExitCodes
 
 # Lets check the config file exists before we continue..
 if os.getenv("CONFIG") is not None:
@@ -22,8 +25,13 @@ if os.getenv("CONFIG") is not None:
 else:
     from firetail import config
 
-from firetail.lib import ESI
-from firetail.utils import ExitCodes
+
+async def prefix_manager(bot, message):
+    if not message.guild:
+        return commands.when_mentioned_or(bot.default_prefix)(bot, message)
+
+    prefix = bot.prefixes.get(message.guild.id) or bot.default_prefix
+    return commands.when_mentioned_or(prefix)(bot, message)
 
 
 class Firetail(commands.Bot):
@@ -34,6 +42,8 @@ class Firetail(commands.Bot):
         self.counter = Counter()
         self.core_dir = os.path.dirname(os.path.realpath(__file__))
         self.config = config
+        self.default_prefix = config.bot_prefix[0]
+        self.prefixes = {}
         self.bot_users = []
         self.repeat_offender = []
         self.last_command = None
@@ -41,13 +51,18 @@ class Firetail(commands.Bot):
         self.req_perms = discord.Permissions(config.bot_permissions)
         self.co_owners = config.bot_coowners
         self.preload_ext = config.preload_extensions
-        kwargs["command_prefix"] = commands.when_mentioned_or(config.bot_prefix[0])
+        kwargs["command_prefix"] = prefix_manager
         kwargs["pm_help"] = True
         # kwargs["command_prefix"] = self.db.prefix_manager
         kwargs["owner_id"] = self.owner
         super().__init__(**kwargs)
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.esi_data = ESI(self.session)
+        self.loop.create_task(self.load_prefixes())
+
+    async def load_prefixes(self):
+        data = await db.select("SELECT * FROM prefixes")
+        self.prefixes = dict(data)
 
     async def send_cmd_help(self, ctx):
         if ctx.invoked_subcommand:

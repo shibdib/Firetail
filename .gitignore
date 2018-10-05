@@ -60,6 +60,10 @@ __pycache__/
 # Config ignore
 firetail/config.py
 
+# Data ignore
+firetail/logs/*
+firetail.sqlite
+
 # Distribution / packaging
 develop-eggs/
 eggs/
