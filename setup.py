@@ -17,7 +17,7 @@ setup(
         'Topic :: Communications :: Chat',
         'Topic :: Utilities',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 
     keywords='eve online eveonline community discord bot',
@@ -31,7 +31,7 @@ setup(
         'asyncpg>=0.13',
         'pytz',
         'youtube_dl',
-        'aiohttp>=3.3.0,<3.4.0'
+        'aiohttp==3.3.2'
     ],
 
     dependency_links=[

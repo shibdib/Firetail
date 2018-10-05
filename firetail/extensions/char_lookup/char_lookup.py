@@ -170,19 +170,30 @@ class CharLookup:
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
-                try:
-                    victim_id = data[0]['victim']['character_id']
-                except Exception:
-                    victim_id = 0
-                try:
-                    if victim_id == character_id:
-                        return data[0]['victim'], data[0]['solar_system_id']
-                    else:
-                        for attacker in data[0]['attackers']:
-                            if attacker['character_id'] == character_id:
-                                return attacker, data[0]['solar_system_id']
-                except Exception:
-                    return None, None
+                kill_esi_url = 'https://esi.tech.ccp.is/latest/killmails/{}/{}/'.format(
+                    data[0]['killmail_id'], data[0]['zkb']['hash'])
+                self.logger.info(
+                    'CharLookup - {} '.format(str(kill_esi_url)))
+                async with session.get(kill_esi_url) as kill_resp:
+                    data = await kill_resp.text()
+                    data = json.loads(data)
+                    self.logger.info(
+                        'CharLookup - {} '.format(str(data)))
+                    try:
+                        self.logger.info(
+                            'CharLookup - {} '.format(str(data['victim']['character_id'])))
+                        victim_id = data['victim']['character_id']
+                    except Exception:
+                        victim_id = 0
+                    try:
+                        if victim_id == character_id:
+                            return data['victim'], data['solar_system_id']
+                        else:
+                            for attacker in data['attackers']:
+                                if attacker['character_id'] == character_id:
+                                    return attacker, data['solar_system_id']
+                    except Exception:
+                        return None, None
 
     async def zkill_stats(self, character_id):
         async with aiohttp.ClientSession() as session:
@@ -249,21 +260,26 @@ class CharLookup:
             special = ' '
         async with aiohttp.ClientSession() as session:
             async with session.get(loss_url) as resp:
-                data = await resp.text()
-                data = json.loads(data)
+                losses = await resp.text()
+                losses = json.loads(losses)
                 i = 0
-                for loss in data:
+                for loss in losses:
                     i = i + 1
                     if i >= 50:
                         break
-                    for item in loss['victim']['items']:
-                        if item['item_type_id'] == 28646:
-                            covert_cyno = covert_cyno + 1
-                        elif item['item_type_id'] == 21096:
-                            cyno = cyno + 1
-                        elif item['item_type_id'] in probe_launchers:
-                            probes = probes + 1
-                    lost_ship_type_id = loss['victim']['ship_type_id']
+                    loss_esi_url = 'https://esi.tech.ccp.is/latest/killmails/{}/{}/'.format(
+                        loss['killmail_id'], loss['zkb']['hash'])
+                    async with session.get(loss_esi_url) as data:
+                        loss_data = await data.text()
+                        loss_data = json.loads(loss_data)
+                        for item in loss_data['victim']['items']:
+                            if item['item_type_id'] == 28646:
+                                covert_cyno = covert_cyno + 1
+                            elif item['item_type_id'] == 21096:
+                                cyno = cyno + 1
+                            elif item['item_type_id'] in probe_launchers:
+                                probes = probes + 1
+                        lost_ship_type_id = loss_data['victim']['ship_type_id']
                 if covert_cyno >= 2:
                     try:
                         attackers = last_kill['attackers']
@@ -311,8 +327,12 @@ class CharLookup:
                 data = await resp.text()
                 data = json.loads(data)
                 try:
-                    all_time_kills = data[0]['killmail_id']
-                    return data[0]
+                    kill_esi_url = 'https://esi.tech.ccp.is/latest/killmails/{}/{}/'.format(
+                        data[0]['killmail_id'], data[0]['zkb']['hash'])
+                    async with session.get(kill_esi_url) as kill_resp:
+                        data = await kill_resp.text()
+                        data = json.loads(data)
+                        return data[0]
                 except Exception:
                     return None
 
