@@ -420,7 +420,6 @@ class Core:
             await ctx.send(embed=embed)
 
     @commands.command(name="prefix")
-    @checks.is_co_owner()
     @checks.spam_check()
     async def _prefix(self, ctx, *, new_prefix: str = None):
         """Get and set server prefix.
@@ -443,16 +442,21 @@ class Core:
                 msg_type='info', title="Prefix is {}".format(prefix))
             return await ctx.send(embed=embed)
 
-        await db.execute_sql(
-            "INSERT OR REPLACE INTO prefixes(guild_id, prefix)"
-            "VALUES(?, ?)", (ctx.guild.id, new_prefix))
+        if await checks.check_is_admin(ctx):
+            await db.execute_sql(
+                "INSERT OR REPLACE INTO prefixes(guild_id, prefix)"
+                "VALUES(?, ?)", (ctx.guild.id, new_prefix))
 
-        ctx.bot.prefixes[ctx.guild.id] = new_prefix
+            ctx.bot.prefixes[ctx.guild.id] = new_prefix
+
+            embed = utils.make_embed(
+                msg_type='info', title="Prefix set to {}".format(new_prefix))
+            return await ctx.send(embed=embed)
 
         embed = utils.make_embed(
-            msg_type='info', title="Prefix set to {}".format(new_prefix))
+            msg_type='error',
+            title="Prefix can only be set by admins.")
         return await ctx.send(embed=embed)
-
 
     @commands.command(name="whitelist")
     @checks.is_admin()

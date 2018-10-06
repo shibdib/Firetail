@@ -9,17 +9,35 @@ async def check_is_owner(ctx):
 
 
 async def check_is_co_owner(ctx):
-    owner = ctx.author.id in ctx.bot.co_owners
-    co_owner = await ctx.bot.is_owner(ctx.author)
-    return owner or co_owner
+    if await check_is_owner(ctx):
+        return True
+    if ctx.author.id in ctx.bot.co_owners:
+        return True
+    return False
+
+
+async def check_is_guildowner(ctx):
+    if await check_is_co_owner(ctx):
+        return True
+    if ctx.author.id == ctx.guild.owner.id:
+        return True
+    return False
 
 
 async def check_is_admin(ctx):
-    return ctx.author.guild_permissions.administrator
+    if await check_is_guildowner(ctx):
+        return True
+    if ctx.author.guild_permissions.manage_guild:
+        return True
+    return False
 
 
 async def check_is_mod(ctx):
-    return ctx.channel.permissions_for(ctx.author).manage_messages
+    if await check_is_admin(ctx):
+        return True
+    if ctx.channel.permissions_for(ctx.author).manage_messages:
+        return True
+    return False
 
 
 async def check_spam(ctx):
@@ -102,6 +120,10 @@ def is_owner():
 
 def is_co_owner():
     return commands.check(check_is_co_owner)
+
+
+def is_guild_owner():
+    return commands.check(check_is_guildowner)
 
 
 def is_admin():
