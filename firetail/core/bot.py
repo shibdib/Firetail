@@ -34,8 +34,13 @@ async def prefix_manager(bot, message):
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
+async def create_tables():
+    await db.create_tables()
+
+
 class Firetail(commands.Bot):
     def __init__(self, **kwargs):
+        create_tables()
         self.default_prefix = config.bot_prefix
         self.owner = config.bot_master
         self._shutdown_mode = ExitCodes.CRITICAL
