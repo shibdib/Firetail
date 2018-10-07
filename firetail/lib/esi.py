@@ -107,7 +107,7 @@ class ESI:
             if planet_id in self._planet_cache:
                 return self._planet_cache[planet_id]
 
-        url = '{}/universe/regions/{}/'.format(ESI_URL, planet_id)
+        url = '{}/universe/planets/{}/'.format(ESI_URL, planet_id)
         data = await self.get_data(url)
         if data:
             self._planet_cache[planet_id] = data
