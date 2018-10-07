@@ -47,7 +47,7 @@ class ESI:
             return None
 
         # if multiple, try stricter search
-        if len(data) > 1:
+        if len(data[category]) > 1 and not force_strict:
             strict_data = await self.get_data(url.format(
                 ESI_URL, category, item, 'true'))
 
