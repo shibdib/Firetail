@@ -34,13 +34,8 @@ async def prefix_manager(bot, message):
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
-async def create_tables():
-    await db.create_tables()
-
-
 class Firetail(commands.Bot):
     def __init__(self, **kwargs):
-        create_tables()
         self.default_prefix = config.bot_prefix
         self.owner = config.bot_master
         self._shutdown_mode = ExitCodes.CRITICAL
@@ -63,9 +58,10 @@ class Firetail(commands.Bot):
         super().__init__(**kwargs)
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.esi_data = ESI(self.session)
-        self.loop.create_task(self.load_prefixes())
+        self.loop.create_task(self.load_db())
 
-    async def load_prefixes(self):
+    async def load_db(self):
+        await db.create_tables()
         data = await db.select("SELECT * FROM prefixes")
         self.prefixes = dict(data)
 
