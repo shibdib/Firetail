@@ -1,167 +1,187 @@
+import asyncio
+import logging
+import os
 import sqlite3
-from sqlite3 import Error
+from functools import wraps
+
+logger = logging.getLogger('firetail.db')
+
+DATABASE = 'firetail.sqlite'
+LOCK = asyncio.Lock()
+HERE = os.path.dirname(__file__)
 
 
-async def create_connection(db_file):
-    """ create a database connection to the SQLite database
-        specified by db_file
-    :param db_file: database file
-    :return: Connection object or None
+def db_access(func):
+    """Decorator to ensure sync access to the sqlite db.
+
+    Functions decorated with this will have it's access to the sqlite db
+    controlled by a global lock to ensure only one access at a time.
+    If it's being accessed by another call, it will wait until it's turn
+    for aquiring access.
+
+    .. note::
+
+        As the wait is controlled by an asyncio.Lock, the returned
+        function is a coroutine, so must be awaited.
+
+    SQlite exceptions are caught by the wrapper, logged, and the data
+    returned as `None`.
+
+    A wrapped function must have the optional ``db`` keyword-only
+    argument, as it will inject the sqlite3 connection instance for the
+    default db, or if an alternative is provided, it will pass it
+    instead.
+
+    Example
+    -------
+
+    .. code-block:: python3
+
+        @db_access
+        def create_tables(*, db=None):
+            ...
+
     """
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except Error as e:
-        print(e)
-    finally:
-        conn.close()
+    def get_db():
+        return sqlite3.connect(DATABASE)
 
-    return None
+    @wraps(func)
+    async def access_control(*args, db=None, **kwargs):
+        logger.info('Waiting for db access.')
+        async with LOCK:
+            logger.info('Aquired db access.')
+            if not db:
+                db = get_db()
+            try:
+                return func(*args, db=db, **kwargs)
+            except sqlite3.Warning as e:
+                logger.exception(type(e).__name__, exc_info=e)
+                return None
+            finally:
+                db.close()
+                logger.info('Closed db.')
+
+    return access_control
 
 
-async def create_table(conn, create_table_sql):
-    """ create a table from the create_table_sql statement
-    :param conn: Connection object
-    :param create_table_sql: a CREATE TABLE statement
-    :return:
+@db_access
+def create_tables(*, db=None):
+    """Creates the tables required by the bot if not already existing.
+
+    Access is controlled with a coroutine wrapper, so this function
+    must be awaited when used.
+
+    Parameters
+    ----------
+    db: sqlite.Connection, optional
+        The sqlite database connection. Not required unless not using
+        the default database for Firetail.
     """
-    c = conn.cursor()
-    c.execute(create_table_sql)
+    with open(os.path.join(HERE, 'sql', 'tables.sql'), 'r') as f:
+        sql = f.read()
+    db.executescript(sql)
+    db.commit()
 
 
-async def create_tables():
-    db = sqlite3.connect('firetail.sqlite')
-    if db is not None:
-        # create general table
-        firetail_table = """ CREATE TABLE IF NOT EXISTS firetail (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        entry TEXT NOT NULL UNIQUE,
-                                        value TEXT NOT NULL,
-                                        additional_value TEXT DEFAULT NULL
-                                    ); """
-        await create_table(db, firetail_table)
-        # create whitelist table
-        whitelist_table = """ CREATE TABLE IF NOT EXISTS whitelist (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        location_id INTEGER,
-                                        role_id INTEGER NOT NULL
-                                    ); """
-        await create_table(db, whitelist_table)
-        # create zkill table
-        zkill_table = """ CREATE TABLE IF NOT EXISTS add_kills (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        channelid INTEGER NOT NULL,
-                                        serverid INTEGER NOT NULL,
-                                        groupid	INTEGER NOT NULL,
-                                        ownerid INTEGER NOT NULL,
-                                        losses TEXT NOT NULL,
-                                        threshold INTEGER NOT NULL
-                                    ); """
-        await create_table(db, zkill_table)
-        # create sov_tracker table
-        sov_tracker_table = """ CREATE TABLE IF NOT EXISTS sov_tracker (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        channel_id INTEGER NOT NULL,
-                                        fight_type STRING NOT NULL,
-                                        system_id INTEGER NOT NULL,
-                                        defender_score INTEGER NOT NULL,
-                                        attackers_score INTEGER NOT NULL
-                                    ); """
-        await create_table(db, sov_tracker_table)
-        # create eve_rpg tables
-        eve_rpg_channels_table = """ CREATE TABLE IF NOT EXISTS eve_rpg_channels (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        server_id INTEGER NOT NULL UNIQUE,
-                                        channel_id STRING NOT NULL,
-                                        owner_id INTEGER NOT NULL
-                                    ); """
-        await create_table(db, eve_rpg_channels_table)
-        eve_rpg_players_table = """ CREATE TABLE IF NOT EXISTS eve_rpg_players (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        server_id INTEGER NOT NULL,
-                                        player_id INTEGER NOT NULL UNIQUE,
-                                        kills INTEGER DEFAULT 0,
-                                        losses INTEGER DEFAULT 0,
-                                        level INTEGER DEFAULT 0,
-                                        xp INTEGER DEFAULT 0,
-                                        ship TEXT DEFAULT NULL,
-                                        item TEXT DEFAULT NULL
-                                    ); """
-        await create_table(db, eve_rpg_players_table)
-        # create access_tokens table
-        tokens_table = """ CREATE TABLE IF NOT EXISTS access_tokens (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        character_id INTEGER NOT NULL,
-                                        discord_id INTEGER NOT NULL,
-                                        refresh_token TEXT NOT NULL,
-                                        access_token TEXT DEFAULT NULL,
-                                        expires INTEGER DEFAULT NULL
-                                    ); """
-        await create_table(db, tokens_table)
-        # create rss table
-        rss_table = """ CREATE TABLE IF NOT EXISTS rss (
-                                       id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                       entry_id TEXT NOT NULL,
-                                       channel_id INTEGER NOT NULL
-                                    ); """
-        await create_table(db, rss_table)
-        # create prefix table
-        prefix_table = ("CREATE TABLE IF NOT EXISTS prefixes ("
-                        "  guild_id INTEGER PRIMARY KEY,"
-                        "  prefix TEXT NOT NULL);")
-        await create_table(db, prefix_table)
-    else:
-        print('Database: Unable to connect to the database')
+@db_access
+def select(sql, single=False, *, db=None):
+    """Executes a given select query to the sqlite database.
 
+    Access is controlled with a coroutine wrapper, so this function
+    must be awaited when used.
 
-async def select(sql, single=False):
-    db = sqlite3.connect('firetail.sqlite')
+    Parameters
+    ----------
+    sql: `str`
+        SQL statement to be executed.
+    single: `bool`, optional
+        Indicates if a single row and single column is to be returned.
+        Default is `False`.
+    db: `sqlite.Connection`, optional
+        The sqlite database connection. Not required, unless not using
+        the default database for Firetail.
+
+    Returns
+    -------
+    List[Tuple[Any]], Any
+        If not `single`, returns a list of tuples of all returned record
+        values.
+        If `single`, returns the first value from the first record.
+        If no returned records, returns None.
+    """
     cursor = db.cursor()
     cursor.execute(sql)
-    try:
-        if single:
-            data = cursor.fetchone()[0]
-        else:
-            data = cursor.fetchall()
-    except:
-        data = None
-    db.close()
+    if single:
+        data = cursor.fetchone()
+        data = data[0] if data else None
+    else:
+        data = cursor.fetchall()
     return data
 
 
-async def select_var(sql, var, single=False):
-    db = sqlite3.connect('firetail.sqlite')
+@db_access
+def select_var(sql, var, single=False, *, db=None):
+    """Executes a given select query to the sqlite database with
+    placeholder variables.
+
+    Access is controlled with a coroutine wrapper, so this function
+    must be awaited when used.
+
+    Parameters
+    ----------
+    sql: `str`
+        SQL statement to be executed.
+    var: `tuple`
+        Tuple of values to replace placeholders.
+    single: `bool`, optional
+        Indicates if a single row and single column is to be returned.
+        Default is `False`.
+    db: `sqlite.Connection`, optional
+        The sqlite database connection. Not required, unless not using
+        the default database for Firetail.
+
+    Returns
+    -------
+    List[Tuple[Any]], Any
+        If not `single`, returns a list of tuples of all returned record
+        values.
+        If `single`, returns the first value from the first record.
+        If no returned records, returns None.
+    """
     cursor = db.cursor()
     cursor.execute(sql, var)
-    try:
-        if single:
-            data = cursor.fetchone()[0]
-        else:
-            data = cursor.fetchall()
-    except:
-        data = None
-    db.close()
+    if single:
+        data = cursor.fetchone()
+        data = data[0] if data else None
+    else:
+        data = cursor.fetchall()
     return data
 
 
-async def get_token(sql, single=False):
-    db = sqlite3.connect('firetail.sqlite')
-    cursor = db.cursor()
-    cursor.execute(sql)
-    try:
-        if single:
-            data = cursor.fetchone()[0]
-        else:
-            data = cursor.fetchall()
-    except:
-        data = None
-    db.close()
-    return data
+@db_access
+def execute_sql(sql, var=None, *, db=None):
+    """Executes a given query to the sqlite database with optional
+    placeholder variable support.
 
+    Access is controlled with a coroutine wrapper, so this function
+    must be awaited when used.
 
-async def execute_sql(sql, var=None):
-    db = sqlite3.connect('firetail.sqlite')
+    Parameters
+    ----------
+    sql: `str`
+        SQL statement to be executed.
+    var: `tuple`, optional
+        Tuple of values to replace placeholders.
+    db: `sqlite.Connection`, optional
+        The sqlite database connection. Not required, unless not using
+        the default database for Firetail.
+
+    Returns
+    -------
+    List[Tuple[Any]]
+        Returns a list of tuples of all returned record values.
+        If no returned records, returns an empty list.
+    """
     cursor = db.cursor()
     cursor.execute(sql, var)
     db.commit()
-    db.close()
