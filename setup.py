@@ -6,7 +6,7 @@ setup(
     description='firetail - An EVE Online Discord Bot',
     url='https://github.com/shibdib/firetail',
     author='shibdib',
-    license='GNU General Public License v3.0',
+    license='MIT License',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
