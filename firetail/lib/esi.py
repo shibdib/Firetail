@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 
-ESI_URL = "https://esi.tech.ccp.is/latest"
+ESI_URL = "https://esi.evetech.net/latest"
 FUZZ_URL = "https://www.fuzzwork.co.uk/api"
 MARKET_URL = "https://market.fuzzwork.co.uk/aggregates"
 OAUTH_URL = "https://login.eveonline.com/oauth/verify"
