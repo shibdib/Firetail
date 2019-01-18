@@ -1,0 +1,62 @@
+CREATE TABLE IF NOT EXISTS firetail (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    entry TEXT NOT NULL UNIQUE,
+    value TEXT NOT NULL,
+    additional_value TEXT DEFAULT NULL
+);
+CREATE TABLE IF NOT EXISTS whitelist (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    location_id INTEGER,
+    role_id INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS add_kills (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    channelid INTEGER NOT NULL,
+    serverid INTEGER NOT NULL,
+    groupid	INTEGER NOT NULL,
+    ownerid INTEGER NOT NULL,
+    losses TEXT NOT NULL,
+    threshold INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sov_tracker (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    channel_id INTEGER NOT NULL,
+    fight_type STRING NOT NULL,
+    system_id INTEGER NOT NULL,
+    defender_score INTEGER NOT NULL,
+    attackers_score INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS eve_rpg_channels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    server_id INTEGER NOT NULL UNIQUE,
+    channel_id STRING NOT NULL,
+    owner_id INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS eve_rpg_players (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    server_id INTEGER NOT NULL,
+    player_id INTEGER NOT NULL UNIQUE,
+    kills INTEGER DEFAULT 0,
+    losses INTEGER DEFAULT 0,
+    level INTEGER DEFAULT 0,
+    xp INTEGER DEFAULT 0,
+    ship TEXT DEFAULT NULL,
+    item TEXT DEFAULT NULL
+);
+CREATE TABLE IF NOT EXISTS access_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    character_id INTEGER NOT NULL,
+    discord_id INTEGER NOT NULL,
+    refresh_token TEXT NOT NULL,
+    access_token TEXT DEFAULT NULL,
+    expires INTEGER DEFAULT NULL
+);
+CREATE TABLE IF NOT EXISTS rss (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    entry_id TEXT NOT NULL,
+    channel_id INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS prefixes (
+    guild_id INTEGER PRIMARY KEY,
+    prefix TEXT NOT NULL
+);
