@@ -47,9 +47,9 @@ def db_access(func):
 
     @wraps(func)
     async def access_control(*args, db=None, **kwargs):
-        logger.info('Waiting for db access.')
+        logger.debug('Waiting for db access.')
         async with LOCK:
-            logger.info('Aquired db access.')
+            logger.debug('Aquired db access.')
             if not db:
                 db = get_db()
             try:
@@ -59,7 +59,7 @@ def db_access(func):
                 return None
             finally:
                 db.close()
-                logger.info('Closed db.')
+                logger.debug('Closed db.')
 
     return access_control
 
