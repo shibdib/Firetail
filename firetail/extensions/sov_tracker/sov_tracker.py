@@ -255,7 +255,7 @@ class SovTracker:
     async def get_sov_info(self, system_id):
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    'https://esi.tech.ccp.is/latest/sovereignty/map/?datasource=tranquility') as resp:
+                    'https://esi.evetech.net/latest/sovereignty/map/?datasource=tranquility') as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 sov_alliance_id = 1
@@ -277,7 +277,7 @@ class SovTracker:
     async def group_name(self, group_id):
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    'https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility'.format(group_id)) as resp:
+                    'https://esi.evetech.net/latest/alliances/{}/?datasource=tranquility'.format(group_id)) as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 try:

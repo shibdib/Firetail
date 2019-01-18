@@ -170,7 +170,7 @@ class CharLookup:
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
-                kill_esi_url = 'https://esi.tech.ccp.is/latest/killmails/{}/{}/'.format(
+                kill_esi_url = 'https://esi.evetech.net/latest/killmails/{}/{}/'.format(
                     data[0]['killmail_id'], data[0]['zkb']['hash'])
                 async with session.get(kill_esi_url) as kill_resp:
                     data = await kill_resp.text()
@@ -261,7 +261,7 @@ class CharLookup:
                     i = i + 1
                     if i >= 50:
                         break
-                    loss_esi_url = 'https://esi.tech.ccp.is/latest/killmails/{}/{}/'.format(
+                    loss_esi_url = 'https://esi.evetech.net/latest/killmails/{}/{}/'.format(
                         loss['killmail_id'], loss['zkb']['hash'])
                     async with session.get(loss_esi_url) as data:
                         loss_data = await data.text()
@@ -321,7 +321,7 @@ class CharLookup:
                 data = await resp.text()
                 data = json.loads(data)
                 try:
-                    kill_esi_url = 'https://esi.tech.ccp.is/latest/killmails/{}/{}/'.format(
+                    kill_esi_url = 'https://esi.evetech.net/latest/killmails/{}/{}/'.format(
                         data[0]['killmail_id'], data[0]['zkb']['hash'])
                     async with session.get(kill_esi_url) as kill_resp:
                         data = await kill_resp.text()
