@@ -321,7 +321,7 @@ class LocationScout:
     async def get_kill_info(self, system_id):
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    'https://esi.tech.ccp.is/latest/universe/system_kills/?datasource=tranquility') as resp:
+                    'https://esi.evetech.net/latest/universe/system_kills/?datasource=tranquility') as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 ship_kills = 0
@@ -338,7 +338,7 @@ class LocationScout:
     async def get_sov_info(self, system_id):
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    'https://esi.tech.ccp.is/latest/sovereignty/map/?datasource=tranquility') as resp:
+                    'https://esi.evetech.net/latest/sovereignty/map/?datasource=tranquility') as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 sov_alliance_id = 1
@@ -360,7 +360,7 @@ class LocationScout:
     async def group_name(self, group_id):
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    'https://esi.tech.ccp.is/latest/alliances/{}/?datasource=tranquility'.format(group_id)) as resp:
+                    'https://esi.evetech.net/latest/alliances/{}/?datasource=tranquility'.format(group_id)) as resp:
                 data = await resp.text()
                 data = json.loads(data)
                 try:
