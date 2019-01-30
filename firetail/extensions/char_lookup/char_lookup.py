@@ -170,8 +170,11 @@ class CharLookup:
             async with session.get(url) as resp:
                 data = await resp.text()
                 data = json.loads(data)
-                kill_esi_url = 'https://esi.evetech.net/latest/killmails/{}/{}/'.format(
-                    data[0]['killmail_id'], data[0]['zkb']['hash'])
+                try:
+                    kill_esi_url = 'https://esi.evetech.net/latest/killmails/{}/{}/'.format(
+                        data[0]['killmail_id'], data[0]['zkb']['hash'])
+                except Exception:
+                    return None, None
                 async with session.get(kill_esi_url) as kill_resp:
                     data = await kill_resp.text()
                     data = json.loads(data)
