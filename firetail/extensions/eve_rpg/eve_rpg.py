@@ -317,64 +317,83 @@ class EveRpg:
                 tracking_two = 0.8
             player_one_weight = (((player[0][5] + 1) * 0.5) + (ship_attack - (ship_defense_two / 2))) * tracking_one
             player_two_weight = (((player_two[0][5] + 1) * 0.5) + (ship_attack_two - (ship_defense / 2))) * tracking_two
+            escape = False
             if player_one_weight > player_two_weight:
                 winner = player
                 loser = player_two
+                if ship_maneuverability_two > ship_maneuverability and random.randint(0, 5) > 3 and random.randint(0, 12) < ship_maneuverability_two:
+                    escape = True
             else:
                 winner = player_two
                 loser = player
+                if ship_maneuverability > ship_maneuverability_two and random.randint(0, 5) > 3 and random.randint(0, 12) < ship_maneuverability:
+                    escape = True
             winner_name = self.bot.get_user(int(winner[0][2])).display_name
             loser_name = self.bot.get_user(int(loser[0][2])).display_name
             winner_ship = winner[0][7]
             loser_ship = loser[0][7]
-            xp_gained = await self.weighted_choice([(5, 45), (7, 15), (10, 5)])
-            message = await self.weighted_choice([(
-                '**PVP** - **{}** flying in a {} got a dank tick when **{}** flying in a {} tried to gank him and '
-                'failed.'.format(
-                    winner_name, winner_ship, loser_name, loser_ship), 10),
-                (
-                    '**PVP** - **{}** flying in a {} went AFK and got killed by **{}** in a {}.'.format(
-                        loser_name, loser_ship, winner_name, winner_ship), 45),
-                (
-                    '**PVP** - **{}** flying in a {} was trying to Krab but **{}** in a '
-                    '{} had other ideas and killed him.'.format(
-                        loser_name, loser_ship, winner_name, winner_ship), 45),
-                (
-                    '**PVP** - **{}** flying in a {} ran into a **{}** while '
-                    'roaming for content. Honorable PVP occurred and {} was '
-                    'victorious.'.format(
-                        loser_name, loser_ship, winner_ship, winner_name), 10),
-                (
-                    '**PVP** - **{}** flying in a {} encountered **{}** on a gate '
-                    'and was defeated by their superior {}.'.format(
-                        loser_name, loser_ship, winner_name, winner_ship), 45),
-                (
-                    '**PVP** - **{}** flying in a {} tried desperately to defeat '
-                    '**{}** but was unable to escape the scram of the enemies {}.'.format(
-                        loser_name, loser_ship, winner_name, winner_ship), 45),
-                (
-                    '**PVP** - **{}** flying in a {} ran into **{}** in a {} on a gate and was killed as soon as he '
-                    'de-cloaked.'.format(
-                        loser_name, loser_ship, winner_name, winner_ship), 10),
-                (
-                    '**PVP** - **{}** flying in a {} had their auto-pilot turned on and was killed by **{}** in a {} '
-                    'at a gate.'.format(
-                        loser_name, loser_ship, winner_name, winner_ship), 45),
-                (
-                    '**PVP** - **{}** flying in a {} tried to warp away from a gate but **{}** in a {} was able to get '
-                    'point and kill them.'.format(
-                        loser_name, loser_ship, winner_name, winner_ship), 45)
-            ])
+            if escape is False:
+                xp_gained = await self.weighted_choice([(5, 45), (7, 15), (10, 5)])
+                message = await self.weighted_choice([(
+                    '**PVP** - **{}** flying in a {} got a dank tick when **{}** flying in a {} tried to gank him and '
+                    'failed.'.format(
+                        winner_name, winner_ship, loser_name, loser_ship), 10),
+                    (
+                        '**PVP** - **{}** flying in a {} went AFK and got killed by **{}** in a {}.'.format(
+                            loser_name, loser_ship, winner_name, winner_ship), 45),
+                    (
+                        '**PVP** - **{}** flying in a {} was trying to Krab but **{}** in a '
+                        '{} had other ideas and killed him.'.format(
+                            loser_name, loser_ship, winner_name, winner_ship), 45),
+                    (
+                        '**PVP** - **{}** flying in a {} ran into a **{}** while '
+                        'roaming for content. Honorable PVP occurred and {} was '
+                        'victorious.'.format(
+                            loser_name, loser_ship, winner_ship, winner_name), 10),
+                    (
+                        '**PVP** - **{}** flying in a {} encountered **{}** on a gate '
+                        'and was defeated by their superior {}.'.format(
+                            loser_name, loser_ship, winner_name, winner_ship), 45),
+                    (
+                        '**PVP** - **{}** flying in a {} tried desperately to defeat '
+                        '**{}** but was unable to escape the scram of the enemies {}.'.format(
+                            loser_name, loser_ship, winner_name, winner_ship), 45),
+                    (
+                        '**PVP** - **{}** flying in a {} ran into **{}** in a {} on a gate and was killed as soon as he '
+                        'de-cloaked.'.format(
+                            loser_name, loser_ship, winner_name, winner_ship), 10),
+                    (
+                        '**PVP** - **{}** flying in a {} had their auto-pilot turned on and was killed by **{}** in a {} '
+                        'at a gate.'.format(
+                            loser_name, loser_ship, winner_name, winner_ship), 45),
+                    (
+                        '**PVP** - **{}** flying in a {} tried to warp away from a gate but **{}** in a {} was able to get '
+                        'point and kill them.'.format(
+                            loser_name, loser_ship, winner_name, winner_ship), 45)
+                ])
+                sql = ''' UPDATE eve_rpg_players
+                        SET ship = (?),
+                            item = NULL
+                        WHERE
+                            player_id = (?); '''
+                values = ('Ibis', loser[0][2],)
+                await db.execute_sql(sql, values)
+                await self.add_loss(loser)
+                await self.add_kill(winner)
+            else:
+                xp_gained = await self.weighted_choice([(5, 45), (7, 15), (10, 5)])
+                message = await self.weighted_choice([(
+                    '**PVP** - **{}** flying in a {} got a dank tick when **{}** flying in a {} tried to gank him and '
+                    'but was unable to catch him before he escaped.'.format(
+                        winner_name, winner_ship, loser_name, loser_ship), 45),
+                    (
+                        '**PVP** - **{}** flying in a {} encountered **{}** on a gate in a {}. He was able to spam jump and escape'
+                        ''.format(loser_name, loser_ship, winner_name, winner_ship), 45),
+                    (
+                        '**PVP** - **{}** flying in a {} ran into **{}** in a {} on a gate but was able to burn back when he de-cloaked.'.format(
+                            loser_name, loser_ship, winner_name, winner_ship), 45),
+                ])
             await self.send_turn(message)
-            sql = ''' UPDATE eve_rpg_players
-                    SET ship = (?),
-                        item = NULL
-                    WHERE
-                        player_id = (?); '''
-            values = ('Ibis', loser[0][2],)
-            await db.execute_sql(sql, values)
-            await self.add_loss(loser)
-            await self.add_kill(winner)
             await self.add_xp(winner, xp_gained)
             # Award ship
             weight = 14
