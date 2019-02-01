@@ -56,6 +56,11 @@ CREATE TABLE IF NOT EXISTS rss (
     entry_id TEXT NOT NULL,
     channel_id INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS rss_channels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rss_feed INTEGER NOT NULL,
+    channel_id INTEGER NOT NULL UNIQUE
+);
 CREATE TABLE IF NOT EXISTS prefixes (
     guild_id INTEGER PRIMARY KEY,
     prefix TEXT NOT NULL

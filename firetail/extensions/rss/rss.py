@@ -1,5 +1,6 @@
 from firetail.lib import db
-from firetail.utils import make_embed
+from discord.ext import commands
+from firetail.core import checks
 import asyncio
 import feedparser
 import discord
@@ -20,6 +21,41 @@ class Rss:
             'updateInterval',
             self.DEFAULT_UPDATE_INTERVAL)
         self.loop.create_task(self.tick_loop())
+
+    @commands.command(name='setRss')
+    @checks.is_mod()
+    async def _set_rss(self, ctx):
+        """Sets a channel to receive eve related RSS updates.
+        Do **!setRss dev** to have a channel relay dev posts.
+        Do **!setRss eve** to have a channel relay general ccp posts.
+        Do **!setRss all** to have a channel relay both posts."""
+        feed = ctx.message.content.split(' ', 1)[1]
+        if feed.lower() is 'dev':
+            feeds = 1
+            text = 'receive CCP Dev posts.'
+        elif feed.lower() is 'eve':
+            feeds = 2
+            text = 'receive EVE Online posts.'
+        else:
+            feeds = 3
+            text = 'receive CCP Dev Blogs and EVE Online posts.'
+        sql = ''' REPLACE INTO rss_channels(rss_feed,channel_id)
+                  VALUES(?,?) '''
+        channel = ctx.message.channel.id
+        values = (channel, feeds)
+        await db.execute_sql(sql, values)
+        self.logger.info('eve_rss - {} added {} to the rpg channel list.')
+        return await ctx.author.send('**Success** - Channel added to {}.'.format(text))
+
+    @commands.command(name='deleteRss')
+    @checks.is_mod()
+    async def _delete_rss(self, ctx):
+        """Un-sets a channel as an RSS channel."""
+        sql = ''' DELETE FROM rss_channels WHERE `channel_id` = (?) '''
+        values = (ctx.message.channel.id,)
+        await db.execute_sql(sql, values)
+        self.logger.info('eve_rss - {} removed {} from the rpg channel list.')
+        return await ctx.author.send('**Success** - Channel removed.')
 
     async def tick_loop(self):
         """ Operation loop to check for new RSS feed data while bot is active
@@ -126,3 +162,45 @@ class Rss:
                         await db.execute_sql(sql, values)
                     except Exception:
                         self.logger.exception("Failed to store sending of entry {}".format(entry['id']))
+            sql = "SELECT * FROM rss_channels"
+            other_channels = await db.select(sql)
+            for rss_channels in other_channels:
+                #  Check if channels are still good and remove if not
+                channel_id = int(rss_channels[2])
+                channel = self.bot.get_channel(int(rss_channels[2]))
+                if channel is None:
+                    continue
+                if feed_name.lower() is 'evenews':
+                    if rss_channels[2] is 2 or 3:
+                        # Start sending entries
+                        for entry in feed['entries']:
+                            content, embed = self.format_message(feed['feed']['title'], entry)
+                            try:
+                                await channel.send(content, embed=embed)
+                            except Exception:
+                                self.logger.exception("Failed to send {} to channel {} for feed {}".format(
+                                    entry['id'], channel_id, feed_name))
+                            else:
+                                sql = '''REPLACE INTO rss(entry_id,channel_id) VALUES(?,?)'''
+                                values = (entry['id'], channel_id)
+                                try:
+                                    await db.execute_sql(sql, values)
+                                except Exception:
+                                    self.logger.exception("Failed to store sending of entry {}".format(entry['id']))
+                elif feed_name.lower() is 'evedev':
+                    if rss_channels[2] is 1 or 3:
+                        # Start sending entries
+                        for entry in feed['entries']:
+                            content, embed = self.format_message(feed['feed']['title'], entry)
+                            try:
+                                await channel.send(content, embed=embed)
+                            except Exception:
+                                self.logger.exception("Failed to send {} to channel {} for feed {}".format(
+                                    entry['id'], channel_id, feed_name))
+                            else:
+                                sql = '''REPLACE INTO rss(entry_id,channel_id) VALUES(?,?)'''
+                                values = (entry['id'], channel_id)
+                                try:
+                                    await db.execute_sql(sql, values)
+                                except Exception:
+                                    self.logger.exception("Failed to store sending of entry {}".format(entry['id']))
