@@ -142,7 +142,7 @@ class EveRpg:
         while not self.bot.is_closed():
             try:
                 await self.process_turn()
-                await asyncio.sleep(12)
+                await asyncio.sleep(20)
             except Exception:
                 self.logger.exception('ERROR:')
                 await asyncio.sleep(5)
@@ -311,10 +311,10 @@ class EveRpg:
                 player_two)
             tracking_one = 1
             if ship_tracking < ship_maneuverability_two:
-                tracking_one = 0.8
+                tracking_one = 0.975
             tracking_two = 1
             if ship_tracking_two < ship_maneuverability:
-                tracking_two = 0.8
+                tracking_two = 0.975
             player_one_weight = (((player[0][5] + 1) * 0.5) + (ship_attack - (ship_defense_two / 2))) * tracking_one
             player_two_weight = (((player_two[0][5] + 1) * 0.5) + (ship_attack_two - (ship_defense / 2))) * tracking_two
             escape = False
@@ -346,8 +346,8 @@ class EveRpg:
                         '{} had other ideas and killed him.'.format(
                             loser_name, loser_ship, winner_name, winner_ship), 45),
                     (
-                        '**PVP** - **{}** flying in a {} ran into a **{}** while '
-                        'roaming for content. Honorable PVP occurred and {} was '
+                        '**PVP** - **{}** flying in a {} ran into a {} while '
+                        'roaming for content. Honorable PVP occurred and **{}** was '
                         'victorious.'.format(
                             loser_name, loser_ship, winner_ship, winner_name), 10),
                     (
@@ -396,7 +396,7 @@ class EveRpg:
             await self.send_turn(message)
             await self.add_xp(winner, xp_gained)
             # Award ship
-            weight = 14
+            weight = 7
             if winner_ship == 'Ibis':
                 weight = 90
             ship_drop = await self.weighted_choice([(True, weight), (False, 76)])
@@ -445,7 +445,7 @@ class EveRpg:
         return self.logger.info('eve_rpg - Bad Channel removed successfully')
 
     async def add_xp(self, player, xp_gained):
-        if player[0][6] + xp_gained < 100:
+        if player[0][6] + xp_gained < 100 * player[0][5]:
             sql = ''' UPDATE eve_rpg_players
                     SET xp = (?)
                     WHERE
@@ -637,6 +637,8 @@ class EveRpg:
         if 'Deadspace-MWD' in items:
             item_maneuverability = item_maneuverability + 3
             item_tracking = item_tracking - 1
+        if 'Deadspace-AB' in items:
+            item_maneuverability = item_maneuverability + 2
         if 'Deadspace-AB' in items:
             item_maneuverability = item_maneuverability + 2
         return item_attack, item_defense, item_maneuverability, item_tracking
