@@ -16,6 +16,7 @@ class EveRpg:
         self.loop.create_task(self.tick_loop())
 
     @commands.command(name='setRpg')
+    @checks.is_mod()
     async def _set_rpg(self, ctx):
         """Sets a channel as an RPG channel.
         Do **!setRpg** to have a channel relay all RPG events.
@@ -29,6 +30,16 @@ class EveRpg:
         await db.execute_sql(sql, values)
         self.logger.info('eve_rpg - {} added {} to the rpg channel list.')
         return await ctx.author.send('**Success** - Channel added.')
+
+    @commands.command(name='deleteRpg')
+    @checks.is_mod()
+    async def _delete_rpg(self, ctx):
+        """Un-sets a channel as an RPG channel."""
+        sql = ''' DELETE FROM eve_rpg_channels WHERE `channel_id` = (?) '''
+        values = (ctx.message.channel.id,)
+        await db.execute_sql(sql, values)
+        self.logger.info('eve_rpg - {} removed {} from the rpg channel list.')
+        return await ctx.author.send('**Success** - Channel removed.')
 
     @commands.command(name='rpg')
     @checks.spam_check()
@@ -45,6 +56,18 @@ class EveRpg:
         await db.execute_sql(sql, values)
         self.logger.info('eve_rpg - ' + str(ctx.message.author) + ' added to the game.')
         return await ctx.author.send('**Success** - Welcome to the game.')
+
+    @commands.command(name='rpgQuit')
+    @checks.spam_check()
+    @checks.is_whitelist()
+    async def _rpg_quit(self, ctx):
+        """Leaves the RPG.
+        If your server doesn't have an RPG channel have an admin do **!setRpg** to receive the game events."""
+        sql = ''' DELETE FROM eve_rpg_players WHERE `player_id` = (?) '''
+        values = (ctx.message.author.id,)
+        await db.execute_sql(sql, values)
+        self.logger.info('eve_rpg - ' + str(ctx.message.author) + ' removed from the game.')
+        return await ctx.author.send('**Success** - You have been removed from the game.')
 
     @commands.command(name='rpgStats', aliases=["rpgstats"])
     @checks.spam_check()
