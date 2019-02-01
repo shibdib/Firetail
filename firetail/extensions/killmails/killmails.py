@@ -34,7 +34,6 @@ class Killmails:
         big_kills = config.killmail['bigKills']
         big_kills_value = config.killmail['bigKillsValue']
         solar_system_id = kill_data['killmail']['solar_system_id']
-        self.logger.info(solar_system_id)
         data = await self.bot.esi_data.system_info(solar_system_id)
         constellation_id = data['constellation_id']
         constellation_data = await self.bot.esi_data.constellation_info(constellation_id)
