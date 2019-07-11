@@ -20,7 +20,7 @@ class EveTime:
         'EST/New York': 'America/New_York',
         'CET/Copenhagen': 'Europe/Copenhagen',
         'MSK/Moscow': 'Europe/Moscow',
-        'AEST/Sydney': 'Australia/Sydney',
+        'AEDT/Sydney': 'Australia/Sydney',
     }
 
     @commands.command(name='time')
