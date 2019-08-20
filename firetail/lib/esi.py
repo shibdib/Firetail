@@ -13,10 +13,16 @@ class ESI:
     def __init__(self, session):
         self.session = session
         self._types_cache = {}
+        self._celestial_cache = {}
         self._system_cache = {}
         self._constellation_cache = {}
         self._region_cache = {}
         self._planet_cache = {}
+        self._station_cache = {}
+        self._stargate_cache = {}
+        self._star_cache = {}
+        self._moon_cache = {}
+        self._asteroid_cache = {}
 
     async def get_data(self, url):
         """Base data retrieval method."""
@@ -68,6 +74,30 @@ class ESI:
 
     # Location Stuff
 
+    # Catch all for unknown ID
+    async def celestial_info(self, celestial_id, allow_cache=True):
+        if allow_cache:
+            if celestial_id in self._celestial_cache:
+                return self._celestial_cache[celestial_id]
+
+        location_info = await self.planet_info(celestial_id)
+        if 'name' not in location_info.keys():
+            location_info = await self.stargate_info(celestial_id)
+            if 'name' not in location_info.keys():
+                location_info = await self.star_info(celestial_id)
+                if 'name' not in location_info.keys():
+                    location_info = await self.station_info(celestial_id)
+                    if 'name' not in location_info.keys():
+                        location_info = await self.moon_info(celestial_id)
+                        if 'name' not in location_info.keys():
+                            location_info = await self.asteroid_info(celestial_id)
+                            if 'name' not in location_info.keys():
+                                location_info = {}
+
+        if location_info is not 0:
+            self._celestial_cache[celestial_id] = location_info
+        return location_info
+
     async def system_info(self, system_id):
         url = '{}/universe/systems/{}/'.format(ESI_URL, system_id)
         return await self.get_data(url)
@@ -111,6 +141,61 @@ class ESI:
         data = await self.get_data(url)
         if data:
             self._planet_cache[planet_id] = data
+        return data
+
+    async def moon_info(self, moon_id, allow_cache=True):
+        if allow_cache:
+            if moon_id in self._moon_cache:
+                return self._moon_cache[moon_id]
+
+        url = '{}/universe/moons/{}/'.format(ESI_URL, moon_id)
+        data = await self.get_data(url)
+        if data:
+            self._moon_cache[moon_id] = data
+        return data
+
+    async def asteroid_info(self, asteroid_id, allow_cache=True):
+        if allow_cache:
+            if asteroid_id in self._asteroid_cache:
+                return self._asteroid_cache[asteroid_id]
+
+        url = '{}/universe/asteroid_belts/{}/'.format(ESI_URL, asteroid_id)
+        data = await self.get_data(url)
+        if data:
+            self._asteroid_cache[asteroid_id] = data
+        return data
+
+    async def stargate_info(self, stargate_id, allow_cache=True):
+        if allow_cache:
+            if stargate_id in self._stargate_cache:
+                return self._stargate_cache[stargate_id]
+
+        url = '{}/universe/stargates/{}/'.format(ESI_URL, stargate_id)
+        data = await self.get_data(url)
+        if data:
+            self._stargate_cache[stargate_id] = data
+        return data
+
+    async def star_info(self, star_id, allow_cache=True):
+        if allow_cache:
+            if star_id in self._star_cache:
+                return self._star_cache[star_id]
+
+        url = '{}/universe/stars/{}/'.format(ESI_URL, star_id)
+        data = await self.get_data(url)
+        if data:
+            self._star_cache[star_id] = data
+        return data
+
+    async def station_info(self, station_id, allow_cache=True):
+        if allow_cache:
+            if station_id in self._station_cache:
+                return self._station_cache[station_id]
+
+        url = '{}/universe/stations/{}/'.format(ESI_URL, station_id)
+        data = await self.get_data(url)
+        if data:
+            self._station_cache[station_id] = data
         return data
 
     async def get_jump_info(self, system_id=None):

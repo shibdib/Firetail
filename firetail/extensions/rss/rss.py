@@ -116,6 +116,7 @@ class Rss:
                 try:
                     await channel.send(content, embed=embed)
                 except Exception:
+                    self.remove_bad_channel(channel_id)
                     self.logger.exception("Failed to send {} to channel {} for feed {}".format(
                         entry['id'], channel_id, feed_name))
                 else:
@@ -125,3 +126,9 @@ class Rss:
                         await db.execute_sql(sql, values)
                     except Exception:
                         self.logger.exception("Failed to store sending of entry {}".format(entry['id']))
+
+    async def remove_bad_channel(self, channel_id):
+        sql = ''' DELETE FROM rss WHERE `channel_id` = (?) '''
+        values = (channel_id,)
+        await db.execute_sql(sql, values)
+        return self.logger.info('RSS - Bad Channel {} removed successfully'.format(channel_id))

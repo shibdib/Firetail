@@ -173,8 +173,11 @@ class Killmails:
         solar_system_info = await self.bot.esi_data.system_info(solar_system_id)
         solar_system_name = solar_system_info['name']
         location_id = kill_data['zkb']['locationID']
-        location_info = await self.bot.esi_data.planet_info(location_id)
-        location_name = location_info['name']
+        location_info = await self.bot.esi_data.celestial_info(location_id)
+        if 'name' in location_info.keys():
+            location_name = location_info['name']
+        else:
+            location_name = 'Unknown'
         solo = kill_data['zkb']['solo']
         awox = kill_data['zkb']['awox']
         special_info = ''
@@ -279,7 +282,7 @@ class Killmails:
         except Exception:
             self.logger.exception(
                 'Killmail - Killmail ID {} failed to send to channel {} due to..'.format(kill_id, channel_id))
-            #  await self.remove_bad_channel(channel_id)
+            await self.remove_bad_channel(channel_id)
 
     async def request_data(self):
         base_url = "https://redisq.zkillboard.com"
